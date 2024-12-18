@@ -1,0 +1,83 @@
+[
+    {
+        "version": "0.1.0",
+        "releaseDate": "2024-11-30",
+        "updateContent": [
+            "软件架构说明"
+        ],
+        "supplement": [
+            "软件名称:PXA Signal Analyzer",
+            "软件功能:自动分析频谱仪数据,替代手工操作",
+            "适用仪表:频谱仪",
+            "前端技术栈:React18 + Redux + Antd5 + CRA",
+            "后端技术栈:Nodejs16 + Electron22",
+            "数据库:Sqlite3 + JSON表"
+        ]
+    },
+    {
+        "version": "0.1.1",
+        "releaseDate": "2024-12-10",
+        "updateContent": [
+            "初版功能完成"
+        ],
+        "supplement": [
+            "提交用户验证功能"
+        ]
+    },
+    {
+        "version": "0.1.2",
+        "releaseDate": "2024-12-11",
+        "updateContent": [
+            "bug修复: 频谱仪数据解析异常"
+        ],
+        "supplement": [
+            "fsPromise解析失败"
+        ]
+    },
+    {
+        "version": "0.1.3",
+        "releaseDate": "2024-12-12",
+        "updateContent": [
+            "bug修复: checkAuth失败修复"
+        ],
+        "supplement": [
+            "http代理重置"
+        ]
+    },
+    {
+        "version": "0.1.4",
+        "releaseDate": "2024-12-13",
+        "updateContent": [
+            "bug修复:报告模板生成失败"
+        ],
+        "supplement": [
+            "testItem失真"
+        ]
+    },
+    {
+        "version": "0.1.5",
+        "releaseDate": "2024-12-15",
+        "updateContent": [
+            "bug修复:projectList.json路径错误"
+        ],
+        "supplement": []
+    },
+    {
+        "version": "0.1.6",
+        "releaseDate": "2024-12-16",
+        "updateContent": [
+            "bug:OBW结果格式解析错误"
+        ],
+        "supplement": []
+    },
+    {
+        "version": "0.1.7",
+        "releaseDate": "2024-12-16 09:52",
+        "updateContent": [
+            "添加log本地化持久存储"
+        ],
+        "supplement": [
+            "便于分析错误"
+        ]
+    }
+]

@@ -1,0 +1,9 @@
+// 测试计划card
+.test-plan-card {
+  height: 100%;
+  .plan-table-content {
+    height: calc(100% - 36px);
+    overflow: hidden;
+    width: 100%;
+  }
+}

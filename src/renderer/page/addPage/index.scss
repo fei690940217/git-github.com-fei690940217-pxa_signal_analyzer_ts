@@ -1,0 +1,10 @@
+.add-project-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  .add-project-content {
+    height: 100%;
+    padding: 5px;
+    display: flex;
+  }
+}

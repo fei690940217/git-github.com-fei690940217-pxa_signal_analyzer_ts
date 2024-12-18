@@ -1,0 +1,30 @@
+.ant-app {
+  .status-bar-wrapper {
+    height: 36px;
+    display: flex;
+    line-height: 36px;
+    padding: 0px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    .ant-tag {
+      cursor: pointer;
+    }
+    .status-bar-left {
+      margin-right: 16px;
+    }
+    .status-bar-right {
+      flex: 1;
+      display: flex;
+      .status-bar-right-item {
+        margin-right: 16px;
+        display: flex;
+        align-items: center;
+      }
+      .single-spectrum-wrapper {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+    }
+  }
+}

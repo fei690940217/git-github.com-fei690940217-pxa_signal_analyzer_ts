@@ -1,0 +1,15 @@
+.line-loss-table {
+  // table -header 背景色
+  thead > tr > th {
+    text-align: left;
+    background: #666;
+    color: #fff;
+    padding: 0 11px;
+  }
+}
+.spectrum-line-loss-wrapper {
+  width: 100%;
+  .spectrum-line-loss-header {
+    padding: 5px 0;
+  }
+}

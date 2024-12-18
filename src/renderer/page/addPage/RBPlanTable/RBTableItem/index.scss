@@ -1,0 +1,27 @@
+.add-project-sub-test-plan-wrapper {
+  height: 100%;
+  overflow: hidden;
+  .ant-table-wrapper {
+    .ant-spin-nested-loading {
+      height: 100%;
+      .ant-spin-container {
+        height: 100%;
+        .ant-table {
+          height: 100%;
+          .ant-table-container {
+            height: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            .ant-table-header {
+            }
+            .ant-table-body {
+              flex: 1;
+              // overflow-y: auto;
+            }
+          }
+        }
+      }
+    }
+  }
+}

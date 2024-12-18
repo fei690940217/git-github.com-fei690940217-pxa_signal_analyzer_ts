@@ -1,0 +1,39 @@
+.log-modal-container {
+  .ant-modal {
+    .ant-modal-content {
+      height: 100%;
+      max-height: 90vh;
+      min-height: 30vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      .ant-modal-header {
+        .ant-modal-title {
+          .title-wrapper {
+            display: flex;
+            justify-content: space-between;
+            .title-left {
+            }
+            .title-right {
+              margin-right: 100px;
+              .log-search-wrapper {
+                display: flex;
+                width: 220px;
+              }
+            }
+          }
+        }
+      }
+      .ant-modal-body {
+        flex: 1;
+        overflow: hidden;
+        .log-list-wrapper {
+          height: 100%;
+          max-height: 90vh;
+          overflow-y: scroll;
+        }
+      }
+    }
+  }
+}

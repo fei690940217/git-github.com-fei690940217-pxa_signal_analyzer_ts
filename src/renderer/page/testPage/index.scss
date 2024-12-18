@@ -1,0 +1,25 @@
+.test-plan-wrapper {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  .test-plan-content {
+    flex: 1;
+    overflow: hidden;
+    padding: 5px;
+    display: flex;
+    .content-left {
+      // width: 360px;
+    }
+    .content-right {
+      flex: 1;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid #f0f0f0;
+      border-radius: 8px;
+    }
+  }
+  .test-plan-footer {
+    margin: 0 5px 5px 5px;
+  }
+}

@@ -1,0 +1,39 @@
+.select-band-modal-wrapper {
+  .select-band-modal-content {
+    .select-band-modal-content-top {
+      .lte-band-column-wrapper {
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        .lte-band-column-left {
+          flex: 1;
+          overflow-x: auto;
+          flex-wrap: wrap;
+        }
+        .lte-band-column-right {
+          text-align: center;
+          width: 30px;
+          justify-content: flex-end;
+        }
+      }
+    }
+    .select-band-modal-content-bottom {
+      .ant-checkbox-group {
+        width: 100%;
+        .select-band-checkbox {
+          width: 100%;
+          .band-checkbox-wrapper {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+
+            .select-band-checkbox-item {
+              width: 16%;
+            }
+          }
+        }
+      }
+    }
+  }
+}

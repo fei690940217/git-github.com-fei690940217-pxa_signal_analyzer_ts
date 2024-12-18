@@ -1,0 +1,36 @@
+.list-item-wrapper {
+  cursor: pointer;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  height: 24px;
+  border-bottom: 1px solid #f4f4f4;
+  margin: 0 10px;
+  font-size: 12px;
+  .icon-wrapper {
+    width: 30px;
+  }
+  .create-date-wrapper {
+    color: rgba($color: #000000, $alpha: 0.45);
+    margin-right: 10px;
+  }
+  .text-wrapper {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #999;
+    .class-error {
+      color: #cc3333;
+    }
+    .class-warning {
+      color: #cc9933;
+    }
+    .class-success {
+      color: #009966;
+    }
+    .class-info {
+      color: #999;
+    }
+  }
+}

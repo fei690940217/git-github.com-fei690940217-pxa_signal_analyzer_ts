@@ -1,0 +1,17 @@
+// left
+.select-band-container {
+  .ant-table-wrapper {
+    td,
+    th {
+      padding: 4px !important;
+      font-size: 12px;
+    }
+    .ant-table-tbody {
+      .ant-table-measure-row {
+        td {
+          padding: 0 !important;
+        }
+      }
+    }
+  }
+}

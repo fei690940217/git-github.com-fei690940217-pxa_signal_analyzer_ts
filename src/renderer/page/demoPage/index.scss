@@ -1,0 +1,16 @@
+.demo-page-wrapper {
+  height: 100%;
+  padding: 10px;
+  .ant-card {
+    height: 100%;
+    .ant-form-item {
+      .ant-tag {
+        cursor: pointer;
+        .anticon {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
+  }
+}

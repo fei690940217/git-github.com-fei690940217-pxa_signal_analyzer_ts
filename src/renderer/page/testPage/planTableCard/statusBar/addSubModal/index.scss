@@ -1,0 +1,29 @@
+.test-list-modal-wrapper {
+  .ant-modal {
+    .ant-modal-content {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+      .ant-modal-header {
+      }
+      .ant-modal-body {
+        flex: 1;
+        overflow: hidden;
+        .test-list-modal-table-wrapper {
+          height: 100%;
+          overflow: hidden;
+          .ant-table-row.test-list-current-row {
+            td {
+              background: #36c;
+              color: white;
+              .ant-btn {
+                color: white;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

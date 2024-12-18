@@ -1,0 +1,40 @@
+.log-and-result-card-wrapper {
+  max-height: 80vh !important;
+  min-height: 60px;
+  position: relative;
+  .handle-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 5px;
+    .handle-content {
+      width: 100%;
+      height: 5px;
+      cursor: pointer;
+      &:hover {
+        cursor: row-resize;
+        border-color: #dcdfe6;
+        border-width: 4px;
+      }
+    }
+  }
+  .log-card {
+    height: 100%;
+    border: none;
+    .ant-card-body {
+      // padding: 3px;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      .log-content {
+        height: 100%;
+        overflow: hidden;
+      }
+    }
+  }
+}

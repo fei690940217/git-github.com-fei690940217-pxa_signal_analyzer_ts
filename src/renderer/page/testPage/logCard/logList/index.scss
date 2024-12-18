@@ -1,0 +1,26 @@
+.log-list-container {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  // title
+  .log-list-title {
+    padding: 5px 10px;
+    background-color: #ebeef5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .log-list-title-text {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .log-list-title-handle {
+    }
+  }
+  // listitem
+  .log-list-wrapper {
+    padding: 5px 10px;
+    flex: 1;
+    overflow-y: scroll;
+  }
+}

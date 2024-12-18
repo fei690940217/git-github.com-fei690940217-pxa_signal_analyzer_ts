@@ -1,0 +1,66 @@
+.ant-layout {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  .ant-layout-header {
+    padding: 0;
+    height: 36px;
+    color: rgba(0, 0, 0, 0.88);
+    line-height: 36px;
+    background: #001529;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    // 语言按钮
+    .lang-icon-container {
+      margin-right: 20px;
+      .lang-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 2px solid #36c;
+        border-radius: 50%;
+        color: #c0c4cc;
+        cursor: pointer;
+      }
+    }
+    .version-icon-container {
+      margin-right: 20px;
+      cursor: pointer;
+      .version-icon {
+        color: #c0c4cc;
+        font-size: 14px;
+      }
+    }
+  }
+  .ant-layout-content {
+    flex: 1;
+    background: #e5e5e5;
+  }
+  .ant-layout-footer {
+    height: 30px;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    //左侧 错误与警告区域
+    .footer-notice-wrapper {
+      flex: 1;
+      overflow: hidden;
+    }
+    //中间版权区域
+    .footer-copyright-wrapper {
+      display: flex;
+      align-items: center;
+      padding-right: 20px;
+      color: #c0c4cc;
+    }
+    //status-container
+    // 状态栏
+    .status-container {
+    }
+  }
+}
