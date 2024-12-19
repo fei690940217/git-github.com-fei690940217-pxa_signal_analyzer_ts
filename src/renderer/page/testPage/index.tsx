@@ -2,20 +2,22 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-05 15:01:54
- * @FilePath: \fcc_5g_test_system_only_spectrum\src\page\testPage\index.jsx
+ * @LastEditTime: 2024-12-19 10:27:57
+ * @FilePath: \pxa_signal_analyzer\src\renderer\page\testPage\index.tsx
  * @Description: 测试与列表主页
  */
-import "./index.scss";
-import PlanTableCard from "./planTableCard";
-import ProjectList from "./projectListPage";
-import LogCard from "./logCard";
-import { useSelector, useDispatch } from "react-redux";
-import { SmileOutlined } from "@ant-design/icons";
-import { Result } from "antd";
+import { useEffect } from 'react';
+import './index.scss';
+import PlanTableCard from './planTableCard';
+import ProjectList from './projectListPage';
+import LogCard from './logCard';
+import { SmileOutlined } from '@ant-design/icons';
+import { Result } from 'antd';
+import { useAppSelector } from '@src/renderer/hook';
 
 export default () => {
-  const currentRow = useSelector((state) => state.projectList.currentRow);
+  const currentRow = useAppSelector((state) => state.projectList.currentRow);
+  useEffect(() => {}, []);
   return (
     <div className="test-plan-wrapper">
       <div className="test-plan-content">
@@ -27,8 +29,8 @@ export default () => {
             <PlanTableCard />
           ) : (
             <Result
-              style={{ height: "100%" }}
-              icon={<SmileOutlined style={{ color: "#DCDFE6" }} />}
+              style={{ height: '100%' }}
+              icon={<SmileOutlined style={{ color: '#DCDFE6' }} />}
               subTitle="请勾选测试项目后继续"
             />
           )}

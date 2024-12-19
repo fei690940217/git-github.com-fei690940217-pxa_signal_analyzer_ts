@@ -2,8 +2,8 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-09 11:48:26
- * @FilePath: \fcc_5g_test_system_only_spectrum\src\page\testPage\projectListPage\cardExtra\index.jsx
+ * @LastEditTime: 2024-12-19 11:11:05
+ * @FilePath: \pxa_signal_analyzer\src\renderer\page\testPage\projectListPage\cardExtra\index.jsx
  * @Description: 项目列表主表格
  */
 
@@ -12,7 +12,7 @@ import { SwapOutlined } from '@ant-design/icons';
 import React, { useState, useEffect, useMemo, lazy } from 'react';
 import './index.scss';
 import { useSelector, useDispatch } from 'react-redux';
-import { setCurrentRow } from '@/store/modules/projectList';
+import setCurrentRow from '@src/renderer/store/asyncThunk/setCurrentRow';
 import { useNavigate } from 'react-router';
 import TestListModal from './testListModal';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +22,7 @@ import { logError } from '@/utils/logLevel.js';
 
 const { appConfigFilePath, ipcRenderer } = window.myApi;
 
-export default ({ collapseFn, projectList, updateProjectList, currentRow }) => {
+export default ({ collapseFn, getProjectList, currentRow }) => {
   const { t, i18n } = useTranslation('testPage');
 
   const navigate = useNavigate();
@@ -59,25 +59,21 @@ export default ({ collapseFn, projectList, updateProjectList, currentRow }) => {
           '',
         );
         //开启Loading
-        React.switchLoading(true);
+        // React.switchLoading(true);
         const src = `${appConfigFilePath}/user/project/${currentRow.projectName}`;
         const dest = `${appConfigFilePath}/user/archive/${currentRow.projectName}`;
         await archiveLoop(src, dest);
-        //更新项目列表
-        const newProjectList = projectList.filter((project) => {
-          return project.id !== currentRow.id;
-        });
-        //更新项目列表
-        updateProjectList(newProjectList);
+        //通知父组件>更新项目列表
+        getProjectList();
         //清除当前行
         dispatch(setCurrentRow({}));
         messageApi.success({
           duration: 5,
           content: '已归档',
         });
-        React.switchLoading(false);
+        // React.switchLoading(false);
       } catch (error) {
-        React.switchLoading(false);
+        // React.switchLoading(false);
         logError(error.toString());
         if (error !== '取消') {
           messageApi.error({
@@ -124,7 +120,7 @@ export default ({ collapseFn, projectList, updateProjectList, currentRow }) => {
         >
           {t('archive')}
         </Button>
-        {/* 归档 */}
+        {/* 调整宽度 */}
         <Button
           icon={<SwapOutlined />}
           type="link"

@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-12-15 14:08:57
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-18 15:14:15
+ * @LastEditTime: 2024-12-18 15:33:03
  * @FilePath: \pxa_signal_analyzer\src\common\index.ts
  * @Description:前后端通用的纯函数,或者部分静态数据
  *
@@ -11,7 +11,8 @@
 
 export const visaProxyDefaultPort: number = 10089;
 export const webAppDefaultPort: number = 10010;
-export const visaProxyAppName: string = 'visa_proxy_telec';
+export const visaProxyFileName = 'visa_proxy_only_spectrum.exe';
+
 export const webAppName: string = 'WebApplication2';
 //测试用例
 export const testItemList = [
@@ -32,13 +33,12 @@ export const testItemList = [
   { label: 'Frame Length', value: 'FL' },
 ];
 //基站连接名称
-export const uxmConnectionName = 'uxmLink';
+export const jizhanConnectionName = 'jizhanConnection';
 //lineLoss连接名称
-export const uxmLineLossConnectionName = 'uxmLineLossLink';
-//MT8000连接名称
-export const MT8000ConnectionName = 'MT8000Link';
+export const lineLossConnectionName = 'lineLossConnection';
 //频谱连接名称
-export const spectrumConnectionName = 'spectrumLink';
+export const pinpuConnectionName = 'pinpuConnection';
+
 export const getIpByVisaAddress = (visaAddress: string) => {
   if (visaAddress) {
     // 定义正则表达式来匹配 IP 地址
@@ -79,7 +79,7 @@ const OBWResultFormat = (result: string | undefined) => {
 };
 
 //测试结果格式化
-export const resultFormatFn = (record) => {
+export const resultFormatFn = (record: any) => {
   const { testItem, result, CSE_Limit, BW } = record;
   if (result) {
     // PAR

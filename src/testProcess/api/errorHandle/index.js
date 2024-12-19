@@ -6,26 +6,26 @@
  * @LastEditTime: 2024-12-10 11:22:25
  * @Descripttion: 异常处理函数,用于判断连接中的
  */
-const axios = require("axios");
-const { addLogFn, delayTime } = require("../../utils");
-const { logInfo, logError } = require('../../utils/logLevel.js')
+import { pinpuConnectionName } from '@src/common';
+
+const axios = require('axios');
+const { addLogFn, delayTime } = require('../../utils');
+const { logInfo, logError } = require('../../utils/logLevel.js');
 
 //重启一条龙
-const restartVisaProxy = require("../../utils/restartVisaProxy.js");
+const restartVisaProxy = require('../../utils/restartVisaProxy.js');
 //基站连接名称
-const baseURL = require("../../../main/publicData/baseURL");
-const { pinpuConnectionName } = require("../../../main/publicData");
-const createSpectrumConnection = require("../../utils/createSpectrumConnection.js");
-
+const baseURL = require('../../../main/publicData/baseURL');
+const createSpectrumConnection = require('../../utils/createSpectrumConnection.js');
 
 //获取返回值,无所谓结果,只要能返回就行
 const get_instr_list = async () => {
   try {
     await axios.post(`${baseURL}/get_instr`, {});
-    return true
+    return true;
   } catch (error) {
-    logError(error.toString())
-    return false
+    logError(error.toString());
+    return false;
   }
 };
 //查询idn
@@ -37,15 +37,15 @@ const queryIDN = async () => {
     };
     const res = await axios.post(`${baseURL}/query`, params);
     if (res.data.error === 0) {
-      return true
+      return true;
     } else {
-      logError(res.data?.errmsg)
-      return false
+      logError(res.data?.errmsg);
+      return false;
     }
   } catch (error) {
-    logError(error.toString())
+    logError(error.toString());
 
-    return false
+    return false;
   }
 };
 

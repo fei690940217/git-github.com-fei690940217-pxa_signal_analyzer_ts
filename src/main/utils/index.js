@@ -2,14 +2,16 @@
  * @Author: feifei
  * @Date: 2023-05-17 09:32:41
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-18 15:19:50
+ * @LastEditTime: 2024-12-18 15:27:10
  * @FilePath: \pxa_signal_analyzer\src\main\utils\index.js
  * @Description:utils
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
+import { pinpuConnectionName } from '@src/common';
+
 const { BrowserWindow } = require('electron');
-const { electronStore, pinpuConnectionName } = require('../publicData');
+const { electronStore } = require('../publicData');
 const { create_instr_fn } = require('../api/api');
 const { getWindow } = require('../windowManager');
 //获取WebContents

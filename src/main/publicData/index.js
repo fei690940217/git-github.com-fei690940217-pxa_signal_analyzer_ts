@@ -22,8 +22,6 @@ exports.appConfigFilePath = path.join(
 exports.jizhanConnectionName = 'jizhanConnection';
 //lineLoss连接名称
 exports.lineLossConnectionName = 'lineLossConnection';
-//频谱连接名称
-exports.pinpuConnectionName = 'pinpuConnection';
 
 exports.visaProxyFileName = 'visa_proxy_only_spectrum.exe';
 exports.defaultPort = 10086;

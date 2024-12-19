@@ -16,9 +16,9 @@ import fs from 'fs';
 import {
   appConfigFilePath,
   jizhanConnectionName,
-  pinpuConnectionName,
   lineLossConnectionName,
 } from './publicData';
+
 import baseURL from './publicData/baseURL';
 
 const { promises: fsPromises } = fs;
@@ -40,7 +40,6 @@ const electronHandler = {
   fs,
   appConfigFilePath,
   jizhanConnectionName,
-  pinpuConnectionName,
   lineLossConnectionName,
   baseURL,
   electronStore: {

@@ -2,13 +2,13 @@
  * @Author: feifei
  * @Date: 2023-10-18 14:51:01
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-17 10:24:25
- * @FilePath: \fcc_5g_test_system_only_spectrum\main\ipcMain\functionList.js
+ * @LastEditTime: 2024-12-18 15:24:45
+ * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\functionList.js
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
-
+import { pinpuConnectionName } from '@src/common';
 const {
   remove,
   ensureDir,
@@ -16,16 +16,16 @@ const {
   readJson,
   outputJson,
   readdir,
-} = require("fs-extra");
-const { statSync } = require("fs");
-const { v4: uuidv4 } = require("uuid");
-const path = require("path");
-const fsPromises = require("fs").promises;
+} = require('fs-extra');
+const { statSync } = require('fs');
+const { v4: uuidv4 } = require('uuid');
+const path = require('path');
+const fsPromises = require('fs').promises;
 
-const { appConfigFilePath, pinpuConnectionName } = require("../publicData");
-const { createSpectrumConnection } = require("../utils");
-const { query_fn } = require("../api/api");
-const { logError } = require("../logger/logLevel");
+const { appConfigFilePath } = require('../publicData');
+const { createSpectrumConnection } = require('../utils');
+const { query_fn } = require('../api/api');
+const { logError } = require('../logger/logLevel');
 //删除某一条的结果
 exports.deleteResult = async (payload) => {
   try {
@@ -34,7 +34,7 @@ exports.deleteResult = async (payload) => {
     const RESULT = resultList.map((item) => {
       const { id } = item;
       if (id === row.id) {
-        item.result = "";
+        item.result = '';
       }
       return item;
     });
@@ -50,7 +50,7 @@ exports.getJsonFile = async (filePath) => {
     const resultObj = await readJson(filePath);
     return Promise.resolve(resultObj);
   } catch (error) {
-    return Promise.resolve({ type: "error", msg: error });
+    return Promise.resolve({ type: 'error', msg: error });
   }
 };
 exports.getJsonFileByFilePath = async (laseFilePath) => {
@@ -59,7 +59,7 @@ exports.getJsonFileByFilePath = async (laseFilePath) => {
     const resultObj = await readJson(filePath);
     return Promise.resolve(resultObj);
   } catch (error) {
-    return Promise.resolve({ type: "error", msg: error });
+    return Promise.resolve({ type: 'error', msg: error });
   }
 };
 //setProjectInfoToJson
@@ -68,14 +68,14 @@ exports.setProjectInfoToJson = async (data) => {
     const { projectName } = data;
     const filePath = path.join(
       appConfigFilePath,
-      "user/project",
+      'user/project',
       projectName,
-      "projectInfo.json"
+      'projectInfo.json',
     );
     await outputJson(filePath, data);
     return Promise.resolve();
   } catch (error) {
-    return Promise.resolve({ type: "error", msg: error });
+    return Promise.resolve({ type: 'error', msg: error });
   }
 };
 // writeJsonFile
@@ -86,7 +86,7 @@ exports.writeJsonFile = async (payload) => {
     await outputJson(filePath, data);
     return Promise.resolve();
   } catch (error) {
-    return Promise.resolve({ type: "error", msg: error });
+    return Promise.resolve({ type: 'error', msg: error });
   }
 };
 //创建项目目录
@@ -98,7 +98,7 @@ exports.createDir = (laseFilePath) => {
       try {
         //判断文件是否存在
         await fsPromises.access(filePath);
-        reject(new Error("项目已存在"));
+        reject(new Error('项目已存在'));
       } catch (error) {
         //文件不存在
         //创建文件夹
@@ -115,27 +115,27 @@ exports.addSubProject = async (payload) => {
   const { projectName, subProjectName } = payload;
   const currentRowFilePath = path.join(
     appConfigFilePath,
-    "user/project",
-    projectName
+    'user/project',
+    projectName,
   );
   //测试记录文件地址
   const subProjectFilePath = path.join(currentRowFilePath, subProjectName);
   try {
-    const imgFilePath = path.join(subProjectFilePath, "img");
+    const imgFilePath = path.join(subProjectFilePath, 'img');
     //确保子文件夹存在
     await ensureDir(imgFilePath);
     //复制文件  src,dest
-    const src = path.join(currentRowFilePath, "result.json");
-    const dest = path.join(subProjectFilePath, "result.json");
+    const src = path.join(currentRowFilePath, 'result.json');
+    const dest = path.join(subProjectFilePath, 'result.json');
     await copy(src, dest);
     //复制项目信息
     try {
-      const src = path.join(currentRowFilePath, "projectInfo.json");
-      const dest = path.join(subProjectFilePath, "projectInfo.json");
+      const src = path.join(currentRowFilePath, 'projectInfo.json');
+      const dest = path.join(subProjectFilePath, 'projectInfo.json');
       await copy(src, dest);
     } catch (error) {
-      const msg = `addSubProject 复制项目信息 error: ${error} `
-      logError(msg)
+      const msg = `addSubProject 复制项目信息 error: ${error} `;
+      logError(msg);
     }
 
     return Promise.resolve();
@@ -152,8 +152,8 @@ exports.getSubProjectList = async (projectName) => {
     //子项目的根目录
     const folderPath = path.join(
       appConfigFilePath,
-      "user/project",
-      projectName
+      'user/project',
+      projectName,
     );
     const fileList = await readdir(folderPath);
     const folders = fileList.filter((item) => {
@@ -190,11 +190,11 @@ exports.testLinkIsEnabledFn = async (payload) => {
       //如果创建成功,给仪表发一条指令
       const rst = await query_fn({
         instr_name: pinpuConnectionName,
-        command: "*IDN?",
+        command: '*IDN?',
       });
       return Promise.resolve(rst);
     } else {
-      return Promise.reject("请输入正确的IP地址");
+      return Promise.reject('请输入正确的IP地址');
     }
   } catch (error) {
     return Promise.reject(error);

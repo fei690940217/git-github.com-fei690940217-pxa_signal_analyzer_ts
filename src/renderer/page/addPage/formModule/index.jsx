@@ -1,9 +1,9 @@
 /*
- * @FilePath: \fcc_5g_test_system_only_spectrum\src\page\addPage\formModule\index.jsx
+ * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\index.jsx
  * @Author: xxx
  * @Date: 2023-03-21 17:18:10
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-16 15:10:47
+ * @LastEditTime: 2024-12-19 10:30:11
  * @Descripttion:  form模块
  */
 import {
@@ -27,10 +27,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import './index.scss';
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 import $moment from 'moment';
 import { testItemList, LTE_BW_LIST } from './util/formData';
-import { setProjectList, setCurrentRow } from '@/store/modules/projectList';
 import addLog from '@/store/asyncThunk/addLog';
 import { logError } from '@/utils/logLevel.js';
 import modalConfirm from '@/utils/modalConfirm';
@@ -89,47 +88,6 @@ const App = ({
       logError(error.toString());
     }
   };
-  //更新项目列表,projectList.json
-  const addUpdatePorjectList = async (formValue) => {
-    const { projectName, testItems, networkMode } = formValue;
-    //给projectList.json中添加本项目
-    let projectObj = {
-      id: uuidv4(),
-      createDate: $moment().format('YYYY-MM-DD HH:mm'),
-      formValue,
-      RBSelectedRowKeys,
-      projectName,
-      testItems,
-      networkMode,
-    };
-    let newProjectList = [...projectList, projectObj];
-    //更新硬盘数据
-    updateProjectList(newProjectList);
-    //更新内存redux中项目列表
-    dispatch(setProjectList(newProjectList));
-    dispatch(setCurrentRow(projectObj));
-    //将当前行信息存入本地json文件,备份数据用
-    setProjectInfoToJson(projectObj);
-  };
-  const editUpdatePorjectList = async (formValue) => {
-    const tempProjectList = cloneDeep(projectList);
-    const { testItems, networkMode } = formValue;
-    const RST = tempProjectList.map((projectItem) => {
-      if (projectItem.id === currentRow.id) {
-        projectItem.formValue = formValue;
-        projectItem.RBSelectedRowKeys = RBSelectedRowKeys;
-        projectItem.testItems = testItems;
-        projectItem.networkMode = networkMode;
-        dispatch(setCurrentRow(projectItem));
-        setProjectInfoToJson(projectItem);
-      }
-      return projectItem;
-    });
-    //更新硬盘数据
-    updateProjectList(RST);
-    //更新redux中项目列表
-    dispatch(setProjectList(RST));
-  };
   //RB选中行验证
   const RBSelectedValidate = () => {
     try {
@@ -154,7 +112,30 @@ const App = ({
       }
     });
   };
-
+  //生成新的当前行数据
+  const newCurrentRowHandle = (isAdd, formValue) => {
+    const { projectName, testItems, networkMode } = formValue;
+    if (isAdd) {
+      //给projectList.json中添加本项目
+      const projectObj = {
+        id: nanoid(8),
+        createDate: $moment().format('YYYY-MM-DD HH:mm'),
+        formValue,
+        RBSelectedRowKeys,
+        projectName,
+        testItems,
+        networkMode,
+      };
+      return projectObj;
+    } else {
+      const tempCurrentRow = cloneDeep(currentRow);
+      tempCurrentRow.formValue = formValue;
+      tempCurrentRow.RBSelectedRowKeys = RBSelectedRowKeys;
+      tempCurrentRow.testItems = testItems;
+      tempCurrentRow.networkMode = networkMode;
+      return tempCurrentRow;
+    }
+  };
   //提交函数
   const submit = async () => {
     try {
@@ -164,7 +145,7 @@ const App = ({
       tempFormValues.Band = selectBand;
       const { projectName, testItems, networkMode } = tempFormValues;
       //判断是否有选中行
-      await RBSelectedValidate(testItems);
+      await RBSelectedValidate();
       const isAdd = projectName !== currentRow.projectName;
       //判断是新增/编辑
       if (isAdd) {
@@ -177,31 +158,28 @@ const App = ({
       }
       //生成测试数据表并更新result.json
       const result = await supRowsGenerate(tempFormValues, RBSelectedRowKeys);
-      //
+      //新增需要创建文件夹
       if (isAdd) {
-        //创建项目文件夹等
         await ipcRenderer.invoke('createDir', `/user/project/${projectName}`);
-        //如果项目创建成功,刷新项目列表
-        addUpdatePorjectList(tempFormValues);
-        //添加log
-        const log = `success_-_${projectName} 项目创建成功`;
-        dispatch(addLog(log));
-      } else {
-        //刷新项目列表
-        editUpdatePorjectList(tempFormValues);
-        //添加log
-        const log = `success_-_${projectName} 项目已修改`;
-        dispatch(addLog(log));
       }
-      //刷新当前行的结果表
+      const newCurrentRow = newCurrentRowHandle(isAdd, tempFormValues);
+      //更新本地数据库
+      setProjectInfoToJson(newCurrentRow);
+      // 写入/刷新 当前行的结果表
       await ipcRenderer.invoke('setJsonFile', {
         type: 'currentResult',
         params: { projectName, result },
       });
       messageApi.success('Success');
       await delayTime(500);
+      //添加log
+      const log = `success_-_${projectName} 项目已修改`;
+      dispatch(addLog(log));
       //跳转首页
-      navigate('/');
+      // navigate('/');
+      navigate('/', {
+        state: { form: 'addPage', projectId: newCurrentRow.id },
+      });
     } catch (error) {
       logError(error.toString());
       if (error !== '取消') {

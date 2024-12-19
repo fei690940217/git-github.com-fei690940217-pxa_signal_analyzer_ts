@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-09-30 11:18:26
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-18 14:16:42
+ * @LastEditTime: 2024-12-18 16:33:50
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\layout\index.jsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -26,6 +26,10 @@ import VersionModal from './versionModal';
 import StatusBar from './statusConfig';
 import { logInfo } from '@/utils/logLevel.js';
 import log from 'loglevel';
+import {
+  electronStoreGet,
+  electronStoreGetAsync,
+} from '@src/renderer/utils/electronStore';
 const { Header, Content, Footer } = Layout;
 const { ipcRenderer } = window.myApi;
 export default () => {
@@ -101,11 +105,11 @@ export default () => {
   const viewVersion = () => {
     setVersionModalVisible(true);
   };
-  const clickk = () => {
-    logInfo('你好世界');
-    log.trace('trace你好师姐');
-    log.debug('trace你好师姐');
-    log.info('trace你好师姐');
+  const clickk = async () => {
+    const res = await electronStoreGetAsync('currentRow');
+    console.log('异步', res);
+    const res1 = electronStoreGet('currentRow');
+    console.log('同步', res1);
   };
   return (
     <Layout className="layout">
@@ -140,6 +144,15 @@ export default () => {
           )}
         </div>
         <div>
+          <Button
+            type="primary"
+            ghost
+            size="small"
+            style={{ marginRight: 10 }}
+            onClick={clickk}
+          >
+            Clickkkk
+          </Button>
           <Button
             type="primary"
             ghost

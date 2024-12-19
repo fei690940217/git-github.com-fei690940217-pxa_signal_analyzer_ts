@@ -1,12 +1,12 @@
 /*
- * @FilePath: \fcc_5g_test_system_only_spectrum\src\page\demoPage\index.jsx
+ * @FilePath: \pxa_signal_analyzer\src\renderer\page\demoPage\index.jsx
  * @Author: xxx
  * @Date: 2023-03-21 17:18:10
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-16 15:06:39
+ * @LastEditTime: 2024-12-18 15:28:02
  * @Descripttion:  基站设置
  */
-import { Button, Form, Input, message, Card, Radio, Tag, Tooltip } from "antd";
+import { Button, Form, Input, message, Card, Radio, Tag, Tooltip } from 'antd';
 import {
   PictureOutlined,
   CheckOutlined,
@@ -14,13 +14,13 @@ import {
   ReloadOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
-} from "@ant-design/icons";
-import React, { useEffect, useMemo, useState } from "react";
-import "./index.scss";
-import { useSelector, useDispatch } from "react-redux";
-import { setIsPermission } from "@/store/modules/home";
+} from '@ant-design/icons';
+import React, { useEffect, useMemo, useState } from 'react';
+import './index.scss';
+import { useSelector, useDispatch } from 'react-redux';
+import { setIsPermission } from '@/store/modules/home';
 
-import { useNetwork } from "ahooks";
+import { useNetwork } from 'ahooks';
 import {
   check_auth,
   get_instr_list,
@@ -29,23 +29,23 @@ import {
   write_fn,
   set_timeout,
   get_soft_version,
-} from "@/api/api";
-import { delayTime } from "@/utils";
-import { logError } from "@/utils/logLevel.js";
+} from '@/api/api';
+import { delayTime } from '@/utils';
+import { logError } from '@/utils/logLevel.js';
+import { pinpuConnectionName, jizhanConnectionName } from '@src/common';
 
 const { Search } = Input;
 //基站,频谱连接名称
-const { pinpuConnectionName, jizhanConnectionName } = window.myApi;
 
 const App = () => {
   const [messageApi, messageContextHolder] = message.useMessage();
 
-  const [baseStationReturnValue, setBaseStationReturnValue] = useState("");
-  const [spectrumReturnValue, setSpectrumReturnValue] = useState("");
+  const [baseStationReturnValue, setBaseStationReturnValue] = useState('');
+  const [spectrumReturnValue, setSpectrumReturnValue] = useState('');
   //手动发送基站指令
   const sendBaseStationCommand = async (value) => {
     try {
-      const isQuery = value?.includes("?");
+      const isQuery = value?.includes('?');
       const params = {
         instr_name: jizhanConnectionName,
         command: value,
@@ -56,7 +56,7 @@ const App = () => {
       } else {
         await write_fn(params);
       }
-      messageApi.success("指令发送成功");
+      messageApi.success('指令发送成功');
     } catch (error) {
       logError(error.toString());
       setBaseStationReturnValue(String(error));
@@ -65,7 +65,7 @@ const App = () => {
   //手动发送频谱指令
   const sendSpectrumCommand = async (value) => {
     try {
-      const isQuery = value?.includes("?");
+      const isQuery = value?.includes('?');
       const params = {
         instr_name: pinpuConnectionName,
         command: value,
@@ -87,7 +87,7 @@ const App = () => {
   const clickk = async (num) => {
     let tempNum = Number(num);
     for (let i = 0; i < tempNum; i++) {
-      const command = "*IDN?";
+      const command = '*IDN?';
       await sendSpectrumCommand(command);
       // await sendSpectrumCommand(command2);
     }
@@ -121,7 +121,7 @@ const App = () => {
         styles={{
           header: {
             minHeight: 36,
-            lineHeight: "36px",
+            lineHeight: '36px',
           },
         }}
         title="手动发送指令"
@@ -130,7 +130,7 @@ const App = () => {
           style={{ width: 700 }}
           labelWrap
           labelAlign="left"
-          labelCol={{ flex: "100px" }}
+          labelCol={{ flex: '100px' }}
           wrapperCol={{
             flex: 1,
           }}

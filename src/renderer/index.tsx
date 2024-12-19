@@ -15,8 +15,6 @@ import '@/style/index.scss';
 import { Provider } from 'react-redux';
 import store from './store';
 import { HashRouter } from 'react-router';
-import React from 'react';
-import { switchLoading } from './utils';
 
 //引入i18n
 import './i18n';
