@@ -3,20 +3,18 @@
  * @Author: xxx
  * @Date: 2023-05-08 13:27:31
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 14:19:54
+ * @LastEditTime: 2024-12-20 14:33:52
  * @Descripttion: visaProxy代理连接
  */
 import { pinpuConnectionName } from '@src/common';
-
 import axios from 'axios';
 //基站连接名称
 import baseURL from '@src/main/publicData/baseURL';
 //重启一条龙
-import restartVisaProxy from './restartVisaProxy.js';
+import restartVisaProxy from './restartVisaProxy';
 import { addLogFn } from './index';
-import { logError, logInfo } from './logLevel.js';
-
-import createSpectrumConnection from './createSpectrumConnection.js';
+import { logError, logInfo } from './logLevel';
+import createSpectrumConnection from './createSpectrumConnection';
 
 //获取返回值,无所谓结果,只要能返回就行
 const get_instr_list = async () => {

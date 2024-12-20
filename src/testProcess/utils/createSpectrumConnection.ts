@@ -3,7 +3,7 @@
  * @Date: 2023-05-17 09:32:41
  * @LastEditors: feifei
  * @LastEditTime: 2024-12-18 15:28:56
- * @FilePath: \pxa_signal_analyzer\src\testProcess\utils\createSpectrumConnection.js
+ * @FilePath: \pxa_signal_analyzer\src\testProcess\utils\createSpectrumConnection.ts
  * @Description: 测试模块的utils函数
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.

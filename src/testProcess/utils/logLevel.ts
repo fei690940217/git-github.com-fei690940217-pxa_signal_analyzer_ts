@@ -8,14 +8,14 @@
  *
  * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved.
  */
-import logger from '../logger';
+import logger from '@src/testProcess/logger';
 
-export const logInfo = (msg) => {
+export const logInfo = (msg: string) => {
   console.log(msg);
   logger.info(msg);
 };
 
-export const logError = (msg) => {
+export const logError = (msg: string) => {
   console.error(msg);
   logger.error(msg);
 };

@@ -2,8 +2,8 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-15 09:50:18
  * @LastEditors: feifei
- * @LastEditTime: 2023-12-04 13:30:28
- * @FilePath: \fcc_5g_test_system\testProcess\api\index.js
+ * @LastEditTime: 2024-12-20 15:07:20
+ * @FilePath: \pxa_signal_analyzer\src\testProcess\api\index.ts
  * @Description: api列表
  */
 import { delayTime } from '../utils';
@@ -102,7 +102,7 @@ export const write_fn = (params, config = {}) => {
  * @param {string} params.command - 查询指令.
  */
 export const query_fn = (params, config = {}) => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<string>(async (resolve, reject) => {
     try {
       const res = await axiosInstance.post('/query', params, config);
       if (res.data.error === 0) {

@@ -2,8 +2,8 @@
  * @Author: feifei
  * @Date: 2023-05-24 10:00:07
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-16 17:58:57
- * @FilePath: \fcc_5g_test_system_only_spectrum\testProcess\index.js
+ * @LastEditTime: 2024-12-20 14:51:19
+ * @FilePath: \pxa_signal_analyzer\src\testProcess\index.ts
  * @Description: 测试专用子进程
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
@@ -11,17 +11,18 @@
 import SharedParameters from './globals';
 import { addLogFn, childSendMainMessage } from './utils';
 import { logError, logInfo } from './utils/logLevel';
-
-import { appConfigFilePath } from '../main/publicData';
+import { appConfigFilePath } from '@src/main/publicData';
 import electronStore from '@src/main/electronStore';
 import path from 'path';
 import logger from './logger';
 import { transports } from 'winston';
+import { ResultItemType } from '@src/customTypes/renderer';
+import {TestParamsType} from '@src/customTypes/testprocess'
 
 const modifyLogConfig = (
-  parentProjectName,
-  subProjectName,
-  currentSelectedItem,
+  parentProjectName: string,
+  subProjectName: string,
+  currentSelectedItem: ResultItemType,
 ) => {
   //注入日志函数
   const logFilePath = path.join(
@@ -45,8 +46,9 @@ const modifyLogConfig = (
     `测试条目:${parentProjectName}/${subProjectName}/${currentSelectedItem.id}`,
   );
 };
+
 //全局参数注入
-const paramsInject = (TestParams) => {
+const paramsInject = (TestParams: TestParamsType) => {
   //注入全局参数
   const { currentSelectedItem, parentProjectName, subProjectName } = TestParams;
   SharedParameters.set('projectName', parentProjectName);
@@ -66,13 +68,15 @@ try {
   SharedParameters.clear();
   const { timeoutTest } = require('./utils');
   const TEST_FN = require('./testIndex');
-  //    全测/单条
-  // const allTest = require("./allTest");
   //已进入进程就直接开始测试
   const argv = process.argv;
   const findItem = argv.find((item) => {
     return item.includes('parentProjectName');
   });
+  //未找到测试参数
+  if (!findItem) {
+    throw new Error('未找到测试参数');
+  }
   //测试所需的参数
   const TestParams = JSON.parse(findItem);
   paramsInject(TestParams);

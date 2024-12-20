@@ -2,8 +2,8 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-29 16:58:00
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 13:14:16
- * @FilePath: \pxa_signal_analyzer\src\testProcess\utils\restartVisaProxy.js
+ * @LastEditTime: 2024-12-20 14:32:34
+ * @FilePath: \pxa_signal_analyzer\src\testProcess\utils\restartVisaProxy.ts
  * @Description: 强制重启visa代理
  */
 import { visaProxyFileName, defaultPort } from '@src/common';
@@ -11,12 +11,12 @@ import { visaProxyFileName, defaultPort } from '@src/common';
 import axios from 'axios';
 import path from 'path';
 import childProcess from 'child_process';
-import { appConfigFilePath } from '../../main/publicData';
+import { appConfigFilePath } from '@src/main/publicData';
 import electronStore from '@src/main/electronStore';
 
-import baseURL from '../../main/publicData/baseURL';
+import baseURL from '@src/main/publicData/baseURL';
 import { delayTime } from './index';
-import createSpectrumConnection from './createSpectrumConnection.js';
+import createSpectrumConnection from './createSpectrumConnection';
 
 //判断端口可用情况,如果不可用会返回一个可用端口
 import portfinder from 'portfinder';

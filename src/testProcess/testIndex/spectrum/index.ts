@@ -3,22 +3,22 @@
  * @Author: xxx
  * @Date: 2023-05-08 15:48:20
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 14:21:21
+ * @LastEditTime: 2024-12-20 14:53:49
  * @Descripttion: 频谱测试主函数(在此区分各测试用例)
  */
-import { delayTime, addLogFn, childSendMainMessage } from '../../utils';
-import visaProxySpectrumConnection from '../../utils/visaProxySpectrumConnection';
-
+import { addLogFn } from '@src/testProcess/utils';
+import visaProxySpectrumConnection from '@src/testProcess/utils/visaProxySpectrumConnection';
 import OBW_TEST from './OBW';
 import PAR_TEST from './PAR';
 import CSE_TEST from './CSE';
 import CSE_GATE_TEST from './CSE/CSEGate';
 import BandEdge_TEST from './BandEdge';
 import BandEdge_GATE_TEST from './BandEdge/bandEdgeGate';
+import { ResultItemType } from '@src/customTypes/renderer';
 
 //循环测试函数?循环每一条数据
-export default (subItem) => {
-  return new Promise(async (resolve, reject) => {
+export default (subItem: ResultItemType) => {
+  return new Promise<string>(async (resolve, reject) => {
     try {
       addLogFn(`success_-_开始判断连接状态`);
       await visaProxySpectrumConnection();

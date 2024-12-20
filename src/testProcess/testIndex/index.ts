@@ -1,18 +1,19 @@
 /*
- * @FilePath: \fcc_5g_test_system_only_spectrum\testProcess\testIndex\index.js
+ * @FilePath: \pxa_signal_analyzer\src\testProcess\testIndex\index.ts
  * @Author: xxx
  * @Date: 2023-05-08 15:48:20
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-16 17:46:26
+ * @LastEditTime: 2024-12-20 14:51:31
  * @Descripttion: 主测试函数
  */
 import { getResultFilePath, refreshResult } from './util';
 import { addLogFn, childSendMainMessage } from '../utils';
 import { logError, logInfo } from '../utils/logLevel';
-
 import SPECTRUM_TEST from './spectrum';
+import { TestParamsType } from '@src/customTypes/testprocess';
+
 //循环测试函数?循环每一条数据
-export default async (TestParams) => {
+export default async (TestParams: TestParamsType) => {
   try {
     const { currentSelectedItem, parentProjectName, subProjectName } =
       TestParams;

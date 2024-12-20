@@ -1,23 +1,28 @@
 /*
- * @FilePath: \pxa_signal_analyzer\src\testProcess\testIndex\spectrum\testFunctionList.js
+ * @FilePath: \pxa_signal_analyzer\src\testProcess\testIndex\spectrum\testFunctionList.ts
  * @Author: xxx
  * @Date: 2023-05-08 13:27:31
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-18 15:28:37
+ * @LastEditTime: 2024-12-20 15:07:55
  * @Descripttion: 测试函数集合
  */
 import { pinpuConnectionName } from '@src/common';
-
 import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 import { orderBy } from 'lodash';
-import SharedParameters from '../../globals';
-
+import SharedParameters from '@src/testProcess/globals';
 import { appConfigFilePath } from '@src/main/publicData';
-import { query_fn, write_fn, get_screen_capture, set_timeout } from '../../api';
-import { delayTime } from '../../utils';
+import {
+  query_fn,
+  write_fn,
+  get_screen_capture,
+  set_timeout,
+} from '@src/testProcess/api';
+import { delayTime } from '@src/testProcess/utils';
+
+import { LineLossTableList } from '@src/customTypes/testprocess';
 //获取图片路径
-export const getImgPath = (id) => {
+export const getImgPath = (id: number) => {
   const projectName = SharedParameters.get('projectName');
   const subProjectName = SharedParameters.get('subProjectName');
   return path.join(
@@ -31,7 +36,11 @@ export const getImgPath = (id) => {
 };
 //公用测试函数
 //参数 指令名称,指令值
-const publicWriteFn = async (instructName, instructValue, timeout) => {
+export const publicWriteFn = async (
+  instructName: string,
+  instructValue: string,
+  timeout?: number,
+) => {
   try {
     const params = {
       instr_name: pinpuConnectionName,
@@ -51,7 +60,11 @@ const publicWriteFn = async (instructName, instructValue, timeout) => {
   }
 };
 
-const publicQueryFn = (instructName, command, timeout) => {
+export const publicQueryFn = (
+  instructName: string,
+  command: string,
+  timeout?: number,
+) => {
   return new Promise(async (resolve, reject) => {
     try {
       const params = {
@@ -72,17 +85,19 @@ const publicQueryFn = (instructName, command, timeout) => {
 };
 
 //频谱线损
-export const CABLE_LOSS = async (DLFreq) => {
-  let num = '';
-  const spectrumLineLoss = SharedParameters.get('spectrumLineLoss');
+export const CABLE_LOSS = async (DLFreq: number) => {
+  let num = 0;
+  //线损
+  const spectrumLineLoss: LineLossTableList =
+    SharedParameters.get('spectrumLineLoss');
   const filterSpectrumLineLoss = spectrumLineLoss.filter((item) => {
     return item.frequency !== DLFreq;
   });
-  const id = uuidv4();
+  const id = nanoid(8);
   const self = {
     id,
     frequency: DLFreq,
-    lineLoss: '',
+    lineLoss: null,
   };
   filterSpectrumLineLoss.push(self);
   //排序
@@ -98,12 +113,12 @@ export const CABLE_LOSS = async (DLFreq) => {
   const nextItem = orderSpectrumLineLoss[findIndex + 1];
   //公式(DLFreq-prevItem.frequency)/(nextItem.frequency-prevItem.frequency)*(nextItem.lineLoss-prevItem.lineLoss)+prevItem.lineLoss
   if (prevItem?.id && nextItem?.id) {
-    const a = DLFreq - prevItem.frequency;
-    const b = nextItem.frequency - prevItem.frequency;
-    const c = nextItem.lineLoss - prevItem.lineLoss;
+    const a = DLFreq - (prevItem.frequency || 0);
+    const b = Number(nextItem.frequency) - Number(prevItem.frequency);
+    const c = Number(nextItem.lineLoss) - Number(prevItem.lineLoss);
     const d = prevItem.lineLoss;
-    const value = (a / b) * c + d;
-    num = value.toFixed(2);
+    const value = (a / b) * c + Number(d);
+    num = Number(value.toFixed(2));
   } else {
     num = 5;
   }
@@ -124,8 +139,8 @@ export const POW_ATT = () => {
 //     instr_name: params.instr_name,
 //     img_path: params.img_path,
 //   };
-export const GET_SCREEN_CAPTURE = (img_path, timeout) => {
-  return new Promise(async (resolve, reject) => {
+export const GET_SCREEN_CAPTURE = (img_path: string, timeout: number) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       const params = {
         instr_name: pinpuConnectionName,
@@ -150,8 +165,8 @@ export const GET_SCREEN_CAPTURE = (img_path, timeout) => {
 //   instr_name: params.instr_name,
 //   img_path: params.timeout,
 // };
-export const SET_TIMEOUT = (timeout) => {
-  return new Promise(async (resolve, reject) => {
+export const SET_TIMEOUT = (timeout: number) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       const params = {
         instr_name: pinpuConnectionName,
@@ -175,7 +190,7 @@ export const STAT_OPER_COND = async () => {
         command,
         instructName: '获取频谱测试状态',
       };
-      let rst = await query_fn(params);
+      const rst: string = await query_fn(params);
       const newRst = rst?.replace(/\s/g, '');
       if (String(newRst) === '0') {
         return Promise.resolve();
@@ -187,5 +202,3 @@ export const STAT_OPER_COND = async () => {
     return Promise.reject(error);
   }
 };
-export const publicWriteFn = publicWriteFn;
-export const publicQueryFn = publicQueryFn;

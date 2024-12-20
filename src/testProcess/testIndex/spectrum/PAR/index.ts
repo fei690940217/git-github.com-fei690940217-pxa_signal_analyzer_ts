@@ -3,13 +3,12 @@
  * @Author: xxx
  * @Date: 2023-05-08 15:48:20
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 14:22:20
+ * @LastEditTime: 2024-12-20 14:55:39
  * @Descripttion: 基站测试函数
  */
 
-import { delayTime, addLogFn } from '../../../utils';
-import SharedParameters from '../../../globals';
-
+import { delayTime, addLogFn } from '@src/testProcess/utils';
+import SharedParameters from '@src/testProcess/globals';
 import {
   publicWriteFn,
   publicQueryFn,
@@ -20,6 +19,7 @@ import {
   SET_TIMEOUT,
   STAT_OPER_COND,
 } from '../testFunctionList';
+import { ResultItemType } from '@src/customTypes/renderer';
 
 const resultNumHandle = (result) => {
   try {
@@ -38,8 +38,8 @@ const resultNumHandle = (result) => {
   }
 };
 //循环测试函数?循环每一条数据
-export default (subItem) => {
-  return new Promise(async (resolve, reject) => {
+export default (subItem: ResultItemType) => {
+  return new Promise<string>(async (resolve, reject) => {
     try {
       //添加error log
       const log = `success_-_开始设置频谱`;
