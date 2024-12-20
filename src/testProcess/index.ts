@@ -8,75 +8,88 @@
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
-const SharedParameters = require('./globals')
-const { addLogFn, childSendMainMessage } = require("./utils");
-const { logError, logInfo } = require('./utils/logLevel')
+import SharedParameters from './globals';
+import { addLogFn, childSendMainMessage } from './utils';
+import { logError, logInfo } from './utils/logLevel';
 
-const { electronStore, appConfigFilePath } = require('../main/publicData')
-const path = require('path')
-const logger = require('./logger')
-const { transports } = require('winston');
+import { appConfigFilePath } from '../main/publicData';
+import electronStore from '@src/main/electronStore';
+import path from 'path';
+import logger from './logger';
+import { transports } from 'winston';
 
-const modifyLogConfig = (parentProjectName, subProjectName, currentSelectedItem) => {
+const modifyLogConfig = (
+  parentProjectName,
+  subProjectName,
+  currentSelectedItem,
+) => {
   //注入日志函数
-  const logFilePath = path.join(appConfigFilePath, 'user', 'project', parentProjectName, subProjectName, "project.log")
+  const logFilePath = path.join(
+    appConfigFilePath,
+    'user',
+    'project',
+    parentProjectName,
+    subProjectName,
+    'project.log',
+  );
 
   logger.configure({
     transports: [
       new transports.File({
-        filename: logFilePath,        // 存储文件路径
-      })
-    ]
+        filename: logFilePath, // 存储文件路径
+      }),
+    ],
   });
-  logInfo('测试子进程已启动,准备开始测试')
-  logInfo(`测试条目:${parentProjectName}/${subProjectName}/${currentSelectedItem.id}`)
-}
+  logInfo('测试子进程已启动,准备开始测试');
+  logInfo(
+    `测试条目:${parentProjectName}/${subProjectName}/${currentSelectedItem.id}`,
+  );
+};
 //全局参数注入
 const paramsInject = (TestParams) => {
   //注入全局参数
-  const { currentSelectedItem, parentProjectName, subProjectName } = TestParams
+  const { currentSelectedItem, parentProjectName, subProjectName } = TestParams;
   SharedParameters.set('projectName', parentProjectName);
   SharedParameters.set('subProjectName', subProjectName);
   SharedParameters.set('currentSelectedItem', currentSelectedItem);
   //频谱线损
-  const spectrumLineLoss = electronStore.get("spectrumLineLoss");
+  const spectrumLineLoss = electronStore.get('spectrumLineLoss');
   SharedParameters.set('spectrumLineLoss', spectrumLineLoss);
   //频谱配置
-  const spectrumConfig = electronStore.get("spectrumConfig");
+  const spectrumConfig = electronStore.get('spectrumConfig');
   SharedParameters.set('spectrumConfig', spectrumConfig);
   //注入日志
-  modifyLogConfig(parentProjectName, subProjectName, currentSelectedItem)
-}
+  modifyLogConfig(parentProjectName, subProjectName, currentSelectedItem);
+};
 try {
   //清空全局数据
-  SharedParameters.clear()
-  const { timeoutTest } = require("./utils");
-  const TEST_FN = require("./testIndex");
+  SharedParameters.clear();
+  const { timeoutTest } = require('./utils');
+  const TEST_FN = require('./testIndex');
   //    全测/单条
   // const allTest = require("./allTest");
   //已进入进程就直接开始测试
   const argv = process.argv;
   const findItem = argv.find((item) => {
-    return item.includes("parentProjectName");
+    return item.includes('parentProjectName');
   });
   //测试所需的参数
-  const TestParams = JSON.parse(findItem)
-  paramsInject(TestParams)
+  const TestParams = JSON.parse(findItem);
+  paramsInject(TestParams);
   //主测试函数
   TEST_FN(TestParams);
   //事件监听
-  process.parentPort.on("message", (e) => {
+  process.parentPort.on('message', (e) => {
     const { messageType } = e.data;
     //接到通知>>>>调用暂停函数
-    if (messageType === "timeoutTest") {
+    if (messageType === 'timeoutTest') {
       timeoutTest();
     }
   });
-
 } catch (error) {
-  logError(String(error))
+  logError(String(error));
   const log = `error_-_${String(error)}`;
   addLogFn(log);
   //通知main > kill子进程
-  childSendMainMessage("processExit", { status: "error" });
+  childSendMainMessage('processExit', { status: 'error' });
 }

@@ -2,12 +2,13 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-19 13:41:43
+ * @LastEditTime: 2024-12-19 15:02:33
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\testPage\projectListPage\index.tsx
  * @Description: 项目列表主表格
  */
 
 import { Table, ConfigProvider, Card, message } from 'antd';
+import type { TableColumnsType, TableProps } from 'antd';
 import React, { useState, useEffect } from 'react';
 import './index.scss';
 import { useAppDispatch, useAppSelector } from '@src/renderer/hook';
@@ -17,14 +18,16 @@ import setCurrentRow from '@src/renderer/store/asyncThunk/setCurrentRow';
 
 import CardExtra from './cardExtra';
 import { useTranslation } from 'react-i18next';
-import { logError } from '@/utils/logLevel.js';
+import { logError } from '@/utils/logLevel';
 import { useLocation } from 'react-router';
 import {
   electronStoreGet,
   electronStoreGetAsync,
 } from '@src/renderer/utils/electronStore';
+import { ProjectItemType } from '@src/customTypes/renderer';
+type TableRowSelection<T extends object = object> =
+  TableProps<T>['rowSelection'];
 const { ipcRenderer } = window.myApi;
-
 const { Column } = Table;
 export default () => {
   const { t, i18n } = useTranslation('testPage');
@@ -53,7 +56,7 @@ export default () => {
   const init_fn = async () => {
     try {
       //获取项目列表
-      const list = await ipcRenderer.invoke('getJsonFile', {
+      const list: ProjectItemType[] = await ipcRenderer.invoke('getJsonFile', {
         type: 'projectList',
       });
       dispatch(setProjectList(list));
@@ -72,7 +75,7 @@ export default () => {
       if (findItem) {
         dispatch(setCurrentRow(findItem));
       } else {
-        dispatch(setCurrentRow({}));
+        dispatch(setCurrentRow(null));
       }
     } catch (error) {
       console.log(error);
@@ -82,7 +85,7 @@ export default () => {
   useEffect(() => {
     init_fn();
   }, []);
-  const tableRowSelection = {
+  const tableRowSelection: TableRowSelection<ProjectItemType> = {
     type: 'checkbox',
     hideSelectAll: true,
     columnTitle: '/',
@@ -92,12 +95,12 @@ export default () => {
         let len = selectedRowKeys.length - 1;
         dispatch(setCurrentRow(selectedRows[len]));
       } else {
-        dispatch(setCurrentRow({}));
+        dispatch(setCurrentRow(null));
       }
     },
     //默认选中项的数组列表
     // defaultSelectedRowKeys,
-    selectedRowKeys: [currentRow.id],
+    selectedRowKeys: [currentRow?.id || ''],
     getCheckboxProps: () => ({
       //如果进行中禁止修改选中行
       disabled: isInProgress,

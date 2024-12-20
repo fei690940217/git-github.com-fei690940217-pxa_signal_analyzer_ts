@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-09-27 09:20:05
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-18 15:04:26
+ * @LastEditTime: 2024-12-19 15:43:27
  * @FilePath: \pxa_signal_analyzer\src\main\preload.ts
  * @Description:
  *
@@ -13,11 +13,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import path from 'path';
 import fs from 'fs';
-import {
-  appConfigFilePath,
-  jizhanConnectionName,
-  lineLossConnectionName,
-} from './publicData';
+import { appConfigFilePath } from './publicData';
 
 import baseURL from './publicData/baseURL';
 
@@ -39,17 +35,7 @@ const electronHandler = {
   fsPromises,
   fs,
   appConfigFilePath,
-  jizhanConnectionName,
-  lineLossConnectionName,
   baseURL,
-  electronStore: {
-    get(key: string) {
-      return ipcRenderer.sendSync('electron-store-get', key);
-    },
-    set(key: string, val: any) {
-      ipcRenderer.send('electron-store-set', key, val);
-    },
-  },
 };
 
 contextBridge.exposeInMainWorld('myApi', electronHandler);

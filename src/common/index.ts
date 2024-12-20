@@ -2,35 +2,26 @@
  * @Author: feifei
  * @Date: 2023-12-15 14:08:57
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-18 15:33:03
+ * @LastEditTime: 2024-12-20 13:13:28
  * @FilePath: \pxa_signal_analyzer\src\common\index.ts
  * @Description:前后端通用的纯函数,或者部分静态数据
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
 
-export const visaProxyDefaultPort: number = 10089;
+export const visaProxyDefaultPort: number = 10086;
+export const defaultPort = 10086;
 export const webAppDefaultPort: number = 10010;
 export const visaProxyFileName = 'visa_proxy_only_spectrum.exe';
 
 export const webAppName: string = 'WebApplication2';
 //测试用例
 export const testItemList = [
-  {
-    label: 'Antenna Power',
-    value: 'AP',
-  },
-  {
-    label: 'Unwanted Emission Strength Out-band Area',
-    value: 'SEM',
-  },
+  { label: 'Peak-Average Ratio', value: 'PAR' },
   { label: 'Occupied Bandwidth', value: 'OBW' },
-  { label: 'Unwanted Emission Strength Spurious Area', value: 'CSE' },
-  { label: 'Adjacent Channel Leakage Power', value: 'ACLP' },
-  { label: 'Secondary Radiated Emission Strength', value: 'SRES' },
-  { label: 'Leakage Power at No-carrier Transmission', value: 'LPNT' },
-  { label: 'Intermodulation Characteristic', value: 'IC' },
-  { label: 'Frame Length', value: 'FL' },
+  { label: 'Conducted Spurious Emission', value: 'CSE' },
+  { label: 'Band Edges Compliance', value: 'BandEdge' },
+  { label: 'Band Edges Compliance IC', value: 'BandEdgeIC' },
 ];
 //基站连接名称
 export const jizhanConnectionName = 'jizhanConnection';

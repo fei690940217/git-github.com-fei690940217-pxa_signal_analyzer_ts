@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-03-21 17:18:10
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-18 17:56:16
+ * @LastEditTime: 2024-12-19 16:17:21
  * @Descripttion:  基站设置
  */
 import {
@@ -50,7 +50,7 @@ const App = () => {
         form.setFieldsValue(spectrumConfigLocal);
       }
     } catch (error) {
-      logError(error?.toString());
+      logError(error?.toString() || '');
     }
   };
   useEffect(() => {

@@ -31,8 +31,8 @@ import {
   get_soft_version,
 } from '@/api/api';
 import { delayTime } from '@/utils';
-import { logError } from '@/utils/logLevel.js';
-import { pinpuConnectionName, jizhanConnectionName } from '@src/common';
+import { logError } from '@/utils/logLevel';
+import { pinpuConnectionName } from '@src/common';
 
 const { Search } = Input;
 //基站,频谱连接名称

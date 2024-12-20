@@ -2,8 +2,8 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-16 14:56:52
- * @FilePath: \fcc_5g_test_system_only_spectrum\src\page\addPage\formModule\BandModal\index.jsx
+ * @LastEditTime: 2024-12-20 09:58:44
+ * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\BandModal\index.jsx
  * @Description: 项目列表主表格
  */
 
@@ -14,9 +14,9 @@ import './index.scss';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { cloneDeep } from 'lodash';
-import { NR_BW_LIST } from '../handle/formData';
+import { NR_BW_LIST } from '@src/renderer/page/addPage/formModule/util/formData';
 import LTEBandModal from './LTEBandModal';
-import { logInfo, logError } from '@/utils/logLevel.js';
+import { logInfo, logError } from '@/utils/logLevel';
 
 const { Column } = Table;
 const { ipcRenderer } = window.myApi;
