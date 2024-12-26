@@ -1,9 +1,9 @@
 /*
- * @FilePath: \fcc_5g_test_system\testProcess\testFunction\spectrum\CSE\CSEGate.js
+ * @FilePath: \pxa_signal_analyzer\src\testProcess\testIndex\spectrum\CSE\CSEGate.ts
  * @Author: xxx
  * @Date: 2023-05-08 15:48:20
  * @LastEditors: feifei
- * @LastEditTime: 2023-12-05 15:18:40
+ * @LastEditTime: 2024-12-20 17:01:00
  * @Descripttion: CSE
  */
 import { delayTime, addLogFn } from '@src/testProcess/utils';
@@ -14,7 +14,6 @@ import {
   publicWriteFn,
   publicQueryFn,
   getImgPath,
-  POW_ATT,
   GET_SCREEN_CAPTURE,
   SET_TIMEOUT,
   STAT_OPER_COND,
@@ -22,18 +21,16 @@ import {
 
 //OBW专用函数
 import { MARKER_POINTS, SWE_POINT, resultNumHandle } from './testFunctionList';
+import { ResultItemType } from '@src/customTypes/renderer';
 
 //循环测试函数?循环每一条数据
-export default (subItem) => {
-  return new Promise(async (resolve, reject) => {
+export default (subItem: ResultItemType) => {
+  return new Promise<string>(async (resolve, reject) => {
     try {
       //添加error log
       const log = `success_-_开始设置频谱`;
       addLogFn(log);
       const {
-        Band,
-        BW,
-        duplexMode,
         DLFreq,
         id,
         CSE_Limit,
@@ -44,8 +41,6 @@ export default (subItem) => {
         VBW,
         RBW,
       } = subItem;
-      const isFDD = duplexMode === 'FDD';
-
       //设置频谱超时 3000
       await SET_TIMEOUT(3000);
       //初始化CSE
@@ -64,11 +59,14 @@ export default (subItem) => {
       //线损 需添加占空比
       await CABLE_LOSS(DLFreq);
       //VBW
-      await publicWriteFn('VBW', `:SENSe:BANDwidth:Video ${VBW / 1000} MHz`);
+      await publicWriteFn(
+        'VBW',
+        `:SENSe:BANDwidth:Video ${parseFloat(VBW) / 1000} MHz`,
+      );
       //RBW
       await publicWriteFn(
         'RBW',
-        `:SENSe:BANDwidth:RESolution ${RBW / 1000} MHz`,
+        `:SENSe:BANDwidth:RESolution ${parseFloat(RBW) / 1000} MHz`,
       );
       //扫描时间
       await publicWriteFn('SWEEP_TIME', `:SENSe:SWEep:TIME:AUTO on`);

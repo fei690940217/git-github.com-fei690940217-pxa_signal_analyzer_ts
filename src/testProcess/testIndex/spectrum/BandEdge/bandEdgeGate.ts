@@ -1,13 +1,12 @@
 /*
- * @FilePath: \fcc_5g_test_system\testProcess\testFunction\spectrum\BandEdge\bandEdgeGate.js
+ * @FilePath: \pxa_signal_analyzer\src\testProcess\testIndex\spectrum\BandEdge\bandEdgeGate.ts
  * @Author: xxx
  * @Date: 2023-05-08 15:48:20
  * @LastEditors: feifei
- * @LastEditTime: 2023-12-07 17:24:58
+ * @LastEditTime: 2024-12-20 17:50:49
  * @Descripttion: CSE
  */
-import { delayTime, addLogFn } from '../../../utils';
-
+import { delayTime, addLogFn } from '@src/testProcess/utils';
 //公用函数
 import {
   publicWriteFn,
@@ -22,23 +21,18 @@ import {
 
 //OBW专用函数
 import { getRepeatString, resultNumHandle } from './testFunctionList';
-
+import { ResultItemType } from '@src/customTypes/renderer';
+import { BandEdgeEmissionLimitConfigType } from '@src/customTypes/main';
 //循环测试函数?循环每一条数据
-export default (subItem) => {
-  return new Promise(async (resolve, reject) => {
+export default (subItem: ResultItemType & BandEdgeEmissionLimitConfigType) => {
+  return new Promise<number[]>(async (resolve, reject) => {
     try {
       //添加error log
       const log = `success_-_开始设置频谱`;
       addLogFn(log);
       const {
-        Band,
-        duplexMode,
-        BW,
         DLFreq,
         id,
-        isSecond,
-        rangeStart,
-        rangeStop,
         no,
         RBW,
         VBW,
@@ -48,7 +42,6 @@ export default (subItem) => {
         sweepTime,
         sweepPoint,
       } = subItem;
-      const isFDD = duplexMode === 'FDD';
       //初始化CSE
       await publicWriteFn('初始化', ':SYST:PRES', 20000);
       await publicWriteFn('进入杂散模式', ':CONFigure:SPURious');
@@ -67,7 +60,7 @@ export default (subItem) => {
         ':SENSe:SPURious:RANGe:LIST:STATe 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0',
       );
       //计算 rangeListState
-      const rangeListState = await getRepeatString('1', no);
+      const rangeListState = getRepeatString('1', no);
       await publicWriteFn(
         'LIST:STATe',
         `:SENSe:SPURious:RANGe:LIST:STATe ${rangeListState}`,
@@ -105,7 +98,7 @@ export default (subItem) => {
       await publicWriteFn('ABS_DATA', `:CALC:SPUR:LIM:ABS:DATA ${LIMIT_STR}`);
       await delayTime(1500);
       //计算 detector_str
-      const detectorStr = await getRepeatString('AVERage', no);
+      const detectorStr = getRepeatString('AVERage', no);
       await publicWriteFn(
         'DETector1_FUNCtion',
         `:SENSe:SPURious:list:DETector1:FUNCtion ${detectorStr}`,
@@ -136,7 +129,7 @@ export default (subItem) => {
       //读取结果  item:'SPUR'  结果为科学计数法 需转换为 10进制
       const rawData = await publicQueryFn('获取频谱结果', `:FETC:SPUR?`, 60000);
       //处理原始数据
-      const resultData = await resultNumHandle(rawData);
+      const resultData = resultNumHandle(rawData);
       //获取截图 img_path 照片路径
       const imgPath = getImgPath(id);
       await GET_SCREEN_CAPTURE(imgPath, 60000);

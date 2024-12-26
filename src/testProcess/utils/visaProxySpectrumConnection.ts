@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-05-08 13:27:31
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 14:33:52
+ * @LastEditTime: 2024-12-20 16:33:11
  * @Descripttion: visaProxy代理连接
  */
 import { pinpuConnectionName } from '@src/common';
@@ -47,7 +47,7 @@ const queryIDN = async () => {
   }
 };
 export default () => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       const visaFlag = await get_instr_list();
       // visa有效性判断

@@ -4,6 +4,8 @@ import {
   TestItemType,
   SupRowType,
 } from '@src/customTypes/renderer';
+import { ARFCNConfigItem, BandItemType } from '@src/customTypes/main';
+import { logError } from '@src/renderer/utils/logLevel';
 
 const { ipcRenderer } = window.myApi;
 
@@ -21,11 +23,18 @@ const edgeBand = [
   'n40(2350-2360MHz)',
 ];
 // 获取项目配置
-const fetchProjectConfig = async () => {
-  return await ipcRenderer.invoke(
-    'getJsonFileByFilePath',
-    'app/addProjectConfig.json',
-  );
+const fetchProjectConfig = async (): Promise<ARFCNConfigItem[]> => {
+  try {
+    const list = await ipcRenderer.invoke(
+      'getJsonFileByFilePath',
+      'app/NR_ARFCN_Config.json',
+    );
+    return list;
+  } catch (error) {
+    console.log(error);
+    logError(error?.toString() || '获取NR_ARFCN_Config.json失败');
+    return [];
+  }
 };
 //sup排序
 //计算排序的数字
@@ -54,6 +63,26 @@ export const resultSortHandle = (list: SupRowType[]) => {
     return computeSortNum(a, b);
   });
 };
+//去数据库寻找ARFCN和DLFreq
+const find_ARFCN_and_Freq = (
+  addProjectConfig: ARFCNConfigItem[],
+  Band: string,
+  SCS: number,
+  BW: number,
+  ARFCN_INDEX: number,
+) => {
+  const level = ['L', 'M', 'H'][ARFCN_INDEX];
+  const findItem = addProjectConfig.find((item) => {
+    const { Band: Band_A, SCS: SCS_A, BW: BW_A, level: level_A } = item;
+    return Band == Band_A && SCS == SCS_A && BW == BW_A && level == level_A;
+  });
+  if (findItem) {
+    const { ARFCN, Freq } = findItem;
+    return { ARFCN, DLFreq: Freq };
+  } else {
+    return null;
+  }
+};
 
 //生成一二级数据 包含, PAR n41 30KHz 100MHz  623334
 const supResultGenerate = async (
@@ -68,42 +97,37 @@ const supResultGenerate = async (
     for (let BandObj of Band) {
       const { Band, LTE_Band, SCS, BW, ARFCN, FH, FL, CSE_Limit, duplexMode } =
         BandObj;
-
+      let tempBand = Band;
+      if (testItem.includes('BandEdge') && edgeBand.includes(Band)) {
+        tempBand = `${Band}edge`;
+      }
       for (let scs of SCS) {
         for (let bw of BW) {
-          let bwArr = [];
-          try {
-            let tempBand = Band;
-            if (testItem.includes('BandEdge') && edgeBand.includes(Band)) {
-              tempBand = `${Band}edge`;
+          for (let ARFCN_INDEX of ARFCN) {
+            //BandEdge/BandEdgeIC 中间信道跳过
+            if (ARFCN_INDEX === 1) {
+              if (testItem?.includes('BandEdge')) {
+                continue;
+              }
             }
-            bwArr = addProjectConfig['FCC'][scs][tempBand][bw];
-            if (!bwArr?.length) {
+            // const [ARFCN, DLFreq] = bwArr[ARFCN_INDEX];
+            const findItem = find_ARFCN_and_Freq(
+              addProjectConfig,
+              tempBand,
+              scs,
+              bw,
+              ARFCN_INDEX,
+            );
+            if (!findItem) {
               return Promise.reject(
                 `请检查项目配置表FCC ${scs}KHz ${Band} ${bw}MHz 是否存在`,
               );
             }
-          } catch (error) {
-            return Promise.reject(
-              `请检查项目配置表FCC ${scs}KHz ${Band} ${bw}MHz 是否存在`,
-            );
-          }
-          for (let ARFCN_INDEX of ARFCN) {
-            //BandEdge/BandEdgeIC 中间信道跳过
-            if (ARFCN_INDEX === 1) {
-              if (testItem === 'BandEdge') {
-                if (Band !== 'n48') {
-                  continue;
-                }
-              } else if (testItem === 'BandEdgeIC') {
-                continue;
-              }
-            }
-            const level = ['Low', 'Mid', 'High'][ARFCN_INDEX];
-            const [ARFCN, DLFreq] = bwArr[ARFCN_INDEX];
+            const { ARFCN, DLFreq } = findItem;
             const flag = ARFCN && DLFreq && ARFCN !== '/' && DLFreq !== '/';
             //跳过
             if (!flag) continue;
+            const level = ['Low', 'Mid', 'High'][ARFCN_INDEX];
             const tempObj = {
               networkMode,
               testItem,

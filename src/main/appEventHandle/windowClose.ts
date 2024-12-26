@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-05-12 17:16:38
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 13:55:13
+ * @LastEditTime: 2024-12-26 11:05:07
  * @Descripttion: 监听窗口关闭事件,进行防呆
  */
 import { ipcMain, dialog } from 'electron';

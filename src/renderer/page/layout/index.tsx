@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-09-30 11:18:26
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-19 16:03:55
+ * @LastEditTime: 2024-12-25 17:26:41
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\layout\index.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -111,10 +111,7 @@ export default () => {
     setVersionModalVisible(true);
   };
   const clickk = async () => {
-    const res = await electronStoreGetAsync('currentRow');
-    console.log('异步', res);
-    const res1 = electronStoreGet('currentRow');
-    console.log('同步', res1);
+    ipcRenderer.send('test');
   };
   return (
     <Layout className="layout">

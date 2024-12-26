@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2024-12-13 16:25:32
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 13:19:28
+ * @LastEditTime: 2024-12-26 10:32:32
  * @FilePath: \pxa_signal_analyzer\src\main\logger\index.ts
  * @Description: 日志模块
  *
@@ -31,6 +31,13 @@ const logger = createLogger({
       maxsize: 5 * 1024 * 1024, // 设置文件大小限制 (5MB)
       maxFiles: 2, // 设置最大文件数量
       tailable: true,
+    }),
+    // 控制台输出
+    new transports.Console({
+      format: combine(
+        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        format.simple(), // 控制台输出格式（可以自定义）
+      ),
     }),
   ],
 });

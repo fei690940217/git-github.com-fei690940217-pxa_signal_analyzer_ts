@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-02-23 18:04:48
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-19 13:58:22
+ * @LastEditTime: 2024-12-26 10:09:16
  * @Descripttion: 测试状态,判断是暂停,进行中等等
  */
 import { createSlice } from '@reduxjs/toolkit';
@@ -50,6 +50,7 @@ export const testStatusSlice = createSlice({
     },
     setCurrentTestRecordName: (state, action) => {
       state.currentTestRecordName = action.payload;
+      console.log('setCurrentTestRecordName', action.payload);
       electronStoreSet('currentTestRecordName', action.payload);
     },
   },

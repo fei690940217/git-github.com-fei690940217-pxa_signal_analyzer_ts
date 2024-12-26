@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-05-08 15:48:20
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 14:55:39
+ * @LastEditTime: 2024-12-20 16:44:37
  * @Descripttion: 基站测试函数
  */
 
@@ -21,14 +21,14 @@ import {
 } from '../testFunctionList';
 import { ResultItemType } from '@src/customTypes/renderer';
 
-const resultNumHandle = (result) => {
+const resultNumHandle = (result: string) => {
   try {
     if (result) {
       const number = Number(result.split(',')[4]);
       if (isNaN(number)) {
         return '';
       } else {
-        return Number(number.toFixed(2));
+        return number.toFixed(2);
       }
     } else {
       return '';

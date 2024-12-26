@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-19 15:02:33
+ * @LastEditTime: 2024-12-26 10:09:48
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\testPage\projectListPage\index.tsx
  * @Description: 项目列表主表格
  */
@@ -20,10 +20,7 @@ import CardExtra from './cardExtra';
 import { useTranslation } from 'react-i18next';
 import { logError } from '@/utils/logLevel';
 import { useLocation } from 'react-router';
-import {
-  electronStoreGet,
-  electronStoreGetAsync,
-} from '@src/renderer/utils/electronStore';
+import { electronStoreGetAsync } from '@src/renderer/utils/electronStore';
 import { ProjectItemType } from '@src/customTypes/renderer';
 type TableRowSelection<T extends object = object> =
   TableProps<T>['rowSelection'];

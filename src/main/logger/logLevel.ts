@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2024-12-17 09:44:49
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 13:19:52
+ * @LastEditTime: 2024-12-26 10:18:26
  * @FilePath: \pxa_signal_analyzer\src\main\logger\logLevel.ts
  * @Description:
  *
@@ -16,6 +16,8 @@ export const logInfo = (msg: string) => {
 };
 
 export const logError = (msg: string) => {
-  console.error(msg);
-  logger.error(msg);
+  const newMsg = msg?.toString();
+  console.log('logError', newMsg);
+  console.error(newMsg);
+  logger.error(newMsg);
 };

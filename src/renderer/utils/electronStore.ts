@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2024-12-18 15:44:42
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-18 16:30:16
+ * @LastEditTime: 2024-12-26 10:04:51
  * @FilePath: \pxa_signal_analyzer\src\renderer\utils\electronStore.ts
  * @Description:
  *
@@ -16,25 +16,27 @@ export const electronStoreSet = (key: string, val: any) => {
     //electron-store-set
     ipcRenderer.send('electron-store-set', { key, val });
   } catch (error) {
-    logError(error?.toString());
+    logError(error?.toString() || 'electronStoreSet error');
   }
 };
 //同步版本的获取
 export const electronStoreGet = (key: string) => {
   try {
-    return ipcRenderer.sendSync('electron-store-get', key);
+    return ipcRenderer.sendSync('electron-store-get', { key });
   } catch (error) {
-    logError(error?.toString());
+    logError(error?.toString() || 'electronStoreGet error');
     return null;
   }
 };
 //异步获取
 export const electronStoreGetAsync = async (key: string) => {
   try {
-    const data = await ipcRenderer.invoke('electron-store-get-async', key);
+    const data = await ipcRenderer.invoke('electron-store-get-async', {
+      key,
+    });
     return data;
   } catch (error) {
-    logError(error?.toString());
+    logError(error?.toString() || 'electronStoreGetAsync error');
     return null;
   }
 };

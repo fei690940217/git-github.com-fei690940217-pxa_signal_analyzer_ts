@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-07-19 15:01:01
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 14:20:22
+ * @LastEditTime: 2024-12-20 16:38:44
  * @FilePath: \pxa_signal_analyzer\src\testProcess\utils\adbCommand.ts
  * @Description:
  *
@@ -13,7 +13,7 @@ import { delayTime, addLogFn, childSendMainMessage } from './index';
 import { logError, logInfo } from './logLevel';
 
 // 封装一个 Promise 化的 exec 方法
-function executeCommand(command) {
+function executeCommand(command: string) {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
       if (error) {
@@ -33,20 +33,20 @@ const closeAirplaneModeCommand =
 const closeBroadcast = `adb shell am broadcast -a android.intent.action.AIRPLANE_MODE --ez state 0`;
 
 const rootFn = () => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       await executeCommand(rootCommand);
       resolve();
     } catch (error) {
       logError(`root命令出错:${String(error)}`);
-      resolve('root命令出错:' + String(error));
+      reject('root命令出错:' + String(error));
     }
   });
 };
 
 //打开飞行模式
 const openFn = () => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       //打开飞行模式
       await executeCommand(openAirplaneModeCommand);
@@ -57,7 +57,7 @@ const openFn = () => {
   });
 };
 const openBroadcastFn = () => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       //广播一下,通知手机响应飞行模式
       await executeCommand(openBroadcast);
@@ -68,7 +68,7 @@ const openBroadcastFn = () => {
   });
 };
 const closeBroadcastFn = () => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       //广播一下,通知手机响应飞行模式
       await executeCommand(closeBroadcast);
@@ -79,7 +79,7 @@ const closeBroadcastFn = () => {
   });
 };
 const closeFn = () => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       await executeCommand(closeAirplaneModeCommand);
       resolve();

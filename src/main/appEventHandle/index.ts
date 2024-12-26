@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-05-17 09:32:41
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 13:23:26
+ * @LastEditTime: 2024-12-26 11:04:53
  * @FilePath: \pxa_signal_analyzer\src\main\appEventHandle\index.ts
  * @Description:
  *
@@ -15,7 +15,6 @@ import configValidate from '../configValidate';
 import ipcMainEvent from '../ipcMain/index';
 import runVisaProxy from '../utils/runVisaProxy';
 import electronStore from '@src/main/electronStore';
-
 //子进程启动函数
 export default (win: BrowserView) => {
   //app事件监听函数
@@ -37,7 +36,6 @@ export default (win: BrowserView) => {
   ipcMainEvent();
   //启动PythonVisa代理
   runVisaProxy();
-
   //添加右键上下文菜单
   const contextMenu = Menu.buildFromTemplate(contextTemplate);
   win.webContents.on('context-menu', (e, params) => {

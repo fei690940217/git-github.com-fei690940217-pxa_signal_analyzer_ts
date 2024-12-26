@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-09-27 09:20:05
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-19 15:43:27
+ * @LastEditTime: 2024-12-25 17:10:10
  * @FilePath: \pxa_signal_analyzer\src\main\preload.ts
  * @Description:
  *
@@ -16,7 +16,6 @@ import fs from 'fs';
 import { appConfigFilePath } from './publicData';
 
 import baseURL from './publicData/baseURL';
-
 const { promises: fsPromises } = fs;
 export type Channels = 'ipc-example';
 

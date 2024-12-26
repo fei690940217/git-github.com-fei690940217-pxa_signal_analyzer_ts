@@ -13,7 +13,7 @@ import isDev from 'electron-is-dev';
 import path from 'path';
 import dispatchAction from '@src/main/utils/dispatchAction';
 import stopTest from './stopTest';
-import { logError, logInfo } from '@src/main/logger/logLevel';
+import { logInfo } from '@src/main/logger/logLevel';
 
 let testProcessInstance = null;
 

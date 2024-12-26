@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-05-08 13:27:31
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 15:07:55
+ * @LastEditTime: 2024-12-20 16:45:14
  * @Descripttion: 测试函数集合
  */
 import { pinpuConnectionName } from '@src/common';
@@ -65,7 +65,7 @@ export const publicQueryFn = (
   command: string,
   timeout?: number,
 ) => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<string>(async (resolve, reject) => {
     try {
       const params = {
         instr_name: pinpuConnectionName,

@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-05-17 09:32:41
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-18 15:28:56
+ * @LastEditTime: 2024-12-20 16:36:32
  * @FilePath: \pxa_signal_analyzer\src\testProcess\utils\createSpectrumConnection.ts
  * @Description: 测试模块的utils函数
  *
@@ -14,9 +14,14 @@ import createConnectRequest from '../api/createConnectRequest';
 import { addLogFn } from './index';
 import SharedParameters from '../globals';
 import { logInfo, logError } from './logLevel';
-
-const create_instr_fn = (params, config = {}) => {
-  return new Promise(async (resolve, reject) => {
+type CreateLinkParams = {
+  instructName: string;
+  instr_name: string;
+  mode: string;
+  ip: string;
+};
+const create_instr_fn = (params: CreateLinkParams, config = {}) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       const res = await createConnectRequest.post(
         `/create_instr`,
@@ -52,7 +57,7 @@ export default async () => {
     }
     return Promise.resolve();
   } catch (error) {
-    logError(error.toString());
+    logError(error?.toString() || '创建频谱连接失败 60');
     return Promise.reject(error);
   }
 };

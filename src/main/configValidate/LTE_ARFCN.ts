@@ -61,7 +61,8 @@ const fddSheetHandle = (list) => {
       }
       resolve(tempObj);
     } catch (error) {
-      logError(error.toString());
+      const msg = `${error?.toString()} LTE_ARFCN.ts 64`;
+      logError(msg);
       resolve({});
     }
   });
@@ -100,7 +101,8 @@ const tddSheetHandle = (list) => {
       }
       resolve(tempObj);
     } catch (error) {
-      logError(error.toString());
+      const msg = `${error?.toString()} LTE_ARFCN.ts 104`;
+      logError(msg);
       resolve({});
     }
   });
@@ -144,6 +146,7 @@ export default async (isRefresh) => {
     }
     await outputJson(resultconfigFilePath, resultObj);
   } catch (error) {
-    logError(error?.toString() || 'LTE_ARFCN.js 147行');
+    const msg = `${error?.toString()} LTE_ARFCN.ts 74`;
+    logError(msg);
   }
 };

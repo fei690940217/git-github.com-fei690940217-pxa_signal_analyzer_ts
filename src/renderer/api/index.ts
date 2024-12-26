@@ -1,17 +1,14 @@
 /*
  * @Author: your name
  * @Date: 2021-07-01 01:24:00
- * @LastEditTime: 2024-12-18 16:36:59
+ * @LastEditTime: 2024-12-26 10:07:05
  * @LastEditors: feifei
  * @Description: In User Settings Edit
- * @FilePath: \pxa_signal_analyzer\src\renderer\api\index.js
+ * @FilePath: \pxa_signal_analyzer\src\renderer\api\index.ts
  */
 
 import axios from 'axios';
-import {
-  electronStoreGet,
-  electronStoreGetAsync,
-} from '@src/renderer/utils/electronStore';
+import { electronStoreGet } from '@src/renderer/utils/electronStore';
 const { baseURL: mainBaseUrl } = window.myApi;
 let baseURL = '';
 //开发环境
@@ -64,14 +61,5 @@ instance.interceptors.response.use(
     }
   },
 );
-
-// 当获取到新的端口号时更新 baseURL
-const updateBaseUrl = () => {
-  const port = electronStoreGet('visaProxyPort');
-  if (port) {
-    const dynamicBaseUrl = `http://127.0.0.1:${port}`;
-    instance.defaults.baseURL = dynamicBaseUrl;
-  }
-};
 
 export default instance;

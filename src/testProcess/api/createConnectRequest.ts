@@ -10,23 +10,6 @@
 import axios from 'axios';
 import baseURL from '@src/main/publicData/baseURL';
 
-const delayTime = (ms: number) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(true);
-    }, ms);
-  });
-};
-//单独封装addLogFn
-const addLogFn = (message) => {
-  process.parentPort.postMessage({
-    type: 'dispatchAction',
-    value: {
-      key: 'addLog',
-      value: message,
-    },
-  });
-};
 // 创建axios实例
 const createInstance = () => {
   const instance = axios.create({

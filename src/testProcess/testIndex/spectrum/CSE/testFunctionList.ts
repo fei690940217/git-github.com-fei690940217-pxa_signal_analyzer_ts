@@ -1,24 +1,26 @@
 /*
- * @FilePath: \fcc_5g_test_system_only_spectrum\testProcess\testIndex\spectrum\CSE\testFunctionList.js
+ * @FilePath: \pxa_signal_analyzer\src\testProcess\testIndex\spectrum\CSE\testFunctionList.ts
  * @Author: xxx
  * @Date: 2023-05-08 13:27:31
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-16 17:40:35
+ * @LastEditTime: 2024-12-20 17:15:15
  * @Descripttion: 测试函数集合
  */
 import { delayTime } from '@src/testProcess/utils';
 import SharedParameters from '@src/testProcess/globals';
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 import { orderBy } from 'lodash';
 import {
   publicWriteFn,
   publicQueryFn,
   CABLE_LOSS as public_cable_loss,
 } from '../testFunctionList';
+import { ResultItemType } from '@src/customTypes/renderer';
+import { LineLossTableList } from '@src/customTypes/testprocess';
 
 //第一段处理逻辑
-const firstParagraph = (BW, FH) => {
-  return new Promise(async (resolve, reject) => {
+const firstParagraph = (BW: number, FH: number) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       //标记1点
       await publicWriteFn(`标记1点`, `:CALCulate:MARKer1:MAXimum`);
@@ -48,7 +50,7 @@ const firstParagraph = (BW, FH) => {
 };
 //第二段处理逻辑
 const secondParagraph = () => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       //标记1点
       await publicWriteFn(`标记1点`, `:CALCulate:MARKer1:MAXimum`);
@@ -59,7 +61,7 @@ const secondParagraph = () => {
   });
 };
 //标点逻辑
-export const MARKER_POINTS = async (subItem) => {
+export const MARKER_POINTS = async (subItem: ResultItemType) => {
   const { BW, FH, segmentNumber } = subItem;
   try {
     if (segmentNumber === 2) {
@@ -76,12 +78,12 @@ export const MARKER_POINTS = async (subItem) => {
 //OBW频谱结果转换
 //频谱返回格式   2.090237516E+01,4.536940000E+01
 //需转换为MHz  1MHz = 1000000 Hz
-export const resultNumHandle = (rstX, rstY) => {
+export const resultNumHandle = (rstX: string, rstY: string) => {
   try {
     if (rstX && rstY) {
-      const x = (Number(rstX) / 1000000).toFixed(2);
-      const y = Number(rstY).toFixed(2);
-      if (isNaN(x) && isNaN(y)) {
+      const x = (parseFloat(rstX) / 1000000).toFixed(2);
+      const y = parseFloat(rstY).toFixed(2);
+      if (isNaN(parseFloat(x)) && isNaN(parseFloat(y))) {
         return '';
       } else {
         return `${x},${y}`;
@@ -93,27 +95,35 @@ export const resultNumHandle = (rstX, rstY) => {
     return '';
   }
 };
-const dutyCycleCompute = (lineLoss, dutyCycle) => {
-  const num = 10 * Math.log10(100 / dutyCycle) + lineLoss;
-  return num;
+const dutyCycleCompute = (
+  lineLoss: number | null,
+  dutyCycle: number | null,
+) => {
+  if (lineLoss && dutyCycle) {
+    const num = 10 * Math.log10(100 / dutyCycle) + lineLoss;
+    return num;
+  } else {
+    return 0;
+  }
 };
 //频谱线损
-export const CABLE_LOSS = async (DLFreq, isFDD) => {
+export const CABLE_LOSS = async (DLFreq: number, isFDD: boolean) => {
   if (isFDD) {
     return public_cable_loss(DLFreq);
   } else {
     let num = '';
-    const spectrumLineLoss = SharedParameters.get('spectrumLineLoss');
+    const spectrumLineLoss: LineLossTableList =
+      SharedParameters.get('spectrumLineLoss');
     //占空比
     const { dutyCycle } = SharedParameters.get('spectrumConfig');
     const filterSpectrumLineLoss = spectrumLineLoss.filter((item) => {
       return item.frequency !== DLFreq;
     });
-    const id = uuidv4();
+    const id = nanoid(8);
     const self = {
       id,
       frequency: DLFreq,
-      lineLoss: '',
+      lineLoss: null,
     };
     filterSpectrumLineLoss.push(self);
     //排序
@@ -131,8 +141,8 @@ export const CABLE_LOSS = async (DLFreq, isFDD) => {
     if (prevItem?.id && nextItem?.id) {
       //如果占空比有值
       if (dutyCycle) {
-        const a = DLFreq - prevItem.frequency;
-        const b = nextItem.frequency - prevItem.frequency;
+        const a = DLFreq - (prevItem?.frequency || 0);
+        const b = (nextItem?.frequency || 0) - (prevItem?.frequency || 0);
         const c =
           dutyCycleCompute(nextItem.lineLoss, dutyCycle) -
           dutyCycleCompute(prevItem.lineLoss, dutyCycle);
@@ -142,25 +152,25 @@ export const CABLE_LOSS = async (DLFreq, isFDD) => {
       }
       //如果 用户没有设置占空比
       else {
-        const a = DLFreq - prevItem.frequency;
-        const b = nextItem.frequency - prevItem.frequency;
-        const c = nextItem.lineLoss - prevItem.lineLoss;
-        const d = prevItem.lineLoss;
+        const a = DLFreq - (prevItem.frequency || 0);
+        const b = (nextItem.frequency || 0) - (prevItem.frequency || 0);
+        const c = (nextItem.lineLoss || 0) - (prevItem.lineLoss || 0);
+        const d = prevItem.lineLoss || 0;
         const value = (a / b) * c + d;
         num = value.toFixed(2);
       }
     } else {
-      num = 5;
+      num = '5';
     }
     const instructValue = `DISPlay:WINDow:TRACe:Y:SCALe:RLEVel:offset ${num}`;
     return await publicWriteFn('设置频谱线损', instructValue);
   }
 };
 //
-export const SWE_POINT = (subItem) => {
-  const { Band, BW, DLFreq, id, limit, rangeStart, rangeStop } = subItem;
-  let num = ((rangeStop - rangeStart) * 2) / 1 + 1;
-  return new Promise(async (resolve, reject) => {
+export const SWE_POINT = (subItem: ResultItemType) => {
+  const { rangeStart, rangeStop } = subItem;
+  let num = ((parseFloat(rangeStop) - parseFloat(rangeStart)) * 2) / 1 + 1;
+  return new Promise<void>(async (resolve, reject) => {
     try {
       //标记1点
       await publicWriteFn(`SWEep_POINts`, `:SENSe:SWEep:POINts ${num}`);

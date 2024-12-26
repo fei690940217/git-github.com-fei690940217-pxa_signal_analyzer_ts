@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-29 16:58:00
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 14:32:34
+ * @LastEditTime: 2024-12-20 16:32:22
  * @FilePath: \pxa_signal_analyzer\src\testProcess\utils\restartVisaProxy.ts
  * @Description: 强制重启visa代理
  */
@@ -23,7 +23,7 @@ import portfinder from 'portfinder';
 //默认端口
 //启动visa代理
 const runVisaProxy = () => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       const port = await portfinder.getPortPromise({
         port: defaultPort,
@@ -34,9 +34,13 @@ const runVisaProxy = () => {
         'visaProxy',
         visaProxyFileName,
       );
-      const child = childProcess.spawn(python_proxy_filename, [port], {
-        detached: false,
-      });
+      const child = childProcess.spawn(
+        python_proxy_filename,
+        [port.toString()],
+        {
+          detached: false,
+        },
+      );
       //如果启动成功
       if (child.pid) {
         electronStore.set('visaProxyPort', port);
@@ -52,7 +56,7 @@ const runVisaProxy = () => {
 };
 //获取pid
 const getPid = () => {
-  return new Promise((resolve, reject) => {
+  return new Promise<string[]>((resolve, reject) => {
     try {
       const targetProcessName = 'visa_proxy_only _spectrum.exe';
       let tasklistOutput = childProcess.execSync('tasklist', {
@@ -75,8 +79,8 @@ const getPid = () => {
   });
 };
 //杀进程
-const killProcess = (pidList) => {
-  return new Promise((resolve, reject) => {
+const killProcess = (pidList: string[]) => {
+  return new Promise<void>((resolve, reject) => {
     try {
       for (let pid of pidList) {
         const killCommand = `taskkill /F /PID ${pid}`; // 假设要终止的进程ID为 12345
@@ -90,7 +94,7 @@ const killProcess = (pidList) => {
 };
 //重启>一条龙,重启,鉴权,键连接
 export default () => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       //找到visa的pid
       const pidList = await getPid();

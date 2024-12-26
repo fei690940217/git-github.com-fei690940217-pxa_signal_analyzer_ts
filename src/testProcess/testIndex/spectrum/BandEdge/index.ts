@@ -3,11 +3,10 @@
  * @Author: xxx
  * @Date: 2023-05-08 15:48:20
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 14:25:36
+ * @LastEditTime: 2024-12-20 17:40:51
  * @Descripttion: CSE
  */
-import { delayTime, addLogFn, childSendMainMessage } from '../../../utils';
-
+import { delayTime, addLogFn } from '@src/testProcess/utils';
 //公用函数
 import {
   publicWriteFn,
@@ -20,13 +19,16 @@ import {
 } from '../testFunctionList';
 
 //OBW专用函数
-import { CABLE_LOSS, resultNumHandle } from './testFunctionList';
-const getRepeatString = (str, num) => {
-  return Array(num).fill(str).join(',');
-};
+import {
+  CABLE_LOSS,
+  resultNumHandle,
+  getRepeatString,
+} from './testFunctionList';
+import { ResultItemType } from '@src/customTypes/renderer';
+import { BandEdgeEmissionLimitConfigType } from '@src/customTypes/main';
 //循环测试函数?循环每一条数据
-export default (subItem) => {
-  return new Promise(async (resolve, reject) => {
+export default (subItem: ResultItemType & BandEdgeEmissionLimitConfigType) => {
+  return new Promise<number[]>(async (resolve, reject) => {
     try {
       //添加error log
       const log = `success_-_开始设置频谱`;
@@ -152,7 +154,7 @@ export default (subItem) => {
       //读取结果  item:'SPUR'  结果为科学计数法 需转换为 10进制
       const rawData = await publicQueryFn('获取频谱结果', `:FETC:SPUR?`, 60000);
       //处理原始数据
-      const resultData = await resultNumHandle(rawData);
+      const resultData = resultNumHandle(rawData);
       //获取截图 img_path 照片路径
       const imgPath = getImgPath(id);
       await GET_SCREEN_CAPTURE(imgPath, 60000);

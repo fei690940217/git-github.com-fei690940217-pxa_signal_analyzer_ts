@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-04-06 10:24:55
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 14:00:04
+ * @LastEditTime: 2024-12-26 10:26:57
  * @Descripttion:CSE limit与Band对照表
  */
 
@@ -14,6 +14,7 @@ import { appConfigFilePath } from '../publicData';
 const xlsx = require('node-xlsx').default;
 import { outputJson, pathExists } from 'fs-extra';
 import { logError } from '../logger/logLevel';
+import { NRBandObjType, BandItemType } from '@src/customTypes/main';
 
 //配置文件地址 源文件
 const configFilePath = path.join(
@@ -22,7 +23,7 @@ const configFilePath = path.join(
 );
 //写入本地 解析后写入本地
 const filePath = path.join(appConfigFilePath, 'app/LTE_Band_List.json');
-export default async (isRefresh) => {
+export default async (isRefresh: boolean) => {
   try {
     //如果是刷新则直接重新生成
     if (!isRefresh) {
@@ -32,7 +33,7 @@ export default async (isRefresh) => {
       }
     }
     const reg = /[\t\r\f\n\s]*/g;
-    const resultList = [];
+    const resultList: BandItemType[] = [];
     //判断文件是否存在
     await fsPromises.access(configFilePath);
     const workSheetsList = xlsx.parse(configFilePath);
@@ -58,7 +59,8 @@ export default async (isRefresh) => {
     await outputJson(filePath, resultList);
     return Promise.resolve();
   } catch (error) {
-    logError(error?.toString() || 'LTE_Band_List.ts 生成失败');
+    const errmsg = `${error?.toString()} LTE_Band_List.ts 生成失败`;
+    logError(errmsg);
     return Promise.reject();
   }
 };

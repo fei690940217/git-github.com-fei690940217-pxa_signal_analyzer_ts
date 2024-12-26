@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2024-12-09 09:18:06
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 13:49:50
+ * @LastEditTime: 2024-12-23 11:35:12
  * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\getAndSetJsonFile.ts
  * @Description:
  *
@@ -18,8 +18,6 @@ import {
   pathExists,
   pathExistsSync,
 } from 'fs-extra';
-import jsonfile from 'jsonfile';
-import { statSync } from 'fs';
 import path from 'path';
 import { appConfigFilePath } from '../publicData';
 import { logError } from '../logger/logLevel';
@@ -53,7 +51,7 @@ const setProjectList = async (params) => {
       'app',
       'projectList.json',
     );
-    await jsonfile.writeFile(projectListJsonFilePath, result);
+    await outputJson(projectListJsonFilePath, result);
   } catch (error) {
     return Promise.reject(error);
   }

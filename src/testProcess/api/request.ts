@@ -1,15 +1,25 @@
 /*
  * @Author: your name
  * @Date: 2021-07-01 01:24:00
- * @LastEditTime: 2024-12-09 15:21:44
+ * @LastEditTime: 2024-12-23 10:03:11
  * @LastEditors: feifei
  * @Description: In User Settings Edit
- * @FilePath: \fcc_5g_test_system_only_spectrum\testProcess\api\request.js
+ * @FilePath: \pxa_signal_analyzer\src\testProcess\api\request.ts
  */
 
 import { addLogFn } from '../utils';
 import responseErrorHandle from './errorHandle';
 import axios from 'axios';
+import {
+  type AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosError,
+  AxiosInterceptorManager,
+  Method,
+  ResponseType,
+  responseEncoding,
+} from 'axios';
 import baseURL from '@src/main/publicData/baseURL';
 import { logInfo, logError } from '../utils/logLevel';
 
@@ -21,7 +31,7 @@ const createInstance = () => {
   });
   return instance;
 };
-const instance = createInstance();
+const instance: AxiosInstance = createInstance();
 // 添加请求拦截器
 instance.interceptors.request.use(
   function (config) {
@@ -32,7 +42,7 @@ instance.interceptors.request.use(
     return Promise.reject(error);
   },
 );
-const responseSuccess = async (res) => {
+const responseSuccess = async (res: AxiosResponse): Promise<AxiosResponse> => {
   try {
     const originalRequest = res.config;
     //以下为返回值
@@ -58,11 +68,11 @@ const responseSuccess = async (res) => {
       return responseErrorHandle(originalRequest, instance);
     }
   } catch (error) {
-    logError(error.toString());
+    logError(error?.toString() || 'responseSuccess函数内发生错误 67');
     return Promise.resolve(res);
   }
 };
-const responseError = async (error) => {
+const responseError = async (error: any) => {
   logError(error.toString());
   try {
     const { message, config } = error.toJSON();

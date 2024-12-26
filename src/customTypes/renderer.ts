@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-10-17 16:56:16
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 10:25:05
+ * @LastEditTime: 2024-12-24 10:12:55
  * @FilePath: \pxa_signal_analyzer\src\customTypes\renderer.ts
  * @Description:
  *
@@ -214,8 +214,8 @@ export interface SupRowType {
   LTE_Band: string[] | null | string; // LTE频段数组
   SCS: number; // 子载波间隔，单位 kHz
   BW: number; // 带宽，单位 MHz
-  ARFCN: number; // 绝对射频通道号
-  DLFreq: number; // 下行频率，单位 MHz
+  ARFCN: string; // 绝对射频通道号
+  DLFreq: string; // 下行频率，单位 MHz
   level: string; // 测试级别，例如 Low
   FH: number; // 频率上限，单位 MHz
   FL: number; // 频率下限，单位 MHz

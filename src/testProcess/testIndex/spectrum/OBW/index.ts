@@ -3,11 +3,11 @@
  * @Author: xxx
  * @Date: 2023-05-08 15:48:20
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 14:22:45
+ * @LastEditTime: 2024-12-20 16:51:43
  * @Descripttion: 基站测试函数
  */
 import { delayTime, addLogFn } from '@src/testProcess/utils';
-import { logError } from '@src/testProcess/logLevel';
+import { logError } from '@src/testProcess/utils/logLevel';
 
 //公用函数
 import {
@@ -20,14 +20,17 @@ import {
   CABLE_LOSS,
   STAT_OPER_COND,
 } from '../testFunctionList';
+import { ResultItemType } from '@src/customTypes/renderer';
+
 //结果处理函数
-const resultNumHandle = (result, BW) => {
+const resultNumHandle = (result: string, BW: number) => {
   try {
     if (result) {
       const digitOBW = BW === 5 || BW === 10 ? 4 : 3;
-      const obw = (Number(result.split(',')[0]) / 1000000).toFixed(digitOBW);
-      const BW26dB = (Number(result.split(',')[6]) / 1000000).toFixed(3);
-      if (isNaN(obw) || isNaN(BW26dB)) {
+      const resultArray = result.split(',');
+      const obw = (parseFloat(resultArray[0]) / 1000000).toFixed(digitOBW);
+      const BW26dB = (parseFloat(resultArray[6]) / 1000000).toFixed(3);
+      if (isNaN(parseFloat(obw)) || isNaN(parseFloat(BW26dB))) {
         return '';
       } else {
         return `${obw},${BW26dB}`;
@@ -36,7 +39,7 @@ const resultNumHandle = (result, BW) => {
       return '';
     }
   } catch (error) {
-    logError(error.toString());
+    logError(error?.toString() || 'OBW结果处理函数错误 41');
     return '';
   }
 };
@@ -59,7 +62,7 @@ const resultNumHandle = (result, BW) => {
 //   100: { RBW: 1000, VBW: 3000 },
 // };
 //   <甘静>  给的
-const RBW_VBW_OBJ = {
+const RBW_VBW_OBJ: Record<number, { RBW: number; VBW: number }> = {
   5: { RBW: 75, VBW: 240 },
   10: { RBW: 150, VBW: 470 },
   15: { RBW: 220, VBW: 680 },
@@ -77,8 +80,8 @@ const RBW_VBW_OBJ = {
   100: { RBW: 1500, VBW: 5000 },
 };
 //循环测试函数?循环每一条数据
-export default (subItem) => {
-  return new Promise(async (resolve, reject) => {
+export default (subItem: ResultItemType) => {
+  return new Promise<string>(async (resolve, reject) => {
     try {
       //添加error log
       const log = `success_-_开始设置频谱`;

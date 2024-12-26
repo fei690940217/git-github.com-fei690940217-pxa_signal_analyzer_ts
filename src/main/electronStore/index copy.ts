@@ -3,13 +3,12 @@
  * @Author: xxx
  * @Date: 2023-04-13 09:47:55
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-26 11:01:38
+ * @LastEditTime: 2024-12-24 15:01:55
  * @Descripttion:
  */
 import path from 'path';
 import {
   outputJson,
-  outputFile,
   pathExists,
   pathExistsSync,
   readJson,
@@ -18,60 +17,61 @@ import {
   readFileSync,
   writeJson,
 } from 'fs-extra';
-import { logError } from '@src/main/logger/logLevel';
+
 const appConfigFilePath = path.join('D:', 'fcc_5g_test_electron_only_spectrum');
 const basePath = path.join(appConfigFilePath, 'app/electron-store');
+
 export default {
   //实现get方法
   get: (key: string) => {
     try {
-      const filePath = path.join(basePath, `${key}.${'json'}`);
+      const filePath = path.join(basePath, `other.json`);
       const flag = pathExistsSync(filePath);
       if (!flag) {
         return null;
       }
       const tempData = readFileSync(filePath, 'utf8');
-      const trimStr = tempData?.trim();
-      if (trimStr) {
+      if (tempData?.trim()) {
         const data = JSON.parse(tempData);
-        return data;
+        return data[key];
       } else {
         return null;
       }
     } catch (error) {
-      const errmsg = `electronStore get ${key} 出错${error?.toString()}`;
-      logError(errmsg);
+      console.error(error);
       return null;
     }
   },
   //实现get方法
   getAsync: async (key: string) => {
     try {
-      const filePath = path.join(basePath, `${key}.json`);
-      const tempData = await readFile(filePath, 'utf8');
-      const trimStr = tempData?.trim();
-      if (trimStr) {
-        const data = JSON.parse(trimStr);
-        return Promise.resolve(data);
+      const filePath = path.join(basePath, `other.json`);
+      const a = await readFile(filePath, 'utf8');
+      let data = {};
+      if (a?.trim()) {
+        data = JSON.parse(a);
+        const val = data[key];
+        return Promise.resolve(val);
       } else {
         return Promise.resolve(null);
       }
     } catch (error) {
-      const errmsg = `electronStore getAsync ${key} 出错${error?.toString()}`;
-      logError(errmsg);
-      return Promise.reject(null);
+      return Promise.reject(error);
     }
   },
   //实现set方法
   set: async (key: string, value: any) => {
     try {
-      const filePath = path.join(basePath, `${key}.json`);
-      await outputJson(filePath, value);
-      return;
+      const filePath = path.join(basePath, `other.json`);
+      const a = await readFile(filePath, 'utf8');
+      let data = {};
+      if (a?.trim()) {
+        data = JSON.parse(a);
+      }
+      data[key] = value;
+      await outputJson(filePath, data);
     } catch (error) {
       console.error(error);
-      const errmsg = `electronStore set ${key} 出错${error?.toString()}`;
-      logError(errmsg);
     }
   },
 };

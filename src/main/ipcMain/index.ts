@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-06-22 15:51:43
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 14:05:56
+ * @LastEditTime: 2024-12-26 10:01:57
  * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\index.ts
  * @Description: 监听渲染进程事件
  *
@@ -17,6 +17,7 @@ import electronStore from '@src/main/electronStore';
 import { appConfigFilePath } from '../publicData';
 import generateDocx from '../utils/generateDocx';
 import logger from '../logger';
+import { type Logger, LeveledLogMethod } from 'winston';
 import {
   deleteResult,
   addSubProject,
@@ -42,6 +43,10 @@ import abortTest from '../utils/abortTest';
 import getLineLoss from './getLineLoss';
 import { getJsonFile, setJsonFile } from './getAndSetJsonFile';
 
+import NR_Band_list from '@src/main/configValidate/NR_Band_List';
+import CSELimit from '@src/main/configValidate/CSELimit';
+import configData from '@src/main/configValidate/NR_ARFCN';
+import TEST from '@src/main/configValidate/RBConfig';
 export default () => {
   //验证配置文件>config文件夹,用户定义
   ipcMain.on('refreshConfigFile', () => {
@@ -50,7 +55,7 @@ export default () => {
 
   //移动文件夹
   ipcMain.handle('moveFile', (e, data) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         const { src, dest } = data;
         await move(src, dest);
@@ -62,7 +67,7 @@ export default () => {
   });
   //删除文件或者文件夹
   ipcMain.handle('removeFile', (e, fileName) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         await remove(fileName);
         resolve();
@@ -76,12 +81,15 @@ export default () => {
     return forceRestartVisaProxy();
   });
   //electron-store操作函数
-  ipcMain.on('electron-store-get', (event, val) => {
-    event.returnValue = electronStore.get(val);
+  ipcMain.on('electron-store-get', (event, payload) => {
+    const { key } = payload;
+    event.returnValue = electronStore.get(key);
   });
   //electron-store-get 异步版本
-  ipcMain.handle('electron-store-get-async', (event, val) => {
-    return electronStore.getAsync(val);
+  ipcMain.handle('electron-store-get-async', (event, payload) => {
+    const { key } = payload;
+
+    return electronStore.getAsync(key);
   });
   ipcMain.on('electron-store-set', (event, payload) => {
     const { key, val } = payload;
@@ -89,9 +97,7 @@ export default () => {
   });
   //测试专用,无其他作用
   ipcMain.on('test', (event, val) => {
-    console.log('接到前端测试信号', val);
-    console.log(event);
-    event.returnValue = '你好世界';
+    // TEST(true);
   });
   //开始测试
   ipcMain.on('startTest', async (event, argv) => {
@@ -121,7 +127,7 @@ export default () => {
   ipcMain.on('testFunction', async (event) => {});
   //前端通知main进程开始生成报告
   ipcMain.handle('generateDocx', (event, value) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       try {
         await generateDocx(value);
         resolve();
@@ -190,8 +196,8 @@ export default () => {
   });
   //addLogRendererToMain,接到前端通知准备添加log
   ipcMain.on('addLogRendererToMain', (e, payload) => {
-    const { level, msg } = payload;
-    logger[level](msg);
+    const { level, msg }: { level: string; msg: string } = payload;
+    logger.log({ level, message: msg });
   });
 
   //archiveProject 归档
