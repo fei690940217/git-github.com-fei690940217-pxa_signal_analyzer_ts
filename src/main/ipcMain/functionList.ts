@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-10-18 14:51:01
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 13:49:12
+ * @LastEditTime: 2024-12-27 10:16:08
  * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\functionList.ts
  * @Description:
  *
@@ -18,22 +18,31 @@ import {
   readJson,
   outputJson,
   readdir,
+  mkdir,
+  readFile,
 } from 'fs-extra';
 import { statSync } from 'fs';
-
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
-const fsPromises = require('fs').promises;
-
 import { appConfigFilePath } from '../publicData';
 import { createSpectrumConnection } from '../utils';
 import { query_fn } from '../api/api';
 import { logError } from '../logger/logLevel';
+import { DeleteResultPayload } from '@src/customTypes/main';
+import { ResultItemType, ProjectItemType } from '@src/customTypes/renderer';
+
 //删除某一条的结果
-export const deleteResult = async (payload) => {
+export const deleteResult = async (payload: DeleteResultPayload) => {
   try {
-    const { resultFilePath, row } = payload;
-    const resultList = await readJson(resultFilePath);
+    const { projectName, subProjectName, row } = payload;
+    const resultFilePath = path.join(
+      appConfigFilePath,
+      'user/project',
+      projectName,
+      subProjectName,
+      'result.json',
+    );
+    const resultList: ResultItemType[] = await readJson(resultFilePath);
     const RESULT = resultList.map((item) => {
       const { id } = item;
       if (id === row.id) {
@@ -48,15 +57,7 @@ export const deleteResult = async (payload) => {
   }
 };
 
-export const getJsonFile = async (filePath) => {
-  try {
-    const resultObj = await readJson(filePath);
-    return Promise.resolve(resultObj);
-  } catch (error) {
-    return Promise.resolve({ type: 'error', msg: error });
-  }
-};
-export const getJsonFileByFilePath = async (laseFilePath) => {
+export const getJsonFileByFilePath = async (laseFilePath: string) => {
   try {
     const filePath = path.join(appConfigFilePath, laseFilePath);
     const resultObj = await readJson(filePath);
@@ -66,7 +67,7 @@ export const getJsonFileByFilePath = async (laseFilePath) => {
   }
 };
 //setProjectInfoToJson
-export const setProjectInfoToJson = async (data) => {
+export const setProjectInfoToJson = async (data: ProjectItemType) => {
   try {
     const { projectName } = data;
     const filePath = path.join(
@@ -81,31 +82,18 @@ export const setProjectInfoToJson = async (data) => {
     return Promise.resolve({ type: 'error', msg: error });
   }
 };
-// writeJsonFile
-export const writeJsonFile = async (payload) => {
-  try {
-    const { laseFilePath, data } = payload;
-    const filePath = path.join(appConfigFilePath, laseFilePath);
-    await outputJson(filePath, data);
-    return Promise.resolve();
-  } catch (error) {
-    return Promise.resolve({ type: 'error', msg: error });
-  }
-};
 //创建项目目录
-export const createDir = (laseFilePath) => {
-  return new Promise(async (resolve, reject) => {
+export const createDir = (laseFilePath: string) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       //1.先以项目名称为名字,创建项目文件夹
       const filePath = path.join(appConfigFilePath, laseFilePath);
-      try {
-        //判断文件是否存在
-        await fsPromises.access(filePath);
+      //判断文件是否存在
+      const flag = await pathExists(filePath);
+      if (flag) {
         reject(new Error('项目已存在'));
-      } catch (error) {
-        //文件不存在
-        //创建文件夹
-        await fsPromises.mkdir(filePath);
+      } else {
+        await mkdir(filePath);
         resolve();
       }
     } catch (error) {
@@ -114,7 +102,11 @@ export const createDir = (laseFilePath) => {
   });
 };
 //addSubProject
-export const addSubProject = async (payload) => {
+type AddSubProjectPayload = {
+  projectName: string;
+  subProjectName: string;
+};
+export const addSubProject = async (payload: AddSubProjectPayload) => {
   const { projectName, subProjectName } = payload;
   const currentRowFilePath = path.join(
     appConfigFilePath,
@@ -150,7 +142,7 @@ export const addSubProject = async (payload) => {
 };
 
 //getSubProjectList
-export const getSubProjectList = async (projectName) => {
+export const getSubProjectList = async (projectName: string) => {
   try {
     //子项目的根目录
     const folderPath = path.join(
@@ -184,7 +176,7 @@ export const getSubProjectList = async (projectName) => {
 };
 
 //testLinkIsEnabledFn
-export const testLinkIsEnabledFn = async (payload) => {
+export const testLinkIsEnabledFn = async (payload: { ip: string }) => {
   try {
     const { ip } = payload;
     if (ip) {
@@ -205,7 +197,7 @@ export const testLinkIsEnabledFn = async (payload) => {
 };
 
 //archiveProject
-export const archiveProject = async (projectName) => {
+export const archiveProject = async (projectName: string) => {
   try {
     const src = path.join(appConfigFilePath, 'user/project', projectName);
     const dest = path.join(appConfigFilePath, 'user/archive', projectName);
@@ -223,7 +215,11 @@ export const archiveProject = async (projectName) => {
   }
 };
 
-export const getImageBase4 = async (paylaod) => {
+export const getImageBase4 = async (paylaod: {
+  projectName: string;
+  subProjectName: string;
+  id: number;
+}) => {
   try {
     const { projectName, subProjectName, id } = paylaod;
     const filePath = path.join(
@@ -240,7 +236,7 @@ export const getImageBase4 = async (paylaod) => {
     if (!flag) {
       return Promise.reject('文件不存在,请检查路径');
     }
-    const imgBase64 = await fsPromises.readFile(filePath, 'base64');
+    const imgBase64 = await readFile(filePath, 'base64');
     const prefix = 'data:image/png;base64,';
     const resultData = prefix + imgBase64;
     return Promise.resolve(resultData);

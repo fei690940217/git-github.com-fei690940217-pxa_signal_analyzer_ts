@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-03-21 17:18:10
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 09:59:14
+ * @LastEditTime: 2024-12-27 17:30:21
  * @Descripttion:  form模块
  */
 import {
@@ -52,20 +52,18 @@ type Props = {
   addProjectForm: any;
   addFormValues: AddFormValueType | null;
   setAddFormValuesFn: Function;
-  selectBand: BandItemInfo[];
-  setSelectBand: Function;
   RBSelectedRowKeys: Key[];
   setRBSelectedRowKeys: (val: Key[]) => void;
+  LTEBandList: any[];
 };
 //设置预设名称
 const App = ({
   addProjectForm,
   addFormValues,
   setAddFormValuesFn,
-  selectBand,
-  setSelectBand,
   RBSelectedRowKeys,
   setRBSelectedRowKeys,
+  LTEBandList,
 }: Props) => {
   const { t, i18n } = useTranslation('addPage');
   // const [addProjectForm] = Form.useForm();
@@ -76,12 +74,13 @@ const App = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const currentRow = useAppSelector((state) => state.projectList.currentRow);
+  const selectBand = useAppSelector((state) => state.projectList.selectBand);
   const networkMode = addFormValues?.networkMode;
   const showLTE = networkMode === 'NSA';
   //state
   const [bandModalVisible, setBandModalVisible] = useState(false);
 
-  //将当前行的水存入本地json文件,备份数据用,无实际作用
+  //将当前行的数据存入本地json文件,备份数据用,无实际作用
   const setProjectInfoToJson = async (data: ProjectItemType) => {
     try {
       await ipcRenderer.invoke('setProjectInfoToJson', data);
@@ -260,8 +259,7 @@ const App = ({
       <BandModal
         modalVisible={bandModalVisible}
         closeModal={() => setBandModalVisible(false)}
-        selectBand={selectBand}
-        setSelectBand={setSelectBand}
+        LTEBandList={LTEBandList}
         showLTE={showLTE}
       ></BandModal>
 
@@ -378,7 +376,7 @@ const App = ({
             </Button>
           </Form.Item>
           {/* 用户选中的Band表 */}
-          <SelectBand selectBand={selectBand} showLTE={showLTE}></SelectBand>
+          <SelectBand showLTE={showLTE} />
           {/* LTE-BW */}
           {showLTE && (
             <Form.Item

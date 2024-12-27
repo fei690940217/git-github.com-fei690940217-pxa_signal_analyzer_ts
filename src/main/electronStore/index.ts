@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-04-13 09:47:55
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-26 11:01:38
+ * @LastEditTime: 2024-12-27 10:26:57
  * @Descripttion:
  */
 import path from 'path';
@@ -48,6 +48,10 @@ export default {
   getAsync: async (key: string) => {
     try {
       const filePath = path.join(basePath, `${key}.json`);
+      const flag = pathExistsSync(filePath);
+      if (!flag) {
+        return Promise.resolve(null);
+      }
       const tempData = await readFile(filePath, 'utf8');
       const trimStr = tempData?.trim();
       if (trimStr) {
@@ -59,7 +63,7 @@ export default {
     } catch (error) {
       const errmsg = `electronStore getAsync ${key} 出错${error?.toString()}`;
       logError(errmsg);
-      return Promise.reject(null);
+      return Promise.resolve(null);
     }
   },
   //实现set方法

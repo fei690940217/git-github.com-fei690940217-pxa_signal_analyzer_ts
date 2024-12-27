@@ -1,0 +1,11 @@
+.select-band-modal-wrapper {
+  .select-band-modal-content {
+    .band-checkbox-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      .band-checkbox-item {
+        width: 33%;
+      }
+    }
+  }
+}

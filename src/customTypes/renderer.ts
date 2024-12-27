@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-10-17 16:56:16
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-24 10:12:55
+ * @LastEditTime: 2024-12-27 13:53:54
  * @FilePath: \pxa_signal_analyzer\src\customTypes\renderer.ts
  * @Description:
  *
@@ -173,18 +173,16 @@ export interface ResultItemType {
 export type StatusType = 'success' | 'error' | 'abort';
 
 export interface BandItemInfo {
+  id: string;
   Band: string;
   FL: number;
   FH: number;
   CSE_Limit: number | null;
   duplexMode: 'TDD' | 'FDD'; // 假设duplexMode只能是TDD或FDD
-  MOP_LOW_Limit: string; // 由于值是"/"，我们将其定义为string类型
-  MOP_UP_Limit: string; // 同上
   LTE_Band: string[] | null; // 空数组，但类型为number[]
   SCS: number[]; // 已知SCS是一个包含数字的数组
   BW: number[]; // 已知BW是一个包含数字的数组
   ARFCN: number[]; // 已知ARFCN是一个包含数字的数组
-  PowerClass: number;
 }
 
 export type RBItemType = {

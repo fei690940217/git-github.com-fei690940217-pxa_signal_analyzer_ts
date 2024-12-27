@@ -3,13 +3,15 @@
  * @Author: xxx
  * @Date: 2022-07-25 14:48:03
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 13:26:35
+ * @LastEditTime: 2024-12-27 13:19:52
  * @Descripttion: 菜单数据
  */
 import { app } from 'electron';
+import { type MenuItemConstructorOptions } from 'electron';
+
 import { mainSendRender } from '../utils/index';
 // 右键菜单
-export const contextTemplate = [
+export const contextTemplate: MenuItemConstructorOptions[] = [
   {
     label: '刷新页面',
     accelerator: 'F5',
@@ -42,22 +44,22 @@ export const contextTemplate = [
   {
     label: '放大',
     accelerator: 'Ctrl+=',
-    role: 'zoomin',
+    role: 'zoomIn',
   },
   {
     label: '缩小',
     accelerator: 'Ctrl+-',
-    role: 'zoomout',
+    role: 'zoomOut',
   },
   {
     label: '重置缩放',
     accelerator: 'Ctrl+0',
-    role: 'resetzoom',
+    role: 'resetZoom',
   },
   {
     label: '开发者工具',
     accelerator: 'F12',
-    role: 'toggledevtools',
+    role: 'toggleDevTools',
   },
 ];
 // let template = [

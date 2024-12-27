@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-03-21 17:18:10
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 11:45:20
+ * @LastEditTime: 2024-12-27 09:59:30
  * @Descripttion:
  */
 import { Image, message, ConfigProvider, Table, notification } from 'antd';
@@ -66,9 +66,9 @@ const App = ({
   //删除某一条的结果
   const deleteResult = async (row: ResultItemType) => {
     try {
-      const resultFilePath = `${appConfigFilePath}/user/project/${currentRow?.projectName}/${currentTestRecordName}/result.json`;
       await ipcRenderer.invoke('deleteResult', {
-        resultFilePath,
+        projectName: currentRow?.projectName,
+        subProjectName: currentTestRecordName,
         row,
       });
       messageApi.success('已删除');

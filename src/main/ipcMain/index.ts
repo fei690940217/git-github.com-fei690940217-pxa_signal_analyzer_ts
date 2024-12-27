@@ -2,29 +2,26 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-06-22 15:51:43
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-26 10:01:57
+ * @LastEditTime: 2024-12-27 10:17:19
  * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\index.ts
  * @Description: 监听渲染进程事件
  *
  */
 import path from 'path';
-import { ipcMain, shell, dialog } from 'electron';
-import childProcess from 'child_process';
+import { ipcMain, shell } from 'electron';
 import configValidate from '../configValidate';
-import { move, remove, copy } from 'fs-extra';
+import { move, remove } from 'fs-extra';
 import electronStore from '@src/main/electronStore';
 
 import { appConfigFilePath } from '../publicData';
 import generateDocx from '../utils/generateDocx';
 import logger from '../logger';
-import { type Logger, LeveledLogMethod } from 'winston';
 import {
   deleteResult,
   addSubProject,
   getSubProjectList,
   testLinkIsEnabledFn,
   getJsonFileByFilePath,
-  writeJsonFile,
   createDir,
   setProjectInfoToJson,
   archiveProject,
@@ -42,11 +39,8 @@ import { mainSendRender } from '../utils';
 import abortTest from '../utils/abortTest';
 import getLineLoss from './getLineLoss';
 import { getJsonFile, setJsonFile } from './getAndSetJsonFile';
-
-import NR_Band_list from '@src/main/configValidate/NR_Band_List';
-import CSELimit from '@src/main/configValidate/CSELimit';
-import configData from '@src/main/configValidate/NR_ARFCN';
-import TEST from '@src/main/configValidate/RBConfig';
+import TEST from '@src/main/configValidate/LTE_ARFCN/index';
+import { DeleteResultPayload } from '@src/customTypes/main';
 export default () => {
   //验证配置文件>config文件夹,用户定义
   ipcMain.on('refreshConfigFile', () => {
@@ -97,7 +91,7 @@ export default () => {
   });
   //测试专用,无其他作用
   ipcMain.on('test', (event, val) => {
-    // TEST(true);
+    TEST(true);
   });
   //开始测试
   ipcMain.on('startTest', async (event, argv) => {
@@ -155,7 +149,7 @@ export default () => {
   });
 
   //deleteResult>前端通知main进程删除某一条的测试结果
-  ipcMain.handle('deleteResult', (e, payload) => {
+  ipcMain.handle('deleteResult', (e, payload: DeleteResultPayload) => {
     return deleteResult(payload);
   });
 
@@ -173,10 +167,6 @@ export default () => {
   //setProjectInfoToJson
   ipcMain.handle('setProjectInfoToJson', (e, payload) => {
     return setProjectInfoToJson(payload);
-  });
-  //writeFile
-  ipcMain.handle('writeJsonFile', (e, payload) => {
-    return writeJsonFile(payload);
   });
   //createDir 创建文件夹
   ipcMain.handle('createDir', (e, payload) => {

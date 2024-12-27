@@ -2,13 +2,13 @@
  * @Author: feifei
  * @Date: 2023-05-17 09:32:41
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-26 11:04:53
+ * @LastEditTime: 2024-12-27 11:01:37
  * @FilePath: \pxa_signal_analyzer\src\main\appEventHandle\index.ts
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
-import { app, Menu, BrowserView } from 'electron';
+import { app, Menu, BrowserView, BrowserWindow } from 'electron';
 import { contextTemplate } from './AppMenuList';
 import windowClose from './windowClose';
 import configValidate from '../configValidate';
@@ -16,9 +16,9 @@ import ipcMainEvent from '../ipcMain/index';
 import runVisaProxy from '../utils/runVisaProxy';
 import electronStore from '@src/main/electronStore';
 //子进程启动函数
-export default (win: BrowserView) => {
+export default (win: BrowserWindow) => {
   //app事件监听函数
-  app.on('window-all-closed', async (event) => {
+  app.on('window-all-closed', async () => {
     //准备杀掉进程
     app.quit();
   });
@@ -39,11 +39,11 @@ export default (win: BrowserView) => {
   //添加右键上下文菜单
   const contextMenu = Menu.buildFromTemplate(contextTemplate);
   win.webContents.on('context-menu', (e, params) => {
-    contextMenu.popup(win, params.x, params.y);
+    contextMenu.popup({ window: win });
   });
   //验证配置文件
   win.on('ready-to-show', () => {
-    configValidate(win);
+    configValidate();
   });
 
   // 监听窗口最小化事件

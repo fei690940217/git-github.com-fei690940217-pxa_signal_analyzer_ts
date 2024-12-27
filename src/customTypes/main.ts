@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-11-03 11:40:24
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-25 11:47:58
+ * @LastEditTime: 2024-12-26 16:04:02
  * @FilePath: \pxa_signal_analyzer\src\customTypes\main.ts
  * @Description:
  *
@@ -10,6 +10,8 @@
  */
 import { CellValue } from 'exceljs';
 import { OFDMType } from './index';
+import { ResultItemType, TestItemType } from '@src/customTypes/renderer';
+
 ///BandList
 export type BandInfoType = {
   id: number;
@@ -86,6 +88,9 @@ export type ARFCNItemType = {
 export type SCSData = ARFCNItemType[];
 
 export type BandEdgeEmissionLimitConfigType = {
+  RB: string;
+  BW: string;
+  level: string;
   no: number;
   start: Array<string>;
   stop: Array<string>;
@@ -141,4 +146,20 @@ export type RBConfigItem = {
   RB: string;
   num: string;
   start: string;
+};
+
+export type LTEARFCNItemType = {
+  Band: string;
+  level: string;
+  BW: string;
+  UL: number;
+  FreqUp: number;
+  DL: number;
+  FreqDown: number;
+};
+
+export type DeleteResultPayload = {
+  projectName: string;
+  subProjectName: string;
+  row: ResultItemType;
 };

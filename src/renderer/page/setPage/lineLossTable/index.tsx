@@ -131,7 +131,6 @@ const App = () => {
     const { type, value, msg } = rst;
     if (type === 'success') {
       if (value?.length) {
-        //找到基站线损表,表格sheetList
         const findItem = value.find((item: any) => {
           return item.name === '频谱线损';
         });

@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-03-21 17:18:10
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-19 17:33:49
+ * @LastEditTime: 2024-12-27 16:43:59
  * @Descripttion:  新建项目
  */
 
@@ -18,6 +18,7 @@ import localforage from 'localforage';
 import { useSelector } from 'react-redux';
 import { useAppSelector } from '@src/renderer/hook';
 import { BandItemInfo, AddFormValueType } from '@src/customTypes/renderer';
+const { ipcRenderer } = window.myApi;
 export default () => {
   const [addProjectForm] = Form.useForm();
   const currentRow = useAppSelector((state) => state.projectList.currentRow);
@@ -29,7 +30,8 @@ export default () => {
   const [selectBand, setSelectBand] = useState<BandItemInfo[]>([]);
   //选中的RB配置id列表
   const [RBSelectedRowKeys, setRBSelectedRowKeys] = useState<Key[]>([]);
-
+  //LTEBandList
+  const [LTEBandList, setLTEBandList] = useState<BandItemInfo[]>([]);
   //进入页面,根据currentRow重置数据
   const initFn = async () => {
     //说明是首页点击复用按钮进入的此页面
@@ -65,6 +67,17 @@ export default () => {
     setAddFormValues(obj);
     localforage.setItem('addFormValues', obj);
   };
+
+  const getBandList = async () => {
+    const LTEBandList = await ipcRenderer.invoke(
+      'getJsonFileByFilePath',
+      'app/LTE_Band_List.json',
+    );
+    setLTEBandList(LTEBandList);
+  };
+  useEffect(() => {
+    getBandList();
+  }, []);
   //从后端获取RBTableObj
   useEffect(() => {
     initFn();
@@ -77,10 +90,9 @@ export default () => {
           addFormValues={addFormValues}
           setAddFormValuesFn={setAddFormValuesFn}
           addProjectForm={addProjectForm}
-          selectBand={selectBand}
-          setSelectBand={setSelectBand}
           RBSelectedRowKeys={RBSelectedRowKeys}
           setRBSelectedRowKeys={setRBSelectedRowKeys}
+          LTEBandList={LTEBandList}
         />
         {/* 勾选RB配置 */}
         <RBPlanTable

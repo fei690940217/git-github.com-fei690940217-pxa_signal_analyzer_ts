@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-04-07 14:24:23
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-25 13:18:03
+ * @LastEditTime: 2024-12-26 15:31:38
  * @Descripttion:   测试用例数据验证与配置文件生成
  */
 
@@ -12,10 +12,7 @@ import rbConfigData from './RBConfig';
 import authTypeObj from './NR_Band_List';
 import LTE_Band_List from './LTE_Band_List';
 import LTE_ARFCN from './LTE_ARFCN';
-import bandedgeLimit from './bandEdge/bandedgeLimit';
-import bandedgeLimitGate from './bandEdge/bandedgeLimitGate';
-import bandedgeLimitIC from './bandEdge/bandedgeICLimit';
-
+import BandEdgeLimit from './bandEdgeLimit';
 import CSELimit from './CSELimit';
 import { logError } from '../logger/logLevel';
 
@@ -25,12 +22,7 @@ export default async (isRefresh: boolean = false) => {
   try {
     await LTE_Band_List(isRefresh);
     LTE_ARFCN(isRefresh);
-    //normal
-    bandedgeLimit(isRefresh);
-    //gate
-    bandedgeLimitGate(isRefresh);
-    //IC
-    bandedgeLimitIC(isRefresh);
+    BandEdgeLimit(isRefresh);
     CSELimit(isRefresh);
     //生成FCC,ce,telec 对应的band列表
     await authTypeObj(isRefresh);
