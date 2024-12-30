@@ -1,18 +1,17 @@
 /*
- * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\util\index.ts
+ * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\util\RESULT.ts
  * @Author: xxx
  * @Date: 2023-04-06 14:36:21
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-25 15:49:19
+ * @LastEditTime: 2024-12-30 15:39:22
  * @Descripttion: 测试数据生成
  */
 import { cloneDeep } from 'lodash';
 import {
-  AddFormValueType,
+  NewAddFormValueType,
   ResultItemType,
   TestItemType,
 } from '@src/customTypes/renderer';
-import { type Key } from 'react';
 //全部的band列表,用于排序
 import BandEdgeICHandle from './BandEdgeICHandle';
 import BandEdgeHandle from './BandEdgeHandle';
@@ -83,7 +82,7 @@ const AbnormalHandle = async (
 };
 
 //对结果添加id
-const resultIdHandle = (supResult) => {
+const resultIdHandle = (supResult: any[]) => {
   const RST = supResult.map((item, index: number) => {
     item.id = index + 1;
     return item;
@@ -91,15 +90,15 @@ const resultIdHandle = (supResult) => {
   return RST;
 };
 
-export default (formValue: AddFormValueType, RBSelectedRowKeys: Key[]) => {
+export default (formValue: NewAddFormValueType) => {
   return new Promise<ResultItemType[]>(async (resolve, reject) => {
     try {
       let RST = null;
-      const { isGate, testItems } = formValue;
+      const { isGate, testItems, RBConfigSelected } = formValue;
       //父级数据生成
       const supResult = await supResultGenerate(formValue);
       //子级数据生成
-      RST = await subsHandle(supResult, RBSelectedRowKeys, testItems);
+      RST = await subsHandle(supResult, RBConfigSelected, testItems);
 
       //对CSE,BandEdge,BandEdgeIC进行特殊处理
       const arr = ['BandEdge', 'CSE', 'BandEdgeIC'];

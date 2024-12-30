@@ -1,10 +1,5 @@
-import {
-  AddFormValueType,
-  ResultItemType,
-  TestItemType,
-  SupRowType,
-} from '@src/customTypes/renderer';
-import { ARFCNConfigItem, BandItemType } from '@src/customTypes/main';
+import { SupRowType, NewAddFormValueType } from '@src/customTypes/renderer';
+import { ARFCNConfigItem } from '@src/customTypes/main';
 import { logError } from '@src/renderer/utils/logLevel';
 
 const { ipcRenderer } = window.myApi;
@@ -86,15 +81,15 @@ const find_ARFCN_and_Freq = (
 
 //生成一二级数据 包含, PAR n41 30KHz 100MHz  623334
 const supResultGenerate = async (
-  formValue: AddFormValueType,
+  formValue: NewAddFormValueType,
 ): Promise<SupRowType[]> => {
   try {
-    const { testItems, networkMode, Band } = formValue;
+    const { testItems, networkMode, selectBand } = formValue;
     const testItem = testItems;
     //获取新增项目的配置文件
     const addProjectConfig = await fetchProjectConfig();
     const supList = [];
-    for (let BandObj of Band) {
+    for (let BandObj of selectBand) {
       const { Band, LTE_Band, SCS, BW, ARFCN, FH, FL, CSE_Limit, duplexMode } =
         BandObj;
       let tempBand = Band;
@@ -155,7 +150,7 @@ const supResultGenerate = async (
 };
 //生成一二级数据 NSA版本,需要考虑let_band
 const nsaSupResultGenerate = async (
-  formValue: AddFormValueType,
+  formValue: NewAddFormValueType,
 ): Promise<SupRowType[]> => {
   try {
     const tempSupList = await supResultGenerate(formValue);
@@ -179,7 +174,7 @@ const nsaSupResultGenerate = async (
   }
 };
 
-export default async (formValue: AddFormValueType) => {
+export default async (formValue: NewAddFormValueType) => {
   const { networkMode } = formValue;
   const isNSA = networkMode === 'NSA';
   return isNSA ? nsaSupResultGenerate(formValue) : supResultGenerate(formValue);

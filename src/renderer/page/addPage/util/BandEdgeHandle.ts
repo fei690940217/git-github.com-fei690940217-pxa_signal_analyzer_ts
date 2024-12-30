@@ -8,7 +8,7 @@
  *
  * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved.
  */
-import { loopFn } from './formData';
+import { loopFn } from './';
 import { logError } from '@/utils/logLevel';
 import {
   AddFormValueType,

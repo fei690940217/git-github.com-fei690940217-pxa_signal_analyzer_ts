@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-04-06 10:24:55
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-23 13:55:56
+ * @LastEditTime: 2024-12-30 15:59:04
  * @Descripttion:NR频段表/FCC,CE,TELEC
  */
 
@@ -15,12 +15,12 @@ import { logError } from '../logger/logLevel';
 import { NRBandObjType } from '@src/customTypes/main';
 const reg = /\s/g;
 //配置文件地址
-const configFilePath = path.join(
+const fromPath = path.join(
   appConfigFilePath,
   'user/operating bands/NR认证频段.xlsx',
 );
 //写入本地
-const filePath = path.join(appConfigFilePath, 'app/authTypeObj.json');
+const toPath = path.join(appConfigFilePath, 'app/NR_Band_List.json');
 
 //单表数据处理
 const xlsxDataHandle = (data: any[][]) => {
@@ -60,21 +60,21 @@ const xlsxDataHandle = (data: any[][]) => {
 export default async (isRefresh: boolean) => {
   try {
     if (!isRefresh) {
-      const flag = await pathExists(filePath);
+      const flag = await pathExists(toPath);
       if (flag) {
         return Promise.resolve();
       }
     }
     const resultObj: NRBandObjType = { FCC: [], CE: [], TELEC: [] };
     //判断配置文件是否存在
-    const isExist = await pathExists(configFilePath);
+    const isExist = await pathExists(fromPath);
     if (!isExist) {
       logError('user/operating bands/NR认证频段.xlsx 文件不存在,请检查');
       return Promise.reject(
         'user/operating bands/NR认证频段.xlsx 文件不存在,请检查',
       );
     }
-    const workSheetsList = xlsx.parse(configFilePath);
+    const workSheetsList = xlsx.parse(fromPath);
     const certificationTypeList: (keyof NRBandObjType)[] = [
       'FCC',
       'CE',
@@ -90,7 +90,7 @@ export default async (isRefresh: boolean) => {
       const { data } = findSheet;
       resultObj[certificationItem] = xlsxDataHandle(data);
     }
-    await outputJson(filePath, resultObj);
+    await outputJson(toPath, resultObj);
     return Promise.resolve();
   } catch (error) {
     const msg = `authTypeObj.js 77 ${error}`;

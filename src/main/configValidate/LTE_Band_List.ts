@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-04-06 10:24:55
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-27 09:46:37
+ * @LastEditTime: 2024-12-30 17:04:40
  * @Descripttion:CSE limit与Band对照表
  */
 
@@ -12,7 +12,6 @@ import { appConfigFilePath } from '../publicData';
 import XLSX from 'xlsx';
 import { outputJson, pathExists } from 'fs-extra';
 import { logError } from '../logger/logLevel';
-import { BandItemType } from '@src/customTypes/main';
 type KeyType = 'Band' | 'FL' | 'FH' | 'duplexMode';
 type LTEBandItemType = {
   Band: string;
@@ -48,7 +47,7 @@ export default async (isRefresh: boolean) => {
     const { Sheets, SheetNames } = wb;
     const sheet = Sheets[SheetNames[0]];
     const json = XLSX.utils.sheet_to_json<LTEBandItemType>(sheet, {
-      range: 0,
+      range: 1,
       header,
       defval: '',
       raw: false, // 禁用原始文本模式

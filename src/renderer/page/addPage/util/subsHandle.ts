@@ -34,11 +34,11 @@ const getRBConfigJson = async (testItems: string): Promise<RBConfigItem[]> => {
 //BandEdgeIC配置项的RB名称比较特殊，需要单独处理,但是实际上以下两项都从Outer_Full中读取数据
 //  'Outer_Full_Left',
 //   'Outer_Full_Right',
-const RBListGenerate = (RBSelectedRowKeys: Key[], testItem: TestItemType) => {
+const RBListGenerate = (RBConfigSelected: Key[], testItem: TestItemType) => {
   try {
     const RB_LIST = RBTableObj[testItem];
     const rbList = RB_LIST.filter((rbItem) => {
-      return RBSelectedRowKeys.includes(rbItem.id);
+      return RBConfigSelected.includes(rbItem.id);
     });
 
     if (testItem === 'BandEdgeIC') {
@@ -187,11 +187,11 @@ const normalListGenerate = async (
 //子级数据生成
 export default async (
   list: SupRowType[],
-  RBSelectedRowKeys: Key[],
+  RBConfigSelected: Key[],
   testItems: TestItemType,
 ) => {
   try {
-    const RBList = RBListGenerate(RBSelectedRowKeys, testItems);
+    const RBList = RBListGenerate(RBConfigSelected, testItems);
     const supList = list;
     //获取新增项目的配置文件
     const addProjectRbConfig = await getRBConfigJson(testItems);

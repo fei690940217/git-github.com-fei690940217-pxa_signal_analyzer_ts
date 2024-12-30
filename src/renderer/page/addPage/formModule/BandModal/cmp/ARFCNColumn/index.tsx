@@ -15,7 +15,7 @@ import './index.scss';
 import { useAppDispatch, useAppSelector } from '@src/renderer/hook';
 import { cloneDeep } from 'lodash';
 import { BandItemInfo } from '@src/customTypes/renderer';
-import { setSelectBand } from '@src/renderer/store/modules/projectList';
+import { setAddFormValue } from '@src/renderer/store/modules/projectList';
 //
 type PropsType = {
   row: BandItemInfo;
@@ -23,7 +23,11 @@ type PropsType = {
 export default ({ row }: PropsType) => {
   const dispatch = useAppDispatch();
   //本弹窗内的选择项
-  const selectBand = useAppSelector((state) => state.projectList.selectBand);
+  // const selectBand = useAppSelector((state) => state.projectList.selectBand);
+  const addFormValue = useAppSelector(
+    (state) => state.projectList.addFormValue,
+  );
+  const { selectBand } = addFormValue;
   const ARFCN_Change = (value: number[]) => {
     //排序
     value.sort((a, b) => a - b);
@@ -34,7 +38,7 @@ export default ({ row }: PropsType) => {
       }
       return item;
     });
-    dispatch(setSelectBand(tempList));
+    dispatch(setAddFormValue({ ...addFormValue, selectBand: tempList }));
   };
   return (
     <div className="lte-band-column-wrapper">

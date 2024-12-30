@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-27 17:45:03
+ * @LastEditTime: 2024-12-30 16:54:14
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\BandModal\index.tsx
  * @Description: 项目列表主表格
  */
@@ -20,33 +20,31 @@ import NRBand from './cmp/NRBand';
 import LTEBand from './cmp/LTEBand';
 import SCSColumn from './cmp/SCSColumn';
 import NRBWColumn from './cmp/NRBWColumn';
-import { setSelectBand } from '@src/renderer/store/modules/projectList';
+import ARFCNColumn from './cmp/ARFCNColumn';
+import { setAddFormValue } from '@src/renderer/store/modules/projectList';
 import { useAppDispatch, useAppSelector } from '@src/renderer/hook';
+import { NRBandObjType, BandItemType } from '@src/customTypes/main';
 const { ipcRenderer } = window.myApi;
 
 type PropsType = {
-  modalVisible: boolean;
-  closeModal: () => void;
   showLTE: boolean;
   LTEBandList: any;
 };
-export default ({
-  modalVisible,
-  closeModal,
-  showLTE,
-  LTEBandList,
-}: PropsType) => {
+export default ({ showLTE, LTEBandList }: PropsType) => {
   //本弹窗内的选择项
-  const [FCCBandList, setFCCBandList] = useState<BandItemInfo[]>([]);
+  const [FCCBandList, setFCCBandList] = useState<BandItemType[]>([]);
   const [messageApi, messageContextHolder] = message.useMessage();
-  const selectBand = useAppSelector((state) => state.projectList.selectBand);
+  const addFormValue = useAppSelector(
+    (state) => state.projectList.addFormValue,
+  );
+  const { selectBand } = addFormValue;
   const dispatch = useAppDispatch();
   //获取FCC Band列表
   const getBandList = async () => {
     try {
-      const allBandList = await ipcRenderer.invoke(
+      const allBandList: NRBandObjType = await ipcRenderer.invoke(
         'getJsonFileByFilePath',
-        'app/authTypeObj.json',
+        'app/NR_Band_List.json',
       );
       setFCCBandList(allBandList['FCC']);
     } catch (error) {
@@ -60,8 +58,8 @@ export default ({
   const bandObj = useMemo(() => {
     try {
       if (FCCBandList?.length) {
-        const FDD_LIST: BandItemInfo[] = [];
-        const TDD_LIST: BandItemInfo[] = [];
+        const FDD_LIST: BandItemType[] = [];
+        const TDD_LIST: BandItemType[] = [];
         //先找出FDD
         FCCBandList.forEach((item) => {
           const { duplexMode } = item;
@@ -80,45 +78,6 @@ export default ({
     }
   }, [FCCBandList]);
 
-  useEffect(() => {
-    if (modalVisible) {
-    }
-  }, [modalVisible]);
-  const formVerify = async () => {
-    try {
-      if (selectBand?.length) {
-        //NSA
-        for (let BandObj of selectBand) {
-          const { Band, SCS, BW, ARFCN } = BandObj;
-          //SA
-          if (!SCS?.length) {
-            return Promise.reject(`${Band}未选择SCS`);
-          }
-          if (!BW?.length) {
-            return Promise.reject(`${Band}未选择BW`);
-          }
-          if (!ARFCN?.length) {
-            return Promise.reject(`${Band}未选择ARFCN`);
-          }
-        }
-        return Promise.resolve();
-      } else {
-        return Promise.reject('未选择NR_Band');
-      }
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-  const submit = async () => {
-    try {
-      await formVerify();
-      closeModal();
-    } catch (error) {
-      logError(error?.toString());
-      messageApi.error(error?.toString());
-    }
-  };
-
   //添加一行
   const addRow = () => {
     const row: BandItemInfo = {
@@ -134,10 +93,22 @@ export default ({
       ARFCN: [], // 已知ARFCN是一个包含数字的数组
     };
     const tempSelectBand = cloneDeep(selectBand);
-    dispatch(setSelectBand([...tempSelectBand, row]));
+    tempSelectBand.push(row);
+    dispatch(setAddFormValue({ ...addFormValue, selectBand: tempSelectBand }));
   };
-  const DelColumnRender = () => {
-    return <DeleteOutlined style={{ color: 'red', cursor: 'print' }} />;
+  //删除一行
+  const delRow = (row: BandItemInfo) => {
+    const tempSelectBand = cloneDeep(selectBand);
+    const rst = tempSelectBand.filter((item) => item.id !== row.id);
+    dispatch(setAddFormValue({ ...addFormValue, selectBand: rst }));
+  };
+  const DelColumnRender = (_text: any, row: BandItemInfo) => {
+    return (
+      <DeleteOutlined
+        onClick={() => delRow(row)}
+        style={{ color: 'red', cursor: 'print' }}
+      />
+    );
   };
   const columns: TableProps<BandItemInfo>['columns'] = [
     {
@@ -150,10 +121,8 @@ export default ({
       title: 'NR_Band',
       dataIndex: 'Band',
       key: 'Band',
-      width: 120,
-      render: (text, record) => (
-        <NRBand row={record} bandObj={bandObj}></NRBand>
-      ),
+      width: 140,
+      render: (text, record) => <NRBand row={record} bandObj={bandObj} />,
     },
     {
       title: 'LTE_Band',
@@ -162,16 +131,16 @@ export default ({
       width: 230,
       hidden: !showLTE,
       render: (text, record) => (
-        <LTEBand row={record} LTEBandList={LTEBandList}></LTEBand>
+        <LTEBand row={record} LTEBandList={LTEBandList} />
       ),
     },
     {
-      title: 'SCS',
+      title: 'SCS(KHz)',
       dataIndex: 'SCS',
       key: 'SCS',
-      width: 160,
+      width: 180,
       ellipsis: true,
-      render: (text, record) => <SCSColumn row={record}></SCSColumn>,
+      render: (text, record) => <SCSColumn row={record} />,
     },
     {
       title: 'NR_BW(MHz)',
@@ -179,15 +148,15 @@ export default ({
       key: 'BW',
       width: 230,
       ellipsis: true,
-      render: (text, record) => <NRBWColumn row={record}></NRBWColumn>,
+      render: (text, record) => <NRBWColumn row={record} />,
     },
     {
       title: 'NR_ARFCN',
       dataIndex: 'ARFCN',
       key: 'ARFCN',
-      width: 220,
+      width: 180,
       ellipsis: true,
-      render: (text, record) => <NRBWColumn row={record}></NRBWColumn>,
+      render: (text, record) => <ARFCNColumn row={record} />,
     },
     {
       title: 'Del',
@@ -197,45 +166,32 @@ export default ({
     },
   ];
   return (
-    <Modal
-      keyboard={false}
-      maskClosable={false}
-      title="NR-Band"
-      open={modalVisible}
-      onCancel={closeModal}
-      style={{ maxHeight: '90vh' }}
-      centered={true}
-      wrapClassName="select-band-modal-wrapper"
-      onOk={submit}
-      width={1200}
-    >
+    <div className="select-band-modal-content">
       {messageContextHolder}
-      <div className="select-band-modal-content">
-        {/* 已选区域 */}
-        <div
-          style={{ marginBottom: 30 }}
-          className="select-band-modal-content-top"
-        >
-          <Table
-            size="small"
-            dataSource={selectBand}
-            rowKey="id"
-            bordered
-            pagination={false}
-            columns={columns}
-          />
-          <div style={{ marginTop: 10 }}>
-            <Tooltip title="添加一行">
-              <Button
-                onClick={addRow}
-                color="primary"
-                variant="dashed"
-                icon={<PlusOutlined />}
-              ></Button>
-            </Tooltip>
-          </div>
-        </div>
+      <div
+        style={{ marginTop: 10 }}
+        className="select-band-modal-content__left"
+      >
+        <Tooltip title="添加一行">
+          <Button
+            onClick={addRow}
+            color="primary"
+            variant="dashed"
+            icon={<PlusOutlined />}
+          ></Button>
+        </Tooltip>
       </div>
-    </Modal>
+      {/* 已选区域 */}
+      <div className="select-band-modal-content__right">
+        <Table
+          size="small"
+          dataSource={selectBand}
+          rowKey="id"
+          bordered
+          pagination={false}
+          columns={columns}
+        />
+      </div>
+    </div>
   );
 };

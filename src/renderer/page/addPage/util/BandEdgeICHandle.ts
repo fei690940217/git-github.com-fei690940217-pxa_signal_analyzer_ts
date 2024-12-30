@@ -2,13 +2,13 @@
  * @Author: feifei
  * @Date: 2024-12-02 17:01:34
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-25 16:06:54
- * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\util\BandEdgeICHandle.ts
+ * @LastEditTime: 2024-12-30 15:46:00
+ * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\util\BandEdgeICHandle.ts
  * @Description:
  *
  * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved.
  */
-import { loopFn } from './formData';
+import { loopFn } from './';
 import { logError } from '@/utils/logLevel';
 
 const { ipcRenderer } = window.myApi;

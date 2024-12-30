@@ -1,43 +1,29 @@
 // left
-.ant-card.add-project-form-card {
-  height: 100%;
-  width: 520px;
-  display: flex;
-  flex-direction: column;
-  .ant-card-head {
-    //title
-    .add-project-title {
-      display: flex;
-      justify-content: space-between;
-    }
-  }
-  .ant-card-body {
+.add-project-form-top {
+  .add-form-wrapper {
     flex: 1;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    //表单
-    .add-form-wrapper {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      .ant-form {
-        .ant-form-item {
-          margin-bottom: 14px;
-          padding: 4px;
-          border-radius: 5px;
-          background: #f7f9fa;
-          .ant-form-item-row {
-            .ant-form-item-label {
-              padding-bottom: 3px;
-            }
-            .ant-form-item-control {
-              padding-left: 10px;
-            }
+    overflow-y: auto;
+    overflow-x: hidden;
+    .ant-form {
+      .ant-form-item {
+        margin-bottom: 14px;
+        padding: 4px;
+        border-radius: 5px;
+        background: #f7f9fa;
+        .ant-form-item-row {
+          .ant-form-item-label {
+            padding-bottom: 3px;
+            font-weight: 600;
           }
-          .test-item-checkbox-wrapper {
-            display: flex;
+          .ant-form-item-control {
+            padding-left: 10px;
           }
+        }
+      }
+      .ant-form-item.select-band-form-item {
+        .ant-row.ant-form-item-row {
+          // 不允许换行
+          flex-wrap: nowrap;
         }
       }
     }

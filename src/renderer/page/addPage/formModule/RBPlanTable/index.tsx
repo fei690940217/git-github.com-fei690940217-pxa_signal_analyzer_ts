@@ -2,40 +2,49 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
+ * @LastEditTime: 2024-12-30 14:47:07
+ * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\RBPlanTable\index.tsx
+ * @Description: 勾选测试项页面
+ */
+
+/*
+ * @Author: fei690940217 690940217@qq.com
+ * @Date: 2022-07-14 11:37:59
+ * @LastEditors: feifei
  * @LastEditTime: 2024-12-20 09:09:44
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\RBPlanTable\RBTableItem\index.tsx
  * @Description: 勾选测试项页面
  */
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React from 'react';
 import './index.scss';
-import { useSelector, useDispatch } from 'react-redux';
 import { Table, ConfigProvider } from 'antd';
-import RBTableObj from '@/page/addPage/formModule/util/RBTableObj';
-import type { TableColumnsType, TableProps } from 'antd';
+import RBTableObj from '@/page/addPage/util/RBTableObj';
+import type { TableProps } from 'antd';
 import type { RBItemType } from '@src/customTypes/renderer';
+import { setAddFormValue } from '@src/renderer/store/modules/projectList';
+import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
+
 type TableRowSelection<T extends object = object> =
   TableProps<T>['rowSelection'];
 const { Column } = Table;
-type Props = {
-  testItem: string;
-  RBSelectedRowKeys: React.Key[];
-  setRBSelectedRowKeys: (val: React.Key[]) => void;
-};
 //props testItem 测试用例
-export default ({
-  testItem,
-  RBSelectedRowKeys,
-  setRBSelectedRowKeys,
-}: Props) => {
+export default () => {
+  const dispatch = useAppDispatch();
+  const addFormValue = useAppSelector(
+    (state) => state.projectList.addFormValue,
+  );
+  const testItem = addFormValue?.testItems || '';
   const RBTableList = RBTableObj[testItem];
   const isHiddenChannel = testItem !== 'BandEdge';
   const tableRowSelection: TableRowSelection<RBItemType> = {
     type: 'checkbox',
     checkStrictly: false,
-    selectedRowKeys: RBSelectedRowKeys,
+    selectedRowKeys: addFormValue?.RBConfigSelected || [],
     onChange: (selectedRowKeys: React.Key[]) => {
-      setRBSelectedRowKeys(selectedRowKeys);
+      dispatch(
+        setAddFormValue({ ...addFormValue, RBConfigSelected: selectedRowKeys }),
+      );
     },
   };
   //OFDM列自定义渲染
@@ -72,9 +81,6 @@ export default ({
           bordered={true}
           rowKey="id"
           pagination={false}
-          scroll={{
-            y: 'auto',
-          }}
         >
           {/* 序号 */}
           <Column

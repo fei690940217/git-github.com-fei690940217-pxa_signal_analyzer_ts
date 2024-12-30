@@ -2,22 +2,24 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-27 17:47:21
+ * @LastEditTime: 2024-12-30 16:53:43
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\BandModal\cmp\NRBand\selectBandModal\index.tsx
  * @Description: 项目列表主表格
  */
 
-import { Modal, Radio, Checkbox } from 'antd';
+import { Modal, Radio, message } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import { useState, useEffect } from 'react';
 import './index.scss';
 import { BandItemInfo } from '@src/customTypes/renderer';
 import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
-import { setSelectBand } from '@src/renderer/store/modules/projectList';
+import { setAddFormValue } from '@src/renderer/store/modules/projectList';
 import { cloneDeep } from 'lodash';
+import { BandItemType } from '@src/customTypes/main';
+
 type BandObjType = {
-  TDD: BandItemInfo[];
-  FDD: BandItemInfo[];
+  TDD: BandItemType[];
+  FDD: BandItemType[];
 };
 type PropsType = {
   modalVisible: boolean;
@@ -27,7 +29,10 @@ type PropsType = {
 };
 export default ({ modalVisible, closeModal, row, bandObj }: PropsType) => {
   const dispatch = useAppDispatch();
-  const selectBand = useAppSelector((state) => state.projectList.selectBand);
+  const addFormValue = useAppSelector(
+    (state) => state.projectList.addFormValue,
+  );
+  const { selectBand } = addFormValue;
   //本弹窗内的选择项
   const [radioGroupValue, setRadioGroupValue] = useState<string>('');
   //弹窗打开事件
@@ -43,19 +48,49 @@ export default ({ modalVisible, closeModal, row, bandObj }: PropsType) => {
   const submit = () => {
     if (radioGroupValue) {
       const tempSelectBand = cloneDeep(selectBand);
+      //先验证一下是否重复选择
+      const findIndex = tempSelectBand.findIndex((item) => {
+        //如果是当前行就不管了,随便重复
+        if (item.id == row.id) {
+          return false;
+        }
+        //如果不是当前行，就判断是否重复
+        return item.Band === radioGroupValue;
+      });
+      if (findIndex >= 0) {
+        return message.error('Band已存在,请重新选择!');
+      }
       const tempList = tempSelectBand.map((item) => {
         if (item.id === row.id) {
-          item.Band = radioGroupValue;
+          const allBandList = [...bandObj.FDD, ...bandObj.TDD];
+          //找到数据库中的Band信息
+          const dbBandItem = allBandList.find((dbBandItem) => {
+            return dbBandItem.Band === radioGroupValue;
+          });
+          if (dbBandItem) {
+            const { FL, FH, CSE_Limit, duplexMode } = dbBandItem;
+            return {
+              ...item,
+              Band: radioGroupValue,
+              FL: FL || 0,
+              FH: FH || 0,
+              CSE_Limit: CSE_Limit || 0,
+              duplexMode: duplexMode || 'FDD',
+            };
+          }
         }
         return item;
       });
-      dispatch(setSelectBand(tempList));
+      dispatch(setAddFormValue({ ...addFormValue, selectBand: tempList }));
       closeModal();
     }
   };
   //组的变化
-  const onSelectBandGroupChange = (checkedValues: RadioChangeEvent) => {
-    console.log('onSelectBandGroupChange ', checkedValues);
+  const onSelectBandGroupChange = (e: RadioChangeEvent) => {
+    const { checked, value } = e.target;
+    if (checked) {
+      setRadioGroupValue(value);
+    }
   };
   return (
     <Modal

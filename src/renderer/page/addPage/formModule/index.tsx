@@ -3,203 +3,42 @@
  * @Author: xxx
  * @Date: 2023-03-21 17:18:10
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-27 17:30:21
+ * @LastEditTime: 2024-12-30 17:16:58
  * @Descripttion:  form模块
  */
-import {
-  Button,
-  Form,
-  Input,
-  message,
-  Select,
-  Card,
-  Radio,
-  Modal,
-  notification,
-  Switch,
-  Space,
-} from 'antd';
+import { Form, Input, Select, Radio, Switch, Space } from 'antd';
 import type { RadioChangeEvent } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { useState } from 'react';
-import { type Key } from 'react';
-
-import { useNavigate } from 'react-router';
+import { type Key, ChangeEvent } from 'react';
 import './index.scss';
-import { nanoid } from 'nanoid';
-import $moment from 'moment';
-import { LTE_BW_LIST } from './util/formData';
 import { testItemList } from '@src/common';
-import addLog from '@/store/asyncThunk/addLog';
-import { logError } from '@/utils/logLevel';
-import modalConfirm from '@/utils/modalConfirm';
-import { delayTime } from '@/utils';
-import supRowsGenerate from './util';
-import { cloneDeep, debounce } from 'lodash';
-import BandModal from './BandModal';
-import SelectBand from './selectBand';
+import SelectBand from './BandModal';
+import RBConfigTable from './RBPlanTable';
 import { useTranslation } from 'react-i18next';
-import { generateDefaultSelectRBList } from '@src/renderer/page/addPage/formModule/util/RBTableObj';
-import {
-  BandItemInfo,
-  AddFormValueType,
-  ProjectItemType,
-} from '@src/customTypes/renderer';
+import { generateDefaultSelectRBList } from '@src/renderer/page/addPage/util/RBTableObj';
 import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
-
-const { ipcRenderer } = window.myApi;
+import { setAddFormValue } from '@src/renderer/store/modules/projectList';
+const LTE_BW_LIST = [
+  { label: 1.4, value: 1.4 },
+  { label: 3, value: 3 },
+  { label: 5, value: 5 },
+  { label: 10, value: 10 },
+  { label: 15, value: 15 },
+  { label: 20, value: 20 },
+];
 type Props = {
   addProjectForm: any;
-  addFormValues: AddFormValueType | null;
-  setAddFormValuesFn: Function;
-  RBSelectedRowKeys: Key[];
-  setRBSelectedRowKeys: (val: Key[]) => void;
   LTEBandList: any[];
 };
 //设置预设名称
-const App = ({
-  addProjectForm,
-  addFormValues,
-  setAddFormValuesFn,
-  RBSelectedRowKeys,
-  setRBSelectedRowKeys,
-  LTEBandList,
-}: Props) => {
-  const { t, i18n } = useTranslation('addPage');
-  // const [addProjectForm] = Form.useForm();
-  const [modalApi, contextHolder] = Modal.useModal();
-  const [messageApi, messageContextHolder] = message.useMessage();
-  const [notificationApi, notificationContextHolder] =
-    notification.useNotification();
-  const navigate = useNavigate();
+const App = ({ addProjectForm, LTEBandList }: Props) => {
+  const { t } = useTranslation('addPage');
   const dispatch = useAppDispatch();
-  const currentRow = useAppSelector((state) => state.projectList.currentRow);
-  const selectBand = useAppSelector((state) => state.projectList.selectBand);
-  const networkMode = addFormValues?.networkMode;
+  const addFormValue = useAppSelector(
+    (state) => state.projectList.addFormValue,
+  );
+  const { selectBand, networkMode, RBConfigSelected } = addFormValue;
   const showLTE = networkMode === 'NSA';
-  //state
-  const [bandModalVisible, setBandModalVisible] = useState(false);
 
-  //将当前行的数据存入本地json文件,备份数据用,无实际作用
-  const setProjectInfoToJson = async (data: ProjectItemType) => {
-    try {
-      await ipcRenderer.invoke('setProjectInfoToJson', data);
-    } catch (error) {
-      logError(error?.toString());
-    }
-  };
-  //RB选中行验证
-  const RBSelectedValidate = () => {
-    try {
-      if (!RBSelectedRowKeys?.length) {
-        return Promise.reject(`请勾选RB配置`);
-      }
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(t('inspectRBConfig'));
-    }
-  };
-
-  //表单验证
-  const formVerify = () => {
-    return new Promise<AddFormValueType>(async (resolve, reject) => {
-      try {
-        //验证且获取表单数据
-        const values = await addProjectForm.validateFields();
-        resolve(values);
-      } catch (error) {
-        reject(t('verifyFormTooltip'));
-      }
-    });
-  };
-  //生成新的当前行数据
-  const newCurrentRowHandle = (isAdd: boolean, formValue: AddFormValueType) => {
-    const { projectName, testItems, networkMode } = formValue;
-    if (isAdd) {
-      //给projectList.json中添加本项目
-      const projectObj = {
-        id: nanoid(8),
-        createDate: $moment().format('YYYY-MM-DD HH:mm'),
-        formValue,
-        RBSelectedRowKeys,
-        projectName,
-        testItems,
-        networkMode,
-      };
-      return projectObj;
-    } else {
-      if (!currentRow?.id) return currentRow;
-      const tempCurrentRow = cloneDeep(currentRow);
-      tempCurrentRow.formValue = formValue;
-      tempCurrentRow.RBSelectedRowKeys = RBSelectedRowKeys;
-      tempCurrentRow.testItems = testItems;
-      tempCurrentRow.networkMode = networkMode;
-      return tempCurrentRow;
-    }
-  };
-  //提交函数
-  const submit = async () => {
-    try {
-      //验证表单
-      const values = await formVerify();
-      const tempFormValues = cloneDeep(values);
-      tempFormValues.Band = selectBand;
-      const { projectName, testItems, networkMode } = tempFormValues;
-      //判断是否有选中行
-      await RBSelectedValidate();
-      const isAdd = projectName !== currentRow?.projectName;
-      //判断是新增/编辑
-      if (isAdd) {
-        await modalConfirm(`${t('confirmNewProject')} < ${projectName} >?`);
-      } else {
-        await modalConfirm(
-          `${t('confirmModifyingProject')} < ${projectName} > ?`,
-          t('modifyOldProjectTooltip'),
-        );
-      }
-      //生成测试数据表并更新result.json
-      const result = await supRowsGenerate(tempFormValues, RBSelectedRowKeys);
-      //新增需要创建文件夹
-      if (isAdd) {
-        await ipcRenderer.invoke('createDir', `/user/project/${projectName}`);
-      }
-      const newCurrentRow = newCurrentRowHandle(isAdd, tempFormValues);
-      if (newCurrentRow?.id) {
-        //更新本地数据库
-        setProjectInfoToJson(newCurrentRow);
-        // 写入/刷新 当前行的结果表
-        await ipcRenderer.invoke('setJsonFile', {
-          type: 'currentResult',
-          params: { projectName, result },
-        });
-        messageApi.success('Success');
-        await delayTime(500);
-        //添加log
-        const log = `success_-_${projectName} 项目已修改`;
-        dispatch(addLog(log));
-        //跳转首页
-        // navigate('/');
-        navigate('/', {
-          state: { form: 'addPage', projectId: newCurrentRow.id },
-        });
-      }
-    } catch (error) {
-      logError(error?.toString());
-      if (error !== '取消') {
-        notificationApi.error({
-          message: 'Tip',
-          description: String(error),
-          duration: null,
-        });
-        return;
-      }
-    }
-  };
-  //表单数据变化后重新生成结果供用户选择
-  const valuesChange = debounce(async (changedValues, allValues) => {
-    //存储表单数据
-    setAddFormValuesFn(allValues);
-  }, 500);
   const BandValidator = async () => {
     try {
       if (selectBand?.length) {
@@ -230,47 +69,82 @@ const App = ({
       return Promise.reject(error);
     }
   };
-
+  const RBConfigValidator = async () => {
+    try {
+      if (RBConfigSelected?.length) {
+        return Promise.resolve();
+      } else {
+        return Promise.reject(`请勾选RB配置`);
+      }
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
   const testItemsChange = (e: RadioChangeEvent) => {
     const testItems = e.target.value;
     if (testItems) {
       const idList = generateDefaultSelectRBList(testItems);
-      setRBSelectedRowKeys(idList);
+      dispatch(
+        setAddFormValue({
+          ...addFormValue,
+          RBConfigSelected: idList,
+          testItems,
+        }),
+      );
     } else {
-      setRBSelectedRowKeys([]);
+      dispatch(
+        setAddFormValue({
+          ...addFormValue,
+          RBConfigSelected: [],
+          testItems: '',
+        }),
+      );
     }
   };
+  const projectNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const projectName = e.target.value;
+    dispatch(setAddFormValue({ ...addFormValue, projectName }));
+  };
+  const isGateChange = (checked: boolean) => {
+    dispatch(setAddFormValue({ ...addFormValue, isGate: checked }));
+  };
+  const networkModeChange = (e: RadioChangeEvent) => {
+    const networkMode = e.target.value;
+    if (networkMode) {
+      dispatch(
+        setAddFormValue({
+          ...addFormValue,
+          networkMode,
+        }),
+      );
+    }
+  };
+  const LTE_ARFCN_Change = (e: RadioChangeEvent) => {
+    const LTE_ARFCN = e.target.value;
+    dispatch(
+      setAddFormValue({
+        ...addFormValue,
+        LTE_ARFCN,
+      }),
+    );
+  };
+  const LTE_BW_Change = (value: number) => {
+    dispatch(
+      setAddFormValue({
+        ...addFormValue,
+        LTE_BW: value,
+      }),
+    );
+  };
   return (
-    <Card
-      className="add-project-form-card"
-      styles={{
-        header: {
-          minHeight: 36,
-          padding: '0 12px',
-        },
-        body: {
-          padding: '8px',
-        },
-      }}
-    >
-      {contextHolder}
-      {messageContextHolder}
-      {notificationContextHolder}
-      <BandModal
-        modalVisible={bandModalVisible}
-        closeModal={() => setBandModalVisible(false)}
-        LTEBandList={LTEBandList}
-        showLTE={showLTE}
-      ></BandModal>
-
+    <div className="add-project-form-top">
       {/* <HeaderModule /> */}
       <div className="add-form-wrapper">
         <Form
           size="small"
           form={addProjectForm}
           layout="horizontal"
-          onValuesChange={valuesChange}
-          labelCol={{ flex: '80px' }}
+          labelCol={{ flex: '100px' }}
           wrapperCol={{ flex: 'auto' }}
           labelAlign="left"
         >
@@ -282,15 +156,19 @@ const App = ({
               {
                 required: true,
                 type: 'string',
-                message: 'required !',
+                message: '不能为空!',
               },
               {
                 pattern: /^[^/\\\\:\\*\\?\\<\\>\\|\"]{1,255}$/,
-                message: `${t('projectNameRuleTooltip')}  ?/|*:<> `,
+                message: `不能包含   ?/|*:<> `,
               },
             ]}
           >
-            <Input />
+            <Input
+              style={{ width: '60%' }}
+              value={addFormValue?.projectName}
+              onChange={projectNameChange}
+            />
           </Form.Item>
 
           {/* 测试用例 */}
@@ -300,43 +178,30 @@ const App = ({
             rules={[
               {
                 required: true,
-                message: 'required!',
-              },
-              {
-                validator: async (_, value) => {
-                  if (Boolean(value.length)) {
-                    return Promise.resolve();
-                  } else {
-                    return Promise.reject(new Error('required !'));
-                  }
-                },
+                message: '不能为空!',
               },
             ]}
           >
-            <Radio.Group onChange={testItemsChange}>
-              <Space direction="vertical">
-                {testItemList.map((item) => {
-                  return (
-                    <Radio key={item.value} value={item.value}>
-                      {item.label}
-                    </Radio>
-                  );
-                })}
-              </Space>
-            </Radio.Group>
+            <Radio.Group
+              value={addFormValue?.testItems}
+              onChange={testItemsChange}
+              options={testItemList}
+            ></Radio.Group>
           </Form.Item>
-          {/* Gate */}
-          <Form.Item
-            valuePropName="checked"
-            name="isGate"
-            label="Gate"
-            extra={
+          <Form.Item label="Gate">
+            <Space align="baseline">
+              <Form.Item name="isGate" noStyle>
+                <Switch
+                  onChange={isGateChange}
+                  value={addFormValue?.isGate}
+                  checkedChildren="开启"
+                  unCheckedChildren="关闭"
+                />
+              </Form.Item>
               <div
-                style={{ fontSize: 12, color: '#F56C6C' }}
+                style={{ fontSize: 12, color: '#faad14' }}
               >{`(建议CSE底噪高于限值或bandedge测试fail时开启)`}</div>
-            }
-          >
-            <Switch checkedChildren="开启" unCheckedChildren="关闭" />
+            </Space>
           </Form.Item>
           {/* 组网模式 */}
           <Form.Item
@@ -346,11 +211,14 @@ const App = ({
             rules={[
               {
                 required: true,
-                message: 'required!',
+                message: '必选项!',
               },
             ]}
           >
-            <Radio.Group>
+            <Radio.Group
+              value={addFormValue?.networkMode}
+              onChange={networkModeChange}
+            >
               <Radio value={'SA'}>SA</Radio>
               <Radio value={'NSA'}>NSA</Radio>
             </Radio.Group>
@@ -358,25 +226,23 @@ const App = ({
           {/* band 频段 */}
           <Form.Item
             label="Band"
-            name="Band"
             required
+            name="Band"
+            validateDebounce={1000}
+            validateTrigger="submit"
             rules={[
               {
                 validator: BandValidator,
               },
             ]}
+            className="select-band-form-item"
           >
-            <Button
-              type="primary"
-              ghost
-              onClick={() => setBandModalVisible(true)}
-              icon={<PlusOutlined />}
-            >
-              Band
-            </Button>
+            <div className="select-band-form-item-content">
+              {/* 用户选中的Band表 */}
+              <SelectBand showLTE={showLTE} LTEBandList={LTEBandList} />
+            </div>
           </Form.Item>
-          {/* 用户选中的Band表 */}
-          <SelectBand showLTE={showLTE} />
+
           {/* LTE-BW */}
           {showLTE && (
             <Form.Item
@@ -385,11 +251,17 @@ const App = ({
               rules={[
                 {
                   required: true,
-                  message: 'Select LTE-BW!',
+                  message: 'Place Select LTE-BW!',
                 },
               ]}
             >
-              <Select placeholder="Select LTE-BW" options={LTE_BW_LIST} />
+              <Select
+                value={addFormValue?.LTE_BW}
+                onChange={LTE_BW_Change}
+                style={{ width: 200 }}
+                placeholder="Select LTE-BW"
+                options={LTE_BW_LIST}
+              />
             </Form.Item>
           )}
 
@@ -401,32 +273,40 @@ const App = ({
               rules={[
                 {
                   required: true,
-                  message: 'place Select LTE-ARFCN!',
+                  message: 'Place Select LTE-ARFCN!',
                 },
               ]}
             >
-              <Radio.Group>
+              <Radio.Group
+                value={addFormValue?.LTE_ARFCN}
+                onChange={LTE_ARFCN_Change}
+              >
                 <Radio value={0}>Low</Radio>
                 <Radio value={1}>Mid</Radio>
                 <Radio value={2}>High</Radio>
               </Radio.Group>
             </Form.Item>
           )}
+          {/* RBConfig */}
+          <Form.Item
+            label="RBConfig"
+            required
+            name="RBConfig"
+            validateTrigger="onChange"
+            rules={[
+              {
+                validator: RBConfigValidator,
+              },
+            ]}
+            className="select-band-form-item"
+          >
+            <div className="select-band-form-item-content">
+              <RBConfigTable />
+            </div>
+          </Form.Item>
         </Form>
       </div>
-      <div>
-        <Button
-          icon={<PlusOutlined />}
-          type="primary"
-          ghost
-          block
-          size="small"
-          onClick={submit}
-        >
-          {t('createProject')}
-        </Button>
-      </div>
-    </Card>
+    </div>
   );
 };
 export default App;

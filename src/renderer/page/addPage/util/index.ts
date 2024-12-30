@@ -1,10 +1,12 @@
 /*
- * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\util\formData.ts
- * @Author: xxx
- * @Date: 2023-04-03 15:00:16
+ * @Author: feifei
+ * @Date: 2024-12-30 15:17:29
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 10:48:58
- * @Descripttion:  form表单不同字段数据
+ * @LastEditTime: 2024-12-30 15:44:37
+ * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\util\index.ts
+ * @Description:
+ *
+ * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved.
  */
 import { evaluate } from 'mathjs';
 
@@ -12,30 +14,6 @@ import { evaluate } from 'mathjs';
 const expressionRegex = /[\+\-\*/]/;
 //判断变量的正则
 const variableRegex = /^[A-Za-z_][A-Za-z0-9_]*$/;
-
-export const NR_BW_LIST = [
-  { label: 5, value: 5 },
-  { label: 10, value: 10 },
-  { label: 15, value: 15 },
-  { label: 20, value: 20 },
-  { label: 25, value: 25 },
-  { label: 30, value: 30 },
-  { label: 40, value: 40 },
-  { label: 50, value: 50 },
-  { label: 60, value: 60 },
-  { label: 70, value: 70 },
-  { label: 80, value: 80 },
-  { label: 90, value: 90 },
-  { label: 100, value: 100 },
-];
-export const LTE_BW_LIST = [
-  { label: 1.4, value: 1.4 },
-  { label: 3, value: 3 },
-  { label: 5, value: 5 },
-  { label: 10, value: 10 },
-  { label: 15, value: 15 },
-  { label: 20, value: 20 },
-];
 
 //判断表格数据的类型 数字,计算公式,单变量,无效
 export const determineType = (value: any) => {

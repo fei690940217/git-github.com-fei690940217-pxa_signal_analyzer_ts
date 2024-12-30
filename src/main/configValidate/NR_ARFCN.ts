@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-04-06 10:24:55
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-26 10:27:32
+ * @LastEditTime: 2024-12-30 16:03:05
  * @Descripttion: 新建项目时进行配置文件验证,防止配置文件
  */
 import xlsx from 'node-xlsx';
@@ -12,25 +12,21 @@ import path from 'path';
 import { mainSendRender } from '../utils';
 import { outputJson, pathExists, readJson } from 'fs-extra';
 import { logError } from '../logger/logLevel';
-
 import { appConfigFilePath } from '../publicData';
-import { ARFCNConfigItem, BandItemType } from '@src/customTypes/main';
+import {
+  ARFCNConfigItem,
+  BandItemType,
+  NRBandObjType,
+} from '@src/customTypes/main';
 const reg = /\s/g; //去掉空格
 type WorkSheetsList = {
   name: string;
   data: any[][];
 };
 //配置文件地址
-const configFilePath = path.join(appConfigFilePath, 'user/operating bands/FCC');
+const fromBasePath = path.join(appConfigFilePath, 'user/operating bands/FCC');
 //写入本地
-// let resultconfigFilePath = path.join(
-//   appConfigFilePath,
-//   "app/addProjectConfig.json"
-// );
-let resultconfigFilePath = path.join(
-  appConfigFilePath,
-  'app/NR_ARFCN_Config.json',
-);
+let toPath = path.join(appConfigFilePath, 'app/NR_ARFCN_Config.json');
 //测试用例
 const numHandle = (num: number | string) => {
   return Number(num).toFixed(2);
@@ -230,35 +226,35 @@ const authTypeItem = 'FCC';
 export default async (isRefresh: boolean) => {
   try {
     if (!isRefresh) {
-      const flag = await pathExists(resultconfigFilePath);
+      const flag = await pathExists(toPath);
       if (flag) {
         return Promise.resolve();
       }
     }
     //读取NR_Band_Obj
-    const filePath = path.join(appConfigFilePath, 'app/authTypeObj.json');
-    const authTypeObj = await readJson(filePath);
+    const filePath = path.join(appConfigFilePath, 'app/NR_Band_List.json');
+    const authTypeObj: NRBandObjType = await readJson(filePath);
     const allBandList = authTypeObj[authTypeItem];
     let RESULT: ARFCNConfigItem[] = [];
     //for of bandList
     for (let SCS of [15, 30, 60]) {
-      const filePath = path.join(configFilePath, `${SCS}KHz.xlsx`);
+      const fromPath = path.join(fromBasePath, `${SCS}KHz.xlsx`);
       //判断文件是否存在
-      const flag = await pathExists(filePath);
+      const flag = await pathExists(fromPath);
       //如果文件不存在直接跳过
       if (!flag) continue;
-      const workSheetsList = xlsx.parse(filePath);
+      const workSheetsList = xlsx.parse(fromPath);
       const subRST = await sheetDataHandle(
         workSheetsList,
         allBandList,
-        filePath,
+        fromPath,
         SCS,
       );
       RESULT = RESULT.concat(subRST);
     }
-    await outputJson(resultconfigFilePath, RESULT);
+    await outputJson(toPath, RESULT);
   } catch (error) {
-    const msg = ` NR_ARFCN配置失败 请检查文件格式是否正确 241 ${error}`;
+    const msg = `NR_ARFCN配置失败 请检查文件格式是否正确 241 ${error}`;
     logError(msg);
   }
 };

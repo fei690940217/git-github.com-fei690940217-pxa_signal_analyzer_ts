@@ -3,16 +3,34 @@
  * @Author: xxx
  * @Date: 2023-02-23 18:04:48
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-27 17:13:44
+ * @LastEditTime: 2024-12-30 15:22:10
  * @Descripttion:
  */
 import { createSlice } from '@reduxjs/toolkit';
 import { electronStoreSet } from '@src/renderer/utils/electronStore';
-import { ProjectItemType, BandItemInfo } from '@src/customTypes/renderer';
+import {
+  ProjectItemType,
+  BandItemInfo,
+  AddFormValueType,
+  NewAddFormValueType,
+} from '@src/customTypes/renderer';
+import { cloneDeep } from 'lodash';
+import localforage from 'localforage';
 type InitialStateType = {
   projectList: ProjectItemType[];
   currentRow: ProjectItemType | null;
   selectBand: BandItemInfo[];
+  addFormValue: NewAddFormValueType;
+};
+const initAddFormValue: NewAddFormValueType = {
+  projectName: '',
+  networkMode: 'SA',
+  testItems: 'PAR',
+  isGate: false,
+  selectBand: [],
+  LTE_BW: 0,
+  LTE_ARFCN: 0,
+  RBConfigSelected: [],
 };
 //初始化时获取项目列表
 const initialState: InitialStateType = {
@@ -20,6 +38,7 @@ const initialState: InitialStateType = {
   //当前行数据
   currentRow: null,
   selectBand: [],
+  addFormValue: cloneDeep(initAddFormValue),
 };
 export const projectListSlice = createSlice({
   //命名空间
@@ -37,13 +56,12 @@ export const projectListSlice = createSlice({
       state.currentRow = payload;
       electronStoreSet('currentRow', payload);
     },
-    setSelectBand: (state, action) => {
+    setAddFormValue: (state, action) => {
       let payload = action.payload;
-      state.selectBand = payload;
+      state.addFormValue = payload;
+      localforage.setItem('addFormValue', payload);
     },
   },
 });
-export const { setProjectList, changeCurrentRow, setSelectBand } =
+export const { setProjectList, changeCurrentRow, setAddFormValue } =
   projectListSlice.actions;
-
-// export default projectListSlice.reducer;

@@ -101,8 +101,8 @@ export type ProjectItemType = {
   projectName: string;
   networkMode: string;
   testItems: string;
-  RBSelectedRowKeys: Key[];
-  formValue: AddFormValueType;
+  RBConfigSelected: Key[];
+  formValue: NewAddFormValueType;
 };
 
 //subProject
@@ -237,3 +237,14 @@ export interface NsaSupRowType {
   CSE_Limit: number | null; // CSE 限制值
   duplexMode: 'TDD' | 'FDD'; // 双工模式，例如 TDD
 }
+
+export type NewAddFormValueType = {
+  projectName: string;
+  networkMode: 'SA' | 'NSA';
+  testItems: TestItemType;
+  isGate: boolean;
+  selectBand: BandItemInfo[];
+  LTE_BW: number | null | undefined;
+  LTE_ARFCN: number | null | undefined;
+  RBConfigSelected: Key[];
+};

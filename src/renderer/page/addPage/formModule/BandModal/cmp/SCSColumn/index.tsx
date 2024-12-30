@@ -11,7 +11,7 @@ import { Select } from 'antd';
 import { cloneDeep } from 'lodash';
 import { BandItemInfo } from '@src/customTypes/renderer';
 import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
-import { setSelectBand } from '@src/renderer/store/modules/projectList';
+import { setAddFormValue } from '@src/renderer/store/modules/projectList';
 //
 type PropsType = {
   row: BandItemInfo;
@@ -19,7 +19,10 @@ type PropsType = {
 export default ({ row }: PropsType) => {
   const dispatch = useAppDispatch();
   //本弹窗内的选择项
-  const selectBand = useAppSelector((state) => state.projectList.selectBand);
+  const addFormValue = useAppSelector(
+    (state) => state.projectList.addFormValue,
+  );
+  const { selectBand } = addFormValue;
   const SCS_Change = (value: number[]) => {
     value.sort((a, b) => a - b);
     const tempSelectBand = cloneDeep(selectBand);
@@ -29,7 +32,7 @@ export default ({ row }: PropsType) => {
       }
       return item;
     });
-    dispatch(setSelectBand(tempList));
+    dispatch(setAddFormValue({ ...addFormValue, selectBand: tempList }));
   };
 
   return (
@@ -47,15 +50,15 @@ export default ({ row }: PropsType) => {
         options={[
           {
             value: 15,
-            label: '15KHz',
+            label: '15',
           },
           {
             value: 30,
-            label: '30KHz',
+            label: '30',
           },
           {
             value: 60,
-            label: '60KHz',
+            label: '60',
           },
         ]}
       />

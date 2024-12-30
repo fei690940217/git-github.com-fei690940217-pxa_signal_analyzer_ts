@@ -12,9 +12,10 @@ import { useState } from 'react';
 import './index.scss';
 import SelectBandModal from './selectBandModal';
 import { BandItemInfo } from '@src/customTypes/renderer';
+import { BandItemType } from '@src/customTypes/main';
 type BandObjType = {
-  TDD: BandItemInfo[];
-  FDD: BandItemInfo[];
+  TDD: BandItemType[];
+  FDD: BandItemType[];
 };
 //
 type PropsType = {

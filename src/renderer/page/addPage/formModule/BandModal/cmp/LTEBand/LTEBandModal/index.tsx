@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-27 17:56:54
+ * @LastEditTime: 2024-12-30 17:09:33
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\BandModal\cmp\LTEBand\LTEBandModal\index.tsx
  * @Description: 项目列表主表格
  */
@@ -10,7 +10,7 @@ import { Modal, Radio, Checkbox } from 'antd';
 import React, { useState, useEffect, useMemo, lazy } from 'react';
 import './index.scss';
 import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
-import { setSelectBand } from '@src/renderer/store/modules/projectList';
+import { setAddFormValue } from '@src/renderer/store/modules/projectList';
 import { cloneDeep } from 'lodash';
 type PropsType = {
   modalVisible: boolean;
@@ -20,7 +20,11 @@ type PropsType = {
 };
 export default ({ modalVisible, closeModal, row, LTEBandList }: PropsType) => {
   const dispatch = useAppDispatch();
-  const selectBand = useAppSelector((state) => state.projectList.selectBand);
+  // const selectBand = useAppSelector((state) => state.projectList.selectBand);
+  const addFormValue = useAppSelector(
+    (state) => state.projectList.addFormValue,
+  );
+  const { selectBand } = addFormValue;
   const { LTE_Band, Band } = row;
   //本弹窗内的选择项
   const [selectLTEBand, setSelectLTEBand] = useState<string[]>([]);
@@ -35,23 +39,19 @@ export default ({ modalVisible, closeModal, row, LTEBandList }: PropsType) => {
   }, [modalVisible]);
 
   const onChange = (list: string[]) => {
-    console.log('LTE_Band_list', list);
     setSelectLTEBand(list);
   };
   const submit = () => {
-    if (selectLTEBand?.length) {
-      const tempSelectBand = cloneDeep(selectBand);
-      const tempList = tempSelectBand.map((item) => {
-        if (item.id === row.id) {
-          item.LTE_Band = selectLTEBand;
-        }
-        return item;
-      });
-      dispatch(setSelectBand(tempList));
-      closeModal();
-    } else {
-      //给个提示
-    }
+    const LTE_Band = Array.isArray(selectLTEBand) ? selectLTEBand : [];
+    const tempSelectBand = cloneDeep(selectBand);
+    const tempList = tempSelectBand.map((item) => {
+      if (item.id === row.id) {
+        item.LTE_Band = LTE_Band;
+      }
+      return item;
+    });
+    dispatch(setAddFormValue({ ...addFormValue, selectBand: tempList }));
+    closeModal();
   };
   return (
     <Modal

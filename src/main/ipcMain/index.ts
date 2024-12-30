@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-06-22 15:51:43
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-27 10:17:19
+ * @LastEditTime: 2024-12-30 16:37:14
  * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\index.ts
  * @Description: 监听渲染进程事件
  *
@@ -39,12 +39,12 @@ import { mainSendRender } from '../utils';
 import abortTest from '../utils/abortTest';
 import getLineLoss from './getLineLoss';
 import { getJsonFile, setJsonFile } from './getAndSetJsonFile';
-import TEST from '@src/main/configValidate/LTE_ARFCN/index';
 import { DeleteResultPayload } from '@src/customTypes/main';
 export default () => {
   //验证配置文件>config文件夹,用户定义
   ipcMain.on('refreshConfigFile', () => {
-    configValidate();
+    //强制刷新
+    configValidate(true);
   });
 
   //移动文件夹
@@ -90,9 +90,7 @@ export default () => {
     electronStore.set(key, val);
   });
   //测试专用,无其他作用
-  ipcMain.on('test', (event, val) => {
-    TEST(true);
-  });
+  ipcMain.on('test', (event, val) => {});
   //开始测试
   ipcMain.on('startTest', async (event, argv) => {
     //通知测试进程
