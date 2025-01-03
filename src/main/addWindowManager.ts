@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2024-12-17 16:22:46
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-31 15:37:18
+ * @LastEditTime: 2025-01-03 17:55:57
  * @FilePath: \pxa_signal_analyzer\src\main\addWindowManager.ts
  * @Description:创建项目专用的窗口,模态窗口
  *
@@ -36,7 +36,7 @@ export const createAddWindow = (payload: OpenTheProjectWindowPayload) => {
     parent: topWindow,
     modal: true,
     show: false,
-    backgroundColor: '#ccc',
+    backgroundColor: '#f5f5f5',
     center: true,
     webPreferences: {
       sandbox: false,
@@ -45,6 +45,7 @@ export const createAddWindow = (payload: OpenTheProjectWindowPayload) => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
       contextIsolation: true, // 开启上下文隔离
     },
+    frame: false, //去掉边框
   });
   //去掉菜单栏
   // childWindow.setMenuBarVisibility(false);

@@ -3,12 +3,12 @@
  * @Author: xxx
  * @Date: 2023-03-21 17:18:10
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-31 15:44:38
+ * @LastEditTime: 2025-01-03 17:45:46
  * @Descripttion:  新建项目
  */
 
-import { Card, Form, Button, message, notification } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Card, Form, Button, message, notification, Flex } from 'antd';
+import { PlusOutlined, CheckOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { type Key } from 'react';
 import './index.scss';
@@ -43,10 +43,16 @@ export default () => {
   );
   //LTEBandList
   const [LTEBandList, setLTEBandList] = useState<BandItemInfo[]>([]);
+  const [isAdd, setIsAdd] = useState<boolean>(true);
+  const title = isAdd ? '新建项目' : '编辑项目';
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const projectName = urlParams.get('projectName');
     const subProjectName = urlParams.get('subProjectName');
+    //如果项目名称不为空，说明是编辑项目，否则是新建项目
+    if (subProjectName) {
+      setIsAdd(false);
+    }
     console.log('projectName', projectName);
     console.log('subProjectName', subProjectName);
   }, []);
@@ -185,37 +191,33 @@ export default () => {
     <div className="add-project-wrapper">
       {notificationContextHolder}
       <div className="add-project-content">
-        <Card
-          className="add-project-form-card"
-          styles={{
-            header: {
-              minHeight: 36,
-              padding: '0 12px',
-            },
-            body: {
-              padding: '8px',
-            },
-          }}
-        >
-          <div className="add-project-content-top">
-            {/* 新增表单 */}
-            <FormModule
-              addProjectForm={addProjectForm}
-              LTEBandList={LTEBandList}
-            />
-          </div>
-          <div className="add-project-content-submit">
-            <Button
-              icon={<PlusOutlined />}
-              type="primary"
-              ghost
-              block
-              onClick={submit}
-            >
-              创 建 项 目
+        <div className="add-project-header">
+          <Flex>
+            <div>{title}</div>
+          </Flex>
+        </div>
+        <div className="add-project-body">
+          {/* 新增表单 */}
+          <FormModule
+            addProjectForm={addProjectForm}
+            LTEBandList={LTEBandList}
+          />
+        </div>
+        <div className="add-project-footer">
+          <Flex gap={20} justify="center">
+            <Button size="small" type="primary" ghost onClick={submit}>
+              取 消
             </Button>
-          </div>
-        </Card>
+            <Button
+              size="small"
+              type="primary"
+              onClick={submit}
+              icon={<CheckOutlined />}
+            >
+              提 交
+            </Button>
+          </Flex>
+        </div>
       </div>
     </div>
   );

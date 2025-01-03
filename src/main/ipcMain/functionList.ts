@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-10-18 14:51:01
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-02 14:53:42
+ * @LastEditTime: 2025-01-03 17:08:44
  * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\functionList.ts
  * @Description:
  *
@@ -31,7 +31,10 @@ import { query_fn } from '../api/api';
 import { logError } from '../logger/logLevel';
 import { DeleteResultPayload } from '@src/customTypes/main';
 import { ResultItemType, ProjectItemType } from '@src/customTypes/renderer';
-import { AddDirType } from '@src/customTypes/index';
+import {
+  AddDirType,
+  OpenTheProjectWindowPayload,
+} from '@src/customTypes/index';
 
 //删除某一条的结果
 export const deleteResult = async (payload: DeleteResultPayload) => {
@@ -241,10 +244,6 @@ export const getImageBase4 = async (paylaod: {
     return Promise.reject(error);
   }
 };
-type OpenTheProjectWindowPayload = {
-  projectName: string;
-  subProjectName?: string;
-};
 //启动项目窗口
 export const openTheProjectWindow = (payload: OpenTheProjectWindowPayload) => {
   createAddWindow(payload);
@@ -268,6 +267,27 @@ export const addDirFn = async (payload: AddDirType) => {
     const dirInfoPath = path.join(dirPath, 'dirInfo.json');
     await outputJson(dirInfoPath, payload);
     return Promise.resolve({ code: 0, msg: '' });
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+//目录归档
+export const archiveDir = async (dirName: string) => {
+  try {
+    const dirPath = path.join(appConfigFilePath, 'user/archive/dir');
+    //确保归档文件夹存在
+    await ensureDir(dirPath);
+    const src = path.join(appConfigFilePath, 'user/project', dirName);
+    const dest = path.join(appConfigFilePath, 'user/archive/dir', dirName);
+    let finalDest = dest;
+    //判断路径是否存在
+    const flag = await pathExists(dest);
+    if (flag) {
+      finalDest = `${dest}_${Date.now()}`;
+    }
+    await move(src, finalDest);
+    return Promise.resolve();
   } catch (error) {
     return Promise.reject(error);
   }

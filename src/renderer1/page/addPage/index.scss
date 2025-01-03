@@ -1,29 +1,25 @@
 .add-project-wrapper {
   height: 100%;
+  overflow: hidden;
   .add-project-content {
+    box-sizing: border-box;
     height: 100%;
-    padding: 5px;
-    .ant-card.add-project-form-card {
-      height: 100%;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      // header
-      .ant-card-head {
-      }
-      //body
-      .ant-card-body {
-        flex: 1;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        .add-project-content-top {
-          flex: 1;
-          overflow: auto;
-        }
-        .add-project-content-submit {
-        }
-      }
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    .add-project-body {
+      flex: 1;
+      overflow: auto;
+      padding: 5px;
+      border: 1px solid #f0f0f0;
+    }
+    .add-project-header {
+      height: 36px;
+      padding: 5px;
+    }
+    .add-project-footer {
+      height: 36px;
+      padding: 5px;
     }
   }
 }

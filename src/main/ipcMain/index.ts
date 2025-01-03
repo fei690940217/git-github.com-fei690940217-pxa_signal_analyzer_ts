@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-06-22 15:51:43
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-02 17:11:06
+ * @LastEditTime: 2025-01-03 16:09:15
  * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\index.ts
  * @Description: 监听渲染进程事件
  *
@@ -32,6 +32,7 @@ import {
   createDir,
   setProjectInfoToJson,
   archiveProject,
+  archiveDir,
   getImageBase4,
   openTheProjectWindow,
   addDirFn,
@@ -245,6 +246,11 @@ export default () => {
     //新建或获取数据库
     return archiveProject(payload);
   });
+  //目录 归档
+  ipcMain.handle('archiveDir', async (e, payload) => {
+    //新建或获取数据库
+    return archiveDir(payload);
+  });
   //archiveProject 归档
   ipcMain.handle('getImageBase4', async (e, payload) => {
     //新建或获取数据库
@@ -265,5 +271,23 @@ export default () => {
   //add-dir
   ipcMain.handle('add-dir', async (e, payload: AddDirType) => {
     return addDirFn(payload);
+  });
+
+  //删除文件或者文件夹
+  ipcMain.handle('removeDir', (e, dirName: string) => {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const dirPath = path.join(
+          appConfigFilePath,
+          'user',
+          'project',
+          dirName,
+        );
+        await remove(dirPath);
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
   });
 };

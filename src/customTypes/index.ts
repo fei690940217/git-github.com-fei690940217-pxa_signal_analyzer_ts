@@ -5,3 +5,8 @@ export type AddDirType = {
   description: string;
   createdAt: string;
 };
+
+export type OpenTheProjectWindowPayload = {
+  projectName: string;
+  subProjectName?: string;
+};

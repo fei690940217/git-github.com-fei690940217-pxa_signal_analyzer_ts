@@ -1,9 +1,9 @@
 /*
- * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\index.tsx
+ * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\formModule\index.tsx
  * @Author: xxx
  * @Date: 2023-03-21 17:18:10
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-30 17:16:58
+ * @LastEditTime: 2025-01-03 17:34:06
  * @Descripttion:  form模块
  */
 import { Form, Input, Select, Radio, Switch, Space } from 'antd';
@@ -229,7 +229,6 @@ const App = ({ addProjectForm, LTEBandList }: Props) => {
             required
             name="Band"
             validateDebounce={1000}
-            validateTrigger="submit"
             rules={[
               {
                 validator: BandValidator,

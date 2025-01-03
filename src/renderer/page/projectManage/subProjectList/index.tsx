@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-03 10:36:44
+ * @LastEditTime: 2025-01-03 17:30:05
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\projectManage\subProjectList\index.tsx
  * @Description: 项目列表主表格
  */
@@ -36,8 +36,8 @@ import { logError } from '@/utils/logLevel';
 import { ProjectItemType, SubProjectItemType } from '@src/customTypes/renderer';
 import { divide } from 'lodash';
 import { useAppSelector } from '@src/renderer/hook';
-import { AddDirType } from '@src/customTypes';
-
+import { AddDirType, OpenTheProjectWindowPayload } from '@src/customTypes';
+import modalConfirm from '@src/renderer/utils/modalConfirm';
 type TableRowSelection<T extends object = object> =
   TableProps<T>['rowSelection'];
 const { Column } = Table;
@@ -121,12 +121,38 @@ export default ({ currentDir }: PropsType) => {
   };
   const addFn = () => {
     if (currentDir?.dirName) {
-      ipcRenderer.send('openTheProjectWindow', {
+      const payload: OpenTheProjectWindowPayload = {
         projectName: currentDir.dirName,
+      };
+      ipcRenderer.send('openTheProjectWindow', payload);
+    } else {
+      messageApi.error({
+        duration: 5,
+        content: '请选择一个目录',
       });
     }
   };
-  const editFn = () => {};
+  const editFn = () => {
+    if (selectSubProject?.length) {
+      if (selectSubProject.length === 1 && currentDir) {
+        const payload: OpenTheProjectWindowPayload = {
+          projectName: currentDir.dirName,
+          subProjectName: selectSubProject[0].projectName,
+        };
+        ipcRenderer.send('openTheProjectWindow', payload);
+      } else {
+        messageApi.warning({
+          duration: 5,
+          content: '只能选择一个项目',
+        });
+      }
+    } else {
+      messageApi.warning({
+        duration: 5,
+        content: '请选择一个项目操作',
+      });
+    }
+  };
   const tableRowSelection: TableRowSelection<ProjectItemType> = {
     type: 'checkbox',
     hideSelectAll: true,
@@ -138,6 +164,37 @@ export default ({ currentDir }: PropsType) => {
     },
     selectedRowKeys: selectSubProject.map((item) => item.id),
   };
+  //归档
+  const archiveFn = async () => {
+    if (currentDir?.id) {
+      try {
+        await modalConfirm(`确认归档 < ${currentDir.dirName} > ?`, '');
+        await ipcRenderer.invoke('archiveDir', currentDir.dirName);
+        //更新项目列表
+        getSubProjectList();
+        //清除选中行
+        setSelectSubProject([]);
+        messageApi.success({
+          duration: 5,
+          content: '已归档',
+        });
+      } catch (error) {
+        logError(error?.toString());
+        if (error !== '取消') {
+          messageApi.error({
+            duration: 5,
+            content: String(error),
+          });
+        }
+      }
+    } else {
+      messageApi.warning({
+        duration: 5,
+        content: '请选择一个目录操作',
+      });
+    }
+  };
+  const deleteFn = () => {};
   return (
     <Card
       className="project-manage-card manage-card-item"
@@ -173,7 +230,7 @@ export default ({ currentDir }: PropsType) => {
               color="primary"
               icon={<HddTwoTone />}
               variant="outlined"
-              onClick={editFn}
+              onClick={archiveFn}
               size="small"
             >
               归档
@@ -183,7 +240,7 @@ export default ({ currentDir }: PropsType) => {
               color="danger"
               icon={<DeleteTwoTone twoToneColor="red" />}
               size="small"
-              onClick={editFn}
+              onClick={deleteFn}
             >
               删除
             </Button>
@@ -191,6 +248,7 @@ export default ({ currentDir }: PropsType) => {
         </Flex>
       }
     >
+      {messageContextHolder}
       <ConfigProvider
         theme={{
           token: {

@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-02 14:30:00
+ * @LastEditTime: 2025-01-03 17:12:53
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\projectManage\dirList\index.tsx
  * @Description: 目录管理
  */
@@ -24,6 +24,7 @@ import { AddDirType } from '@src/customTypes';
 
 import modalConfirm from '@src/renderer/utils/modalConfirm';
 import AddDirModal from './addDirModal';
+
 type TableRowSelection<T extends object = object> =
   TableProps<T>['rowSelection'];
 const { ipcRenderer } = window.myApi;
@@ -87,11 +88,8 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
   const archiveFn = async () => {
     if (currentDir?.id) {
       try {
-        await modalConfirm(
-          `${t('archiveTooltip')} < ${currentDir.dirName} > ?`,
-          '',
-        );
-        await ipcRenderer.invoke('archiveProject', currentDir.dirName);
+        await modalConfirm(`确认归档 < ${currentDir.dirName} > ?`, '');
+        await ipcRenderer.invoke('archiveDir', currentDir.dirName);
         //通知父组件>更新项目列表
         getProjectList();
         //清除当前行
@@ -112,12 +110,38 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
     } else {
       messageApi.warning({
         duration: 5,
-        content: t('operationProjectTooltip'),
+        content: '请选择一个目录操作',
       });
     }
   };
   const addFn = () => {
     setModalVisible(true);
+  };
+  const deleteFn = async () => {
+    if (currentDir?.id) {
+      try {
+        await modalConfirm(
+          `确认删除 < ${currentDir.dirName} > ?`,
+          '永久性操作,不可在回收站找回,请谨慎操作!',
+        );
+        await ipcRenderer.invoke('removeDir', currentDir.dirName);
+        //通知父组件>更新项目列表
+        getProjectList();
+        //清除当前行
+        setCurrentDir(null);
+        messageApi.success({
+          duration: 5,
+          content: '已删除',
+        });
+      } catch (error) {
+        logError(error?.toString());
+      }
+    } else {
+      messageApi.warning({
+        duration: 5,
+        content: '请选择一个目录操作',
+      });
+    }
   };
   return (
     <Card
@@ -163,6 +187,7 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
               color="danger"
               icon={<DeleteTwoTone twoToneColor="red" />}
               size="small"
+              onClick={deleteFn}
             >
               删除
             </Button>
@@ -170,6 +195,7 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
         </Flex>
       }
     >
+      {messageContextHolder}
       <AddDirModal
         modalVisible={modalVisible}
         closeModal={() => setModalVisible(false)}
