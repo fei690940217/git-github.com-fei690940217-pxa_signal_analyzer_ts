@@ -20,6 +20,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const port = process.env.PORT || 1212;
+const addPort = 1213;
+
 const manifest = path.resolve(webpackPaths.dllPath, 'renderer.json');
 const skipDLLs =
   module.parent?.filename.includes('webpack.config.renderer.dev.dll') ||
@@ -47,16 +49,28 @@ const configuration: webpack.Configuration = {
 
   target: ['web', 'electron-renderer'],
 
-  entry: [
-    `webpack-dev-server/client?http://localhost:${port}/dist`,
-    'webpack/hot/only-dev-server',
-    path.join(webpackPaths.srcRendererPath, 'index.tsx'),
-  ],
-
+  // entry: [
+  //   `webpack-dev-server/client?http://localhost:${port}/dist`,
+  //   'webpack/hot/only-dev-server',
+  //   path.join(webpackPaths.srcRendererPath, 'index.tsx'),
+  // ],
+  entry: {
+    index: [
+      `webpack-dev-server/client?http://localhost:${port}/dist`,
+      'webpack/hot/only-dev-server',
+      path.join(webpackPaths.srcRendererPath, 'index.tsx'), // 页面1入口
+    ],
+    renderer1: [
+      `webpack-dev-server/client?http://localhost:${port}/dist`,
+      'webpack/hot/only-dev-server',
+      path.join(webpackPaths.srcRenderer1Path, 'index.tsx'), // 页面2入口
+    ],
+  },
   output: {
     path: webpackPaths.distRendererPath,
     publicPath: '/',
-    filename: 'renderer.dev.js',
+    // filename: 'renderer.dev.js',
+    filename: '[name].dev.js', // [name] 将会被替换为 renderer 或 renderer1
     library: {
       type: 'umd',
     },
@@ -143,7 +157,7 @@ const configuration: webpack.Configuration = {
      */
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
-      REACT_APP_LOG_LEVEL:'trace'
+      REACT_APP_LOG_LEVEL: 'trace',
     }),
     new webpack.LoaderOptionsPlugin({
       debug: true,
@@ -163,6 +177,21 @@ const configuration: webpack.Configuration = {
       env: process.env.NODE_ENV,
       isDevelopment: process.env.NODE_ENV !== 'production',
       nodeModules: webpackPaths.appNodeModulesPath,
+      chunks: ['index'], // 只注入 index.dev.js
+    }),
+    new HtmlWebpackPlugin({
+      filename: path.join('renderer1.html'), // 输出文件（独立的renderer1页面）
+      template: path.join(webpackPaths.srcRenderer1Path, 'index.ejs'), // 模板文件
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      env: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
+      chunks: ['renderer1'], // 只注入 renderer1.dev.js
     }),
   ],
 

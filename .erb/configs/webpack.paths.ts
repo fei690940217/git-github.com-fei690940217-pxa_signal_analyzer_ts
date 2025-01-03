@@ -7,6 +7,8 @@ const dllPath = path.join(__dirname, '../dll');
 const srcPath = path.join(rootPath, 'src');
 const srcMainPath = path.join(srcPath, 'main');
 const srcRendererPath = path.join(srcPath, 'renderer');
+const srcRenderer1Path = path.join(srcPath, 'renderer1');
+
 //测试进程的文件路径
 const srcTestProcessPath = path.join(srcPath, 'testProcess');
 const releasePath = path.join(rootPath, 'release');
@@ -32,6 +34,7 @@ export default {
   srcPath,
   srcMainPath,
   srcRendererPath,
+  srcRenderer1Path,
   srcTestProcessPath,
   releasePath,
   appPath,

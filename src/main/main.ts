@@ -92,6 +92,7 @@ const createWindowFn = () => {
     }
   });
   const htmlUrl = resolveHtmlPath('index.html');
+  console.log(htmlUrl);
   mainWindow.loadURL(htmlUrl);
   appEventHandle(mainWindow);
   mainWindow.on('closed', () => {

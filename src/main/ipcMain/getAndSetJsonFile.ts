@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2024-12-09 09:18:06
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-23 11:35:12
+ * @LastEditTime: 2025-01-02 14:01:22
  * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\getAndSetJsonFile.ts
  * @Description:
  *
@@ -21,22 +21,23 @@ import {
 import path from 'path';
 import { appConfigFilePath } from '../publicData';
 import { logError } from '../logger/logLevel';
+import { AddDirType } from '@src/customTypes';
 //getSubProjectList //获取本地项目文件夹内的文件列表,与本地文件夹内的文件列表进行比对
 const getLocalProjectList = async () => {
   try {
     //子项目的根目录
     const folderPath = path.join(appConfigFilePath, 'user/project');
     const fileList = await readdir(folderPath);
-    const folders = fileList.filter((item) => {
-      const fullPath = path.join(folderPath, item, 'projectInfo.json');
-      return pathExistsSync(fullPath);
-    });
-    const rst = folders.map((item) => {
-      const fullPath = path.join(folderPath, item, 'projectInfo.json');
-      const readJson = readJsonSync(fullPath);
-      return readJson;
-    });
-    return Promise.resolve(rst);
+    const RST: AddDirType[] = [];
+    for (const item of fileList) {
+      const fullPath = path.join(folderPath, item, 'dirInfo.json');
+      const flag = await pathExists(fullPath);
+      if (flag) {
+        const dirInfo: AddDirType = await readJson(fullPath);
+        RST.push(dirInfo);
+      }
+    }
+    return Promise.resolve(RST);
   } catch (error) {
     //报错后需要判断子文件夹是否已创建,如果创建的话删掉
     return Promise.reject(error);

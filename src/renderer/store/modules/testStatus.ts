@@ -3,10 +3,12 @@
  * @Author: xxx
  * @Date: 2023-02-23 18:04:48
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-26 10:09:16
+ * @LastEditTime: 2025-01-03 10:59:43
  * @Descripttion: 测试状态,判断是暂停,进行中等等
  */
 import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+
 import {
   electronStoreSet,
   electronStoreGet,
@@ -34,21 +36,21 @@ export const testStatusSlice = createSlice({
   } as InitialStateType,
   //相当于vuex的mutions
   reducers: {
-    setIsInProgress: (state, action) => {
+    setIsInProgress: (state, action: PayloadAction<boolean>) => {
       electronStoreSet('isInProgress', action.payload);
       state.isInProgress = action.payload;
     },
-    setIsTimeout: (state, action) => {
+    setIsTimeout: (state, action: PayloadAction<boolean>) => {
       electronStoreSet('isTimeout', action.payload);
       state.isTimeout = action.payload;
     },
-    setLogList: (state, action) => {
+    setLogList: (state, action: PayloadAction<LogListType[]>) => {
       state.logList = action.payload;
     },
-    setLocalLogList: (state, action) => {
+    setLocalLogList: (state, action: PayloadAction<LogListType[]>) => {
       state.localLogList = action.payload;
     },
-    setCurrentTestRecordName: (state, action) => {
+    setCurrentTestRecordName: (state, action: PayloadAction<string>) => {
       state.currentTestRecordName = action.payload;
       console.log('setCurrentTestRecordName', action.payload);
       electronStoreSet('currentTestRecordName', action.payload);

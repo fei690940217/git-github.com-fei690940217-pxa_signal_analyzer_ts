@@ -2,12 +2,13 @@
  * @Author: feifei
  * @Date: 2023-10-18 14:51:01
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-27 10:16:08
+ * @LastEditTime: 2025-01-02 14:53:42
  * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\functionList.ts
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
+import { createAddWindow } from '@src/main/addWindowManager';
 import { pinpuConnectionName } from '@src/common';
 import {
   remove,
@@ -21,7 +22,7 @@ import {
   mkdir,
   readFile,
 } from 'fs-extra';
-import { statSync } from 'fs';
+import { statSync, promises as fsPromises } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { appConfigFilePath } from '../publicData';
@@ -30,6 +31,7 @@ import { query_fn } from '../api/api';
 import { logError } from '../logger/logLevel';
 import { DeleteResultPayload } from '@src/customTypes/main';
 import { ResultItemType, ProjectItemType } from '@src/customTypes/renderer';
+import { AddDirType } from '@src/customTypes/index';
 
 //删除某一条的结果
 export const deleteResult = async (payload: DeleteResultPayload) => {
@@ -142,33 +144,27 @@ export const addSubProject = async (payload: AddSubProjectPayload) => {
 };
 
 //getSubProjectList
-export const getSubProjectList = async (projectName: string) => {
+export const getSubProjectList = async (dirtName: string) => {
   try {
     //子项目的根目录
     const folderPath = path.join(
       appConfigFilePath,
-      'user/project',
-      projectName,
+      'user',
+      'project',
+      dirtName,
     );
+    const RST: ProjectItemType[] = [];
     const fileList = await readdir(folderPath);
-    const folders = fileList.filter((item) => {
-      const fullPath = `${folderPath}/${item}`;
-      return statSync(fullPath).isDirectory();
-    });
-    const rst = folders.map((item) => {
-      const fullPath = `${folderPath}/${item}`;
-      const obj = statSync(fullPath);
-      let createTime = 0;
-      if (obj.birthtimeMs) {
-        createTime = Math.floor(obj.birthtimeMs);
-      }
 
-      return { subProjectName: item, id: uuidv4(), createTime };
-    });
-    rst.sort((a, b) => {
-      return b.createTime - a.createTime;
-    });
-    return Promise.resolve(rst);
+    for (const item of fileList) {
+      const fullPath = `${folderPath}/${item}/projectInfo.json`;
+      const flag = await pathExists(fullPath);
+      if (flag) {
+        const obj: ProjectItemType = await readJson(fullPath);
+        RST.push(obj);
+      }
+    }
+    return Promise.resolve(RST);
   } catch (error) {
     //报错后需要判断子文件夹是否已创建,如果创建的话删掉
     return Promise.reject(error);
@@ -242,6 +238,37 @@ export const getImageBase4 = async (paylaod: {
     return Promise.resolve(resultData);
   } catch (error) {
     //报错后需要判断子文件夹是否已创建,如果创建的话删掉
+    return Promise.reject(error);
+  }
+};
+type OpenTheProjectWindowPayload = {
+  projectName: string;
+  subProjectName?: string;
+};
+//启动项目窗口
+export const openTheProjectWindow = (payload: OpenTheProjectWindowPayload) => {
+  createAddWindow(payload);
+};
+
+//新建目录
+export const addDirFn = async (payload: AddDirType) => {
+  try {
+    const { dirName } = payload;
+    //1.先判断文件夹是否存在
+    const dirPath = path.join(appConfigFilePath, 'user', 'project', dirName);
+    //判断文件是否存在
+    const flag = await pathExists(dirPath);
+    if (flag) {
+      return Promise.resolve({ code: 1, msg: '文件夹已存在' });
+    }
+    //继续
+    //确保文件夹存在
+    await ensureDir(dirPath);
+    //写入dirInfo.json文件
+    const dirInfoPath = path.join(dirPath, 'dirInfo.json');
+    await outputJson(dirInfoPath, payload);
+    return Promise.resolve({ code: 0, msg: '' });
+  } catch (error) {
     return Promise.reject(error);
   }
 };

@@ -10,11 +10,13 @@ import { configureStore } from '@reduxjs/toolkit';
 import home from './modules/home';
 import { projectListSlice } from './modules/projectList';
 import testStatus from './modules/testStatus';
+import testPage from './modules/testPage';
 const store = configureStore({
   reducer: {
     home,
     projectList: projectListSlice.reducer,
     testStatus,
+    testPage,
   },
 });
 

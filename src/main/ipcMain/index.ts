@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-06-22 15:51:43
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-30 16:37:14
+ * @LastEditTime: 2025-01-02 17:11:06
  * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\index.ts
  * @Description: 监听渲染进程事件
  *
@@ -10,7 +10,14 @@
 import path from 'path';
 import { ipcMain, shell } from 'electron';
 import configValidate from '../configValidate';
-import { move, remove } from 'fs-extra';
+import {
+  move,
+  pathExists,
+  readJson,
+  readdir,
+  remove,
+  writeJson,
+} from 'fs-extra';
 import electronStore from '@src/main/electronStore';
 
 import { appConfigFilePath } from '../publicData';
@@ -26,6 +33,8 @@ import {
   setProjectInfoToJson,
   archiveProject,
   getImageBase4,
+  openTheProjectWindow,
+  addDirFn,
 } from './functionList';
 //子进程启动函数
 import {
@@ -40,6 +49,8 @@ import abortTest from '../utils/abortTest';
 import getLineLoss from './getLineLoss';
 import { getJsonFile, setJsonFile } from './getAndSetJsonFile';
 import { DeleteResultPayload } from '@src/customTypes/main';
+import { AddDirType } from '@src/customTypes/index';
+import { nanoid } from 'nanoid';
 export default () => {
   //验证配置文件>config文件夹,用户定义
   ipcMain.on('refreshConfigFile', () => {
@@ -89,8 +100,37 @@ export default () => {
     const { key, val } = payload;
     electronStore.set(key, val);
   });
+  const TEST = async () => {
+    try {
+      //子项目的根目录
+      const folderPath = path.join(
+        appConfigFilePath,
+        'user',
+        'project',
+        'SZ24100188 5G',
+      );
+      const fileList = await readdir(folderPath);
+
+      for (const item of fileList) {
+        const fullPath = `${folderPath}/${item}/projectInfo.json`;
+        const flag = await pathExists(fullPath);
+        if (flag) {
+          const obj = await readJson(fullPath);
+          obj.id = item;
+          await writeJson(fullPath, obj);
+        }
+      }
+      return Promise.resolve();
+    } catch (error) {
+      //报错后需要判断子文件夹是否已创建,如果创建的话删掉
+      return Promise.reject(error);
+    }
+  };
   //测试专用,无其他作用
-  ipcMain.on('test', (event, val) => {});
+  ipcMain.on('test', (event, val) => {
+    //使用脚本对projectInfo进行处理
+    TEST();
+  });
   //开始测试
   ipcMain.on('startTest', async (event, argv) => {
     //通知测试进程
@@ -128,18 +168,30 @@ export default () => {
       }
     });
   });
+  type ShowItemInFolderPayload = {
+    projectName: string;
+    dirName: string;
+  };
   //打开指定的文件夹
-  ipcMain.on('showItemInFolder', (event, payload) => {
-    const { projectName, subProjectName } = payload;
-    const dirpath = path.join(
-      appConfigFilePath,
-      'user',
-      'project',
-      projectName,
-      subProjectName,
-    );
-    shell.openPath(dirpath);
-  });
+  ipcMain.handle(
+    'showItemInFolder',
+    async (event, payload: ShowItemInFolderPayload) => {
+      try {
+        const { projectName, dirName } = payload;
+        const dirpath = path.join(
+          appConfigFilePath,
+          'user',
+          'project',
+          dirName,
+          projectName,
+        );
+        const str = await shell.openPath(dirpath);
+        return Promise.resolve(str);
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+  );
 
   //打开选择文件对话框
   ipcMain.handle('showOpenDialog', async (e, filePath) => {
@@ -197,5 +249,21 @@ export default () => {
   ipcMain.handle('getImageBase4', async (e, payload) => {
     //新建或获取数据库
     return getImageBase4(payload);
+  });
+  type OpenTheProjectWindowPayload = {
+    projectName: string;
+    subProjectName?: string;
+  };
+  //openTheProjectWindow
+  ipcMain.on(
+    'openTheProjectWindow',
+    (e, payload: OpenTheProjectWindowPayload) => {
+      //新建或获取数据库
+      openTheProjectWindow(payload);
+    },
+  );
+  //add-dir
+  ipcMain.handle('add-dir', async (e, payload: AddDirType) => {
+    return addDirFn(payload);
   });
 };

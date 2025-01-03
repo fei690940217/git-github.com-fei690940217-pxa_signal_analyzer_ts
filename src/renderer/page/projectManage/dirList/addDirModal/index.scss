@@ -1,0 +1,14 @@
+.add-edit-dir-modal-wrapper {
+  .ant-modal {
+    .ant-modal-content {
+      max-height: 90vh;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      .ant-modal-close-x {
+        color: #cccccc;
+      }
+    }
+  }
+}

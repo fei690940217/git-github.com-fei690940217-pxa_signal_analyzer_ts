@@ -1,0 +1,128 @@
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+}
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+//公用弹窗样式
+.ant-modal-wrap.public-modal-style {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .ant-modal {
+    top: 0;
+    max-height: 90vh;
+    .ant-modal-content {
+      padding: 12px;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      .ant-modal-body {
+        flex: 1;
+        overflow-y: auto;
+      }
+    }
+  }
+}
+
+/* 滚动条样式 */
+
+::-webkit-scrollbar {
+  height: 17px;
+  width: 17px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  border-style: dashed;
+  border-color: transparent;
+  border-width: 6px;
+  background-color: rgba(157, 165, 183, 0.4);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(157, 165, 183, 0.7);
+}
+
+/* 轨道 */
+
+::-webkit-scrollbar-track {
+  background-color: #fff;
+}
+
+//图片预览样式自定义
+.custom-preview-image-class {
+  //控制按钮组
+  .ant-image-preview-operations {
+    justify-content: center;
+    .ant-image-preview-operations-operation.ant-image-preview-operations-operation-close {
+    }
+  }
+}
+
+//测试结束弹窗样式
+.pass-fail-modal-wrapper {
+  //pass
+  .pass-modal-container {
+    .ant-modal-content {
+      background: #f0f9eb;
+      .ant-modal-body {
+        .ant-modal-confirm-title {
+          font-size: 48px;
+          font-weight: 600;
+          color: #67c23a;
+          text-align: center;
+        }
+      }
+    }
+  }
+  //file
+  .fail-modal-container {
+    .ant-modal-content {
+      background: #fef0f0;
+      .ant-modal-body {
+        .ant-modal-confirm-title {
+          font-size: 48px;
+          font-weight: 600;
+          color: #f56c6c;
+          text-align: center;
+        }
+      }
+    }
+  }
+  //error
+  .error-modal-container {
+    .ant-modal-content {
+      background: #fef0f0;
+      .ant-modal-body {
+        .ant-modal-confirm-title {
+          font-size: 48px;
+          font-weight: 600;
+          color: #f56c6c;
+          text-align: center;
+        }
+      }
+    }
+  }
+  //中止
+  .abort-modal-container {
+    .ant-modal-content {
+      background: #f2f6fc;
+      .ant-modal-body {
+        .ant-modal-confirm-title {
+          font-size: 48px;
+          font-weight: 600;
+          color: #606266;
+          text-align: center;
+        }
+      }
+    }
+  }
+}

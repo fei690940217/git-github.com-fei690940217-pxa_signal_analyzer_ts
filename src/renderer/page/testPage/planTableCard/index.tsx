@@ -1,98 +1,134 @@
 /*
- * @Author: fei690940217 690940217@qq.com
- * @Date: 2022-07-14 11:37:59
- * @LastEditors: feifei
- * @LastEditTime: 2024-12-19 17:04:26
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\testPage\planTableCard\index.tsx
- * @Description: 主测试模块
+ * @Author: xxx
+ * @Date: 2023-03-21 17:18:10
+ * @LastEditors: feifei
+ * @LastEditTime: 2025-01-03 14:31:44
+ * @Descripttion:
  */
+import { Image, message, ConfigProvider, Table, notification } from 'antd';
+import type { TableColumnsType, TableProps } from 'antd';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
+import { type Key } from 'react';
+
+import { useSelector, useDispatch } from 'react-redux';
 import './index.scss';
-import { notification, Modal } from 'antd';
-import StatusBar from './statusBar';
-import ResultTable from './resultTable';
-import { getCurrentResult, handleProcessExitFn } from './util';
-import { useAppSelector } from '@src/renderer/hook';
-import { ResultItemType, StatusType } from '@src/customTypes/renderer';
+import ColumnsHandle from './column';
+import addLog from '@/store/asyncThunk/addLog';
+import { logError } from '@/utils/logLevel';
+import { useAppDispatch, useAppSelector } from '@src/renderer/hook';
+import { ResultItemType, TestItemType } from '@src/customTypes/renderer';
+import { setCurrentResultItem } from '@src/renderer/store/modules/testPage';
+type TableRowSelection<T extends object = object> =
+  TableProps<T>['rowSelection'];
+const { ipcRenderer } = window.myApi;
 
-const { ipcRendererOn, ipcRendererOff } = window.myApi;
-
-export default () => {
-  const [modalApi, modalContextHolder] = Modal.useModal();
-  const [notificationApi, notificationContextHolder] =
-    notification.useNotification();
-  //父当前行
-  const currentRow = useAppSelector((state) => state.projectList.currentRow);
-  //子当前行
-  const currentTestRecordName = useAppSelector(
-    (state) => state.testStatus.currentTestRecordName,
+type Props = {
+  currentResult: ResultItemType[];
+  refreshCurrentResult: () => void;
+};
+const App = ({ currentResult, refreshCurrentResult }: Props) => {
+  const dispatch = useAppDispatch();
+  const [messageApi, contextHolder] = message.useMessage();
+  //请前测试记录文件夹名称
+  const currentDir = useAppSelector((state) => state.testPage.currentDir);
+  const currentSubProject = useAppSelector(
+    (state) => state.testPage.currentSubProject,
   );
-  const [selectedListItem, setSelectedListItem] = useState([]);
-  const [currentResult, setCurrentResult] = useState<ResultItemType[]>([]);
-  const selectedListItemRef = useRef(selectedListItem);
-  useEffect(() => {
-    // 更新最新的 selectedListItem
-    selectedListItemRef.current = selectedListItem;
-  }, [selectedListItem]);
-  //currentSelectedItem
-  const currentSelectedItem: ResultItemType | null = useMemo(() => {
-    const id = selectedListItem?.length > 0 ? selectedListItem[0] : null;
-    const flag = currentResult?.length > 0;
-    if (id && flag) {
-      const findItem = currentResult.find((item) => item.id === id);
-      if (findItem) {
-        return findItem;
-      } else {
-        return null;
-      }
-    } else {
-      return null;
-    }
-  }, [selectedListItem, currentResult]);
-  const refreshCurrentResult = async () => {
+  const currentResultItem = useAppSelector(
+    (state) => state.testPage.currentResultItem,
+  );
+  //展示截图使用
+  const [visible, setVisible] = useState(false);
+  const [imgSrc, setImgSrc] = useState('');
+
+  //测试用例
+  const testItem = currentResult[0]?.testItem || '';
+  //展示截图
+  const showScreenCapture = async (id: number) => {
     try {
-      if (currentRow?.id) {
-        const list = await getCurrentResult(
-          currentRow.projectName,
-          currentTestRecordName,
-        );
-        setCurrentResult(list);
-      }
-    } catch (error) {}
+      const imageUrl = await ipcRenderer.invoke('getImageBase4', {
+        projectName: currentDir?.dirName,
+        subProjectName: currentSubProject?.projectName,
+        id,
+      });
+      setImgSrc(imageUrl);
+      setVisible(true);
+    } catch (error) {
+      logError(error?.toString());
+      messageApi.error('无法预览,请检查图片是否存在');
+    }
   };
-  useEffect(() => {
-    refreshCurrentResult();
-  }, [currentRow, currentTestRecordName]);
-  //监测测试停止
-  useEffect(() => {
-    const handleProcessExit = async (_e: any, status: StatusType) => {
-      handleProcessExitFn(
-        status,
-        selectedListItemRef.current,
-        setCurrentResult,
-      );
-    };
-    ipcRendererOn('processExit', handleProcessExit);
-    // 注销监听函数
-    return () => {
-      ipcRendererOff('processExit', handleProcessExit); // 清理监听器
-    };
-  }, []);
+  //删除某一条的结果
+  const deleteResult = async (row: ResultItemType) => {
+    try {
+      await ipcRenderer.invoke('deleteResult', {
+        projectName: currentDir?.dirName,
+        subProjectName: currentSubProject?.projectName,
+        row,
+      });
+      messageApi.success('已删除');
+      //添加log
+      const log = `warning_-_id为${row.id}的测试条目,结果已删除`;
+      dispatch(addLog(log));
+      refreshCurrentResult();
+    } catch (error) {
+      logError(error?.toString());
+      notification.error({
+        message: 'Error',
+        description: error?.toString(),
+      });
+    }
+  };
+  const columns = ColumnsHandle(testItem, showScreenCapture, deleteResult);
+  const selectedRowKeys = currentResultItem?.id ? [currentResultItem.id] : [];
+  const tableRowSelection: TableRowSelection<ResultItemType> = {
+    type: 'radio',
+    columnTitle: '/',
+    selectedRowKeys,
+    onChange: (selectedRowKeys: Key[], rows) => {
+      dispatch(setCurrentResultItem(rows[0]));
+    },
+  };
   return (
-    <div className="test-plan-card">
-      {notificationContextHolder}
-      {modalContextHolder}
-      {/* 状态栏 */}
-      <StatusBar currentSelectedItem={currentSelectedItem} />
-      <div className="plan-table-content">
-        <ResultTable
-          refreshCurrentResult={refreshCurrentResult}
-          currentResult={currentResult}
-          selectedListItem={selectedListItem}
-          setSelectedListItem={setSelectedListItem}
-        />
+    <div className="all-result-table-wrapper">
+      {contextHolder}
+      <div className="all-result-table-content">
+        <ConfigProvider
+          theme={{
+            token: {
+              colorBorderSecondary: '#ccc',
+            },
+          }}
+        >
+          <Table
+            rowSelection={tableRowSelection}
+            bordered
+            style={{ height: '100%', width: '100%', overflow: 'hidden' }}
+            size="small"
+            dataSource={currentResult}
+            rowKey="id"
+            pagination={false}
+            scroll={{ y: '' }}
+            columns={columns}
+          ></Table>
+        </ConfigProvider>
       </div>
+      {/* 截图预览 */}
+      <Image
+        style={{
+          display: 'none',
+        }}
+        preview={{
+          visible,
+          src: imgSrc,
+          onVisibleChange: (value) => {
+            setVisible(value);
+          },
+        }}
+      />
     </div>
   );
 };
+export default App;

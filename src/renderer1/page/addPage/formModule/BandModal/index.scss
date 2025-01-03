@@ -1,0 +1,27 @@
+.select-band-modal-content {
+  display: flex;
+  &__left {
+    width: 40px;
+  }
+  &__right {
+    flex: 1;
+    overflow: hidden;
+    .lte-band-column-wrapper {
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: space-between;
+      .lte-band-column-left {
+        flex: 1;
+        overflow-x: auto;
+        flex-wrap: wrap;
+      }
+      .lte-band-column-right {
+        display: flex;
+        text-align: center;
+        width: 30px;
+        justify-content: flex-end;
+      }
+    }
+  }
+}

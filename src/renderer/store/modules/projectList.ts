@@ -3,10 +3,12 @@
  * @Author: xxx
  * @Date: 2023-02-23 18:04:48
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-30 15:22:10
+ * @LastEditTime: 2025-01-02 14:15:51
  * @Descripttion:
  */
 import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+
 import { electronStoreSet } from '@src/renderer/utils/electronStore';
 import {
   ProjectItemType,
@@ -16,6 +18,7 @@ import {
 } from '@src/customTypes/renderer';
 import { cloneDeep } from 'lodash';
 import localforage from 'localforage';
+import { AddDirType } from '@src/customTypes';
 type InitialStateType = {
   projectList: ProjectItemType[];
   currentRow: ProjectItemType | null;

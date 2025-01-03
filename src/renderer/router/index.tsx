@@ -21,6 +21,8 @@ const AddPage = lazy(() => import('@/page/addPage'));
 const SetPage = lazy(() => import('@/page/setPage'));
 //demo
 const DemoPage = lazy(() => import('@/page/demoPage'));
+// 项目管理
+const ProjectManage = lazy(() => import('@/page/projectManage'));
 
 const routes: RouteObject[] = [
   {
@@ -32,6 +34,10 @@ const routes: RouteObject[] = [
         index: true,
         // path: "/",
         element: <TestPage></TestPage>,
+      },
+      {
+        path: '/projectManage',
+        element: <ProjectManage />,
       },
       {
         path: '/add',

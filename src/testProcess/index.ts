@@ -2,14 +2,14 @@
  * @Author: feifei
  * @Date: 2023-05-24 10:00:07
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 14:51:19
+ * @LastEditTime: 2024-12-31 17:09:10
  * @FilePath: \pxa_signal_analyzer\src\testProcess\index.ts
  * @Description: 测试专用子进程
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
 import SharedParameters from './globals';
-import { addLogFn, childSendMainMessage } from './utils';
+import { addLogFn, childSendMainMessage, timeoutTest } from './utils';
 import { logError, logInfo } from './utils/logLevel';
 import { appConfigFilePath } from '@src/main/publicData';
 import electronStore from '@src/main/electronStore';
@@ -17,8 +17,8 @@ import path from 'path';
 import logger from './logger';
 import { transports } from 'winston';
 import { ResultItemType } from '@src/customTypes/renderer';
-import {TestParamsType} from '@src/customTypes/testprocess'
-
+import { TestParamsType } from '@src/customTypes/testprocess';
+import TEST_FN from './testIndex';
 const modifyLogConfig = (
   parentProjectName: string,
   subProjectName: string,
@@ -66,8 +66,7 @@ const paramsInject = (TestParams: TestParamsType) => {
 try {
   //清空全局数据
   SharedParameters.clear();
-  const { timeoutTest } = require('./utils');
-  const TEST_FN = require('./testIndex');
+
   //已进入进程就直接开始测试
   const argv = process.argv;
   const findItem = argv.find((item) => {

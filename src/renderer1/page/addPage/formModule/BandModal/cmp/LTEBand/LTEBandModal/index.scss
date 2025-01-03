@@ -1,0 +1,45 @@
+.select-band-modal-wrapper {
+  .select-band-modal-content {
+    .band-checkbox-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      .band-checkbox-item {
+        width: 33%;
+        .band-checkbox-item-content {
+          margin: 3px 5px;
+          border: 1px solid #e5e5e5;
+          border-radius: 5px;
+          padding: 2px 5px;
+          display: flex;
+          justify-content: space-between;
+          //checkbox
+          .band-checkbox-item-left {
+          }
+          //添加LTE Band的图标
+          .band-checkbox-item-right {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+          }
+        }
+      }
+    }
+  }
+}
+//popover
+.ant-popover.select-lte-band-popover {
+  .ant-popover-inner {
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    .ant-popover-inner-content {
+      flex: 1;
+      overflow-y: auto;
+      .lte-band-item {
+        &:hover {
+          background: #ccc;
+        }
+      }
+    }
+  }
+}

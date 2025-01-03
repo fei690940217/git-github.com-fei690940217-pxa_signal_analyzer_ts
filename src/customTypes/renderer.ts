@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-10-17 16:56:16
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-27 13:53:54
+ * @LastEditTime: 2024-12-30 17:58:42
  * @FilePath: \pxa_signal_analyzer\src\customTypes\renderer.ts
  * @Description:
  *
@@ -31,7 +31,7 @@ export interface CurrentRow {
   id: string;
   created_at: string;
   projectName: string;
-  testItems: string[];
+  testItems: TestItemType;
   networkMode: 'NSA' | 'SA';
   LTE_BW?: number;
   LTE_ARFCN?: number;
@@ -100,7 +100,7 @@ export type ProjectItemType = {
   createDate: string;
   projectName: string;
   networkMode: string;
-  testItems: string;
+  testItems: TestItemType;
   RBConfigSelected: Key[];
   formValue: NewAddFormValueType;
 };
@@ -202,6 +202,12 @@ export type RBObjType = {
 };
 
 export type TestItemType = 'PAR' | 'OBW' | 'CSE' | 'BandEdge' | 'BandEdgeIC';
+export type TestItemLabelType =
+  | 'PAR'
+  | 'OBW'
+  | 'CSE'
+  | 'BandEdge'
+  | 'BandEdgeIC';
 
 //  supList  测试结果生成时的父级数据
 

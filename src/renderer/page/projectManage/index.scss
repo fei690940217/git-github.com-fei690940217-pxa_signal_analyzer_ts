@@ -1,0 +1,46 @@
+.project-manage-container {
+  padding: 5px;
+  height: 100%;
+  overflow: hidden;
+  .manage-card-item {
+    display: flex;
+    flex-direction: column;
+    .ant-card-body {
+      flex: 1;
+      overflow: hidden;
+      .ant-table-wrapper {
+        height: 100%;
+        .ant-spin-nested-loading {
+          height: 100%;
+          .ant-spin-container {
+            height: 100%;
+            .ant-table {
+              height: 100%;
+              .ant-table-container {
+                height: 100%;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                .ant-table-body {
+                  flex: 1;
+                  overflow: hidden;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  // 目录管理卡片样式
+  .dir-manage-card {
+    width: 400px;
+    height: 100%;
+    overflow: hidden;
+  }
+  .project-manage-card {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+  }
+}

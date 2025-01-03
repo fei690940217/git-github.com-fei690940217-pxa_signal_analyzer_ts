@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2024-12-17 14:48:08
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-18 11:27:18
+ * @LastEditTime: 2024-12-31 11:27:37
  * @FilePath: \pxa_signal_analyzer\.erb\configs\webpack.config.renderer.prod.ts
  * @Description:
  *
@@ -45,7 +45,15 @@ const configuration: webpack.Configuration = {
 
   target: ['web', 'electron-renderer'],
 
-  entry: [path.join(webpackPaths.srcRendererPath, 'index.tsx')],
+  // entry: [path.join(webpackPaths.srcRendererPath, 'index.tsx')],
+  entry: {
+    index: [
+      path.join(webpackPaths.srcRendererPath, 'index.tsx'), // 页面1入口
+    ],
+    renderer1: [
+      path.join(webpackPaths.srcRenderer1Path, 'index.tsx'), // 页面2入口
+    ],
+  },
 
   output: {
     path: webpackPaths.distRendererPath,
@@ -128,7 +136,7 @@ const configuration: webpack.Configuration = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
       DEBUG_PROD: false,
-      REACT_APP_LOG_LEVEL:'info'
+      REACT_APP_LOG_LEVEL: 'info',
     }),
 
     new MiniCssExtractPlugin({

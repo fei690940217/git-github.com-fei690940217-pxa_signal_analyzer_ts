@@ -2,12 +2,13 @@
  * @Author: feifei
  * @Date: 2023-12-15 14:08:57
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 13:13:28
+ * @LastEditTime: 2024-12-31 09:22:05
  * @FilePath: \pxa_signal_analyzer\src\common\index.ts
  * @Description:前后端通用的纯函数,或者部分静态数据
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
+import { TestItemType } from '@src/customTypes/renderer';
 
 export const visaProxyDefaultPort: number = 10086;
 export const defaultPort = 10086;
@@ -15,8 +16,22 @@ export const webAppDefaultPort: number = 10010;
 export const visaProxyFileName = 'visa_proxy_only_spectrum.exe';
 
 export const webAppName: string = 'WebApplication2';
+
+export const FullAbbreviationTable = {
+  PAR: 'Peak-Average Ratio',
+  OBW: 'Occupied Bandwidth',
+  BandEdge: 'Band Edges Compliance',
+  BandEdgeIC: 'Band Edges Compliance IC',
+  CSE: 'Conducted Spurious Emission',
+  MOP: 'Maximum Output Power',
+};
+
+type TestItem = {
+  label: string;
+  value: TestItemType; // 限制 value 字段的值为这些固定的字符串
+};
 //测试用例
-export const testItemList = [
+export const testItemList: readonly TestItem[] = [
   { label: 'Peak-Average Ratio', value: 'PAR' },
   { label: 'Occupied Bandwidth', value: 'OBW' },
   { label: 'Conducted Spurious Emission', value: 'CSE' },
@@ -166,13 +181,4 @@ export const verdictHandle = (record: any): boolean => {
   } else {
     return false;
   }
-};
-
-export const FullAbbreviationTable = {
-  PAR: 'Peak-Average Ratio',
-  OBW: 'Occupied Bandwidth',
-  BandEdge: 'Band Edges Compliance',
-  BandEdgeIC: 'Band Edges Compliance IC',
-  CSE: 'Conducted Spurious Emission',
-  MOP: 'Maximum Output Power',
 };

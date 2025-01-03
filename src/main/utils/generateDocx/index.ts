@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-06-20 14:53:26
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 13:34:43
+ * @LastEditTime: 2025-01-02 15:47:43
  * @FilePath: \pxa_signal_analyzer\src\main\utils\generateDocx\index.ts
  * @Description:生成docx  officeGen版   (docx版本不支持2007)
  *
@@ -19,15 +19,19 @@ import OBWGenerateXLSX from './OBWHandle';
 import { readJson } from 'fs-extra';
 import { logError, logInfo } from '@src/main/logger/logLevel';
 
-export default async (params) => {
+type Params = {
+  projectName: string;
+  dirName: string;
+};
+export default async (params: Params) => {
   try {
-    const { projectName, subProjectName } = params;
-    logInfo(`开始生成报告 ${projectName}/${subProjectName}`);
+    const { projectName, dirName } = params;
+    logInfo(`开始生成报告 ${dirName}/${projectName}`);
     const baseURL = path.join(
       appConfigFilePath,
       'user/project',
+      dirName,
       projectName,
-      subProjectName,
     );
     const filePath = path.join(baseURL, 'result.json');
     const currentResult = await readJson(filePath);
@@ -37,26 +41,23 @@ export default async (params) => {
     //添加log
     dispatchAction({
       key: 'addLog',
-      value: `${projectName}/${subProjectName} 开始生成报告`,
+      value: `${dirName}/${projectName} 开始生成报告`,
     });
 
     if (testItem === 'OBW') {
-      await OBWGenerateXLSX(testItem, currentResult, baseURL, subProjectName);
+      await OBWGenerateXLSX(testItem, currentResult, baseURL, projectName);
     } else {
-      await otherDocxGenerate(testItem, currentResult, baseURL, subProjectName);
+      await otherDocxGenerate(testItem, currentResult, baseURL, projectName);
     }
     //添加log
     dispatchAction({
       key: 'addLog',
-      value: `success_-_${projectName}/${subProjectName} 报告已生成生成`,
+      value: `success_-_${dirName}/${projectName} 报告已生成生成`,
     });
+    logInfo(`${dirName}/${projectName} 报告已生成`);
     return Promise.resolve();
   } catch (error) {
-    logError(`${subProjectName} 生成报告出错 ${error.toString()}`);
-    dispatchAction({
-      key: 'addLog',
-      value: `error_-_ ${subProjectName} 生成报告出错 ${error.toString()}`,
-    });
+    logError(`生成报告出错 ${error?.toString()}`);
     return Promise.reject(error);
   }
 };

@@ -15,7 +15,8 @@ import { logError } from '@src/main/logger/logLevel';
 import { xlsxDataArrayToObject, workbookNameHandle } from './util';
 import mergeCellDataFill from '@src/main/utils/mergeCellDataFill';
 import { RBConfigItem } from '@src/customTypes/main';
-const testItems = ['BandEdge', 'CSE', 'OBW', 'PAR'];
+import { TestItemType } from '@src/customTypes/renderer';
+const testItems: TestItemType[] = ['BandEdge', 'CSE', 'OBW', 'PAR'];
 //RB配置文件地址
 const configFilePath = path.join(appConfigFilePath, 'user/rbConfig');
 //解析后存储地址
