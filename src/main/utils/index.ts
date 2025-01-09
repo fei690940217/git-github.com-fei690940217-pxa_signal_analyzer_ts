@@ -2,14 +2,14 @@
  * @Author: feifei
  * @Date: 2023-05-17 09:32:41
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-31 15:33:13
+ * @LastEditTime: 2025-01-07 14:58:41
  * @FilePath: \pxa_signal_analyzer\src\main\utils\index.ts
  * @Description:utils
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
 import { pinpuConnectionName } from '@src/common';
-import { getWindow } from '@src/main/windowManager';
+import { getWindow } from '@src/main/windowManage/mainWindow';
 import path from 'path';
 import { create_instr_fn } from '../api/api';
 //主进程给渲染进程发送消息,key,value形式

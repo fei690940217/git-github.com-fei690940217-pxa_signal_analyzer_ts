@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2024-12-09 09:18:06
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-02 14:01:22
+ * @LastEditTime: 2025-01-08 15:24:35
  * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\getAndSetJsonFile.ts
  * @Description:
  *
@@ -118,7 +118,29 @@ const setCurrentResult = async (params) => {
     return Promise.reject(error);
   }
 };
-export const getJsonFile = async (payload) => {
+const getProjectInfo = async (params) => {
+  try {
+    const { projectName } = params;
+    const baseFile = path.join(
+      appConfigFilePath,
+      'user',
+      'project',
+      projectName,
+    );
+    let filePath = '';
+    filePath = path.join(baseFile, 'dirInfo.json');
+    const resultList = await readJson(filePath);
+    return Promise.resolve(resultList);
+  } catch (error) {
+    const msg = `getProjectInfo 128 error: ${error?.message}`;
+    logError(msg);
+  }
+};
+type GetJsonFilePayloadType = {
+  type: string;
+  params?: any;
+};
+export const getJsonFile = async (payload: GetJsonFilePayloadType) => {
   try {
     const { type, params } = payload;
     //获取项目列表
@@ -133,6 +155,10 @@ export const getJsonFile = async (payload) => {
     //获取当前项目或者子项目的测试列表
     else if (type === 'currentResult') {
       return getCurrentResult(params);
+    }
+    //获取项目信息
+    else if (type === 'projectInfo') {
+      return getProjectInfo(params);
     }
   } catch (error) {
     const msg = `getJsonFile 137 error: ${error?.message}`;

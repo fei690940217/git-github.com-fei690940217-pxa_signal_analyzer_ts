@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-09-30 11:18:26
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-02 15:45:06
+ * @LastEditTime: 2025-01-07 15:25:05
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\layout\index.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -117,12 +117,13 @@ export default () => {
     setVersionModalVisible(true);
   };
   const clickk = async () => {
-    ipcRenderer.send('test');
+    // ipcRenderer.send('test');
   };
   //强制更新所有配置文件
   const refreshConfigFile = () => {
     ipcRenderer.send('refreshConfigFile');
   };
+  useEffect(() => {}, []);
   return (
     <Layout className="layout">
       <VersionModal

@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-03 17:30:05
+ * @LastEditTime: 2025-01-09 17:08:57
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\projectManage\subProjectList\index.tsx
  * @Description: 项目列表主表格
  */
@@ -27,8 +27,9 @@ import {
   FolderOpenTwoTone,
   FileWordTwoTone,
   HddTwoTone,
+  ReloadOutlined,
 } from '@ant-design/icons';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './index.scss';
 import Moment from 'moment';
 import { useTranslation } from 'react-i18next';
@@ -38,6 +39,9 @@ import { divide } from 'lodash';
 import { useAppSelector } from '@src/renderer/hook';
 import { AddDirType, OpenTheProjectWindowPayload } from '@src/customTypes';
 import modalConfirm from '@src/renderer/utils/modalConfirm';
+import { refreshProjectListChannel } from '@src/BroadcastChannel';
+import CardTitle from './cardTitle';
+import detailModal from './detailModal';
 type TableRowSelection<T extends object = object> =
   TableProps<T>['rowSelection'];
 const { Column } = Table;
@@ -52,13 +56,31 @@ export default ({ currentDir }: PropsType) => {
   const [selectSubProject, setSelectSubProject] = useState<ProjectItemType[]>(
     [],
   );
+  const currentDirRef = useRef(currentDir);
+  // 更新 currentDirRef 的值
+  useEffect(() => {
+    currentDirRef.current = currentDir;
+  }, [currentDir]);
+  useEffect(() => {
+    refreshProjectListChannel.addEventListener('message', (event) => {
+      console.log('监测到项目已经更新');
+      getSubProjectList();
+    });
+    return () => {
+      refreshProjectListChannel.removeEventListener('message', (event) => {
+        getSubProjectList();
+      });
+    };
+  }, []);
   //获取测试列表
   const getSubProjectList = async () => {
-    if (currentDir?.id) {
-      const list = await ipcRenderer.invoke(
+    console.log('准备获取子项目列表', currentDir);
+    if (currentDirRef.current?.id) {
+      const list = await ipcRenderer.invoke<ProjectItemType[]>(
         'getSubProjectList',
-        currentDir.dirName,
+        currentDirRef.current.dirName,
       );
+      console.log('子项目列表', list);
       setSubProjectList(list);
     } else {
       setSubProjectList([]);
@@ -116,42 +138,15 @@ export default ({ currentDir }: PropsType) => {
       </Tooltip>
     );
   };
-  const createTimeRender = (text: string) => {
-    return Moment(text).format('YYYY-MM-DD HH:mm');
-  };
-  const addFn = () => {
-    if (currentDir?.dirName) {
-      const payload: OpenTheProjectWindowPayload = {
-        projectName: currentDir.dirName,
-      };
-      ipcRenderer.send('openTheProjectWindow', payload);
-    } else {
-      messageApi.error({
-        duration: 5,
-        content: '请选择一个目录',
-      });
-    }
-  };
-  const editFn = () => {
-    if (selectSubProject?.length) {
-      if (selectSubProject.length === 1 && currentDir) {
-        const payload: OpenTheProjectWindowPayload = {
-          projectName: currentDir.dirName,
-          subProjectName: selectSubProject[0].projectName,
-        };
-        ipcRenderer.send('openTheProjectWindow', payload);
-      } else {
-        messageApi.warning({
-          duration: 5,
-          content: '只能选择一个项目',
-        });
-      }
-    } else {
-      messageApi.warning({
-        duration: 5,
-        content: '请选择一个项目操作',
-      });
-    }
+  //详情页
+  const detailColumnRender = (_text: any, record: ProjectItemType) => {
+    return (
+      <Tooltip title="查看详情">
+        <Button size="small" type="link" onClick={() => detailModal(record)}>
+          详情
+        </Button>
+      </Tooltip>
+    );
   };
   const tableRowSelection: TableRowSelection<ProjectItemType> = {
     type: 'checkbox',
@@ -164,37 +159,6 @@ export default ({ currentDir }: PropsType) => {
     },
     selectedRowKeys: selectSubProject.map((item) => item.id),
   };
-  //归档
-  const archiveFn = async () => {
-    if (currentDir?.id) {
-      try {
-        await modalConfirm(`确认归档 < ${currentDir.dirName} > ?`, '');
-        await ipcRenderer.invoke('archiveDir', currentDir.dirName);
-        //更新项目列表
-        getSubProjectList();
-        //清除选中行
-        setSelectSubProject([]);
-        messageApi.success({
-          duration: 5,
-          content: '已归档',
-        });
-      } catch (error) {
-        logError(error?.toString());
-        if (error !== '取消') {
-          messageApi.error({
-            duration: 5,
-            content: String(error),
-          });
-        }
-      }
-    } else {
-      messageApi.warning({
-        duration: 5,
-        content: '请选择一个目录操作',
-      });
-    }
-  };
-  const deleteFn = () => {};
   return (
     <Card
       className="project-manage-card manage-card-item"
@@ -203,49 +167,12 @@ export default ({ currentDir }: PropsType) => {
         body: { padding: 8 },
       }}
       title={
-        <Flex gap={20}>
-          <h2 className="card-title-text">项目管理</h2>
-          <Flex gap={8} align="center">
-            <Button
-              color="primary"
-              icon={<PlusOutlined />}
-              variant="solid"
-              size="small"
-              onClick={addFn}
-            >
-              新增
-            </Button>
-            {/* 归档 */}
-            <Button
-              color="primary"
-              icon={<EditOutlined />}
-              variant="solid"
-              size="small"
-              onClick={editFn}
-            >
-              编辑
-            </Button>
-            {/* 归档 */}
-            <Button
-              color="primary"
-              icon={<HddTwoTone />}
-              variant="outlined"
-              onClick={archiveFn}
-              size="small"
-            >
-              归档
-            </Button>
-            <Button
-              variant="outlined"
-              color="danger"
-              icon={<DeleteTwoTone twoToneColor="red" />}
-              size="small"
-              onClick={deleteFn}
-            >
-              删除
-            </Button>
-          </Flex>
-        </Flex>
+        <CardTitle
+          currentDir={currentDir}
+          getSubProjectList={getSubProjectList}
+          selectSubProject={selectSubProject}
+          setSelectSubProject={setSelectSubProject}
+        />
       }
     >
       {messageContextHolder}
@@ -288,7 +215,15 @@ export default ({ currentDir }: PropsType) => {
             dataIndex="createTime"
             key="createTime"
             ellipsis={true}
-            render={createTimeRender}
+            render={(text) => Moment(text).format('YYYY-MM-DD HH:mm')}
+          />
+          {/* 操作 */}
+          <Column
+            align="center"
+            width={70}
+            title="Detail"
+            ellipsis={true}
+            render={detailColumnRender}
           />
           {/* 操作 */}
           <Column

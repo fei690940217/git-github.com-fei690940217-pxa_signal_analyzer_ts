@@ -2,18 +2,28 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-03 17:12:53
+ * @LastEditTime: 2025-01-08 09:38:59
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\projectManage\dirList\index.tsx
  * @Description: 目录管理
  */
 
-import { Table, ConfigProvider, Card, message, Button, Flex } from 'antd';
+import {
+  Table,
+  ConfigProvider,
+  Card,
+  message,
+  Button,
+  Flex,
+  Tooltip,
+} from 'antd';
 import type { TableProps } from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
   DeleteTwoTone,
   HddTwoTone,
+  EyeOutlined,
+  EyeTwoTone,
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import './index.scss';
@@ -41,11 +51,12 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
   //是否正在测试
   const isInProgress = useAppSelector((state) => state.testStatus.isInProgress);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [isAdd, setIsAdd] = useState<boolean>(true);
   const [dirList, setDirList] = useState<AddDirType[]>([]);
 
   const getProjectList = async () => {
     try {
-      const list = await ipcRenderer.invoke('getJsonFile', {
+      const list = await ipcRenderer.invoke<AddDirType[]>('getJsonFile', {
         type: 'projectList',
       });
       setDirList(list);
@@ -115,7 +126,19 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
     }
   };
   const addFn = () => {
+    setIsAdd(true);
     setModalVisible(true);
+  };
+  const editDirFn = async () => {
+    if (currentDir?.id) {
+      setIsAdd(false);
+      setModalVisible(true);
+    } else {
+      messageApi.warning({
+        duration: 5,
+        content: '请选择一个目录操作',
+      });
+    }
   };
   const deleteFn = async () => {
     if (currentDir?.id) {
@@ -143,6 +166,30 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
       });
     }
   };
+  const otherInfoColumnRender = (
+    _text: any,
+    record: AddDirType,
+    _index: any,
+  ) => {
+    const { createdAt, description } = record;
+    const title = (
+      <div>
+        <Flex>
+          <label>创建时间:</label>
+          <div>{createdAt}</div>
+        </Flex>
+        <Flex>
+          <label>简介:</label>
+          <div>{description}</div>
+        </Flex>
+      </div>
+    );
+    return (
+      <Tooltip title={title}>
+        <EyeTwoTone twoToneColor="#36c" style={{ cursor: 'pointer' }} />
+      </Tooltip>
+    );
+  };
   return (
     <Card
       className="dir-manage-card manage-card-item"
@@ -169,6 +216,7 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
               icon={<EditOutlined />}
               variant="solid"
               size="small"
+              onClick={editDirFn}
             >
               编辑
             </Button>
@@ -199,8 +247,9 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
       <AddDirModal
         modalVisible={modalVisible}
         closeModal={() => setModalVisible(false)}
-        isAdd={true}
+        isAdd={isAdd}
         refreshDirList={getProjectList}
+        currentDir={currentDir}
       ></AddDirModal>
       <ConfigProvider
         theme={{
@@ -234,6 +283,13 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
             dataIndex="dirName"
             key="dirName"
             ellipsis={true}
+          />
+          {/* 项目名称 */}
+          <Column
+            align="center"
+            title="Other"
+            width={60}
+            render={otherInfoColumnRender}
           />
         </Table>
       </ConfigProvider>

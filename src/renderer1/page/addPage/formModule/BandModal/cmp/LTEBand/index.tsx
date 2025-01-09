@@ -2,8 +2,8 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-30 14:58:11
- * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\BandModal\cmp\LTEBand\index.tsx
+ * @LastEditTime: 2025-01-08 17:23:45
+ * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\formModule\BandModal\cmp\LTEBand\index.tsx
  * @Description: 项目列表主表格
  */
 
@@ -16,8 +16,9 @@ import { BandItemInfo } from '@src/customTypes/renderer';
 type PropsType = {
   row: BandItemInfo;
   LTEBandList: any;
+  changeSelectBand: (value: BandItemInfo[]) => void;
 };
-export default ({ row, LTEBandList }: PropsType) => {
+export default ({ row, LTEBandList, changeSelectBand }: PropsType) => {
   const { LTE_Band } = row;
   //本弹窗内的选择项
   const [LTEBandModalVisible, setLTEBandModalVisible] =
@@ -32,6 +33,7 @@ export default ({ row, LTEBandList }: PropsType) => {
         closeModal={() => setLTEBandModalVisible(false)}
         row={row}
         LTEBandList={LTEBandList}
+        changeSelectBand={changeSelectBand}
       />
       {/* left */}
       <div className="lte-band-column-left">{LTE_Band?.join(' , ')}</div>

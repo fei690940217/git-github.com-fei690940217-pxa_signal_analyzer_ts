@@ -2,8 +2,8 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-30 15:44:10
- * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\BandModal\cmp\NRBWColumn\index.tsx
+ * @LastEditTime: 2025-01-08 17:28:06
+ * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\formModule\BandModal\cmp\NRBWColumn\index.tsx
  * @Description: 项目列表主表格
  */
 
@@ -30,8 +30,9 @@ const NR_BW_LIST = [
 //
 type PropsType = {
   row: BandItemInfo;
+  changeSelectBand: (value: BandItemInfo[]) => void;
 };
-export default ({ row }: PropsType) => {
+export default ({ row, changeSelectBand }: PropsType) => {
   const dispatch = useAppDispatch();
   //本弹窗内的选择项
   const addFormValue = useAppSelector(
@@ -47,7 +48,7 @@ export default ({ row }: PropsType) => {
       }
       return item;
     });
-    dispatch(setAddFormValue({ ...addFormValue, selectBand: tempList }));
+    changeSelectBand(tempList);
   };
   return (
     <div className="lte-band-column-wrapper">

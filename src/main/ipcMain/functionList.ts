@@ -2,13 +2,16 @@
  * @Author: feifei
  * @Date: 2023-10-18 14:51:01
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-03 17:08:44
+ * @LastEditTime: 2025-01-08 10:36:16
  * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\functionList.ts
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
-import { createAddWindow } from '@src/main/addWindowManager';
+import {
+  createAddWindow,
+  getAddWindow,
+} from '@src/main/windowManage/addWindow';
 import { pinpuConnectionName } from '@src/common';
 import {
   remove,
@@ -21,6 +24,7 @@ import {
   readdir,
   mkdir,
   readFile,
+  rename,
 } from 'fs-extra';
 import { statSync, promises as fsPromises } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
@@ -271,7 +275,56 @@ export const addDirFn = async (payload: AddDirType) => {
     return Promise.reject(error);
   }
 };
+//editDirFn
+type EditDirFnPayload = {
+  newDirInfo: AddDirType;
+  oldDirInfo: AddDirType;
+};
+export const editDirFn = async (payload: EditDirFnPayload) => {
+  try {
+    const { newDirInfo, oldDirInfo } = payload;
+    //判断一下dirName是否一致
+    const newDirName = newDirInfo.dirName;
+    const oldDirName = oldDirInfo.dirName;
+    //1.先判断旧文件夹是否存在
+    const dirPath = path.join(appConfigFilePath, 'user', 'project', oldDirName);
+    const newDirPath = path.join(
+      appConfigFilePath,
+      'user',
+      'project',
+      newDirName,
+    );
 
+    const flag = await pathExists(dirPath);
+    if (!flag) {
+      return Promise.resolve({
+        code: 1,
+        msg: '找不打要修改的目录,请刷新后重试!',
+      });
+    }
+    //如果不一样需要修改文件夹名称,如果一致就不需要修改文件夹名称
+    if (newDirName !== oldDirName) {
+      try {
+        await rename(dirPath, newDirPath);
+      } catch (error) {
+        return Promise.resolve({
+          code: 1,
+          msg: `修改文件夹名称失败,请手动修改文件夹名称!${error}`,
+        });
+      }
+    }
+
+    //继续
+    //确保文件夹存在
+    await ensureDir(newDirPath);
+    //写入dirInfo.json文件
+    const dirInfoPath = path.join(newDirPath, 'dirInfo.json');
+    await outputJson(dirInfoPath, newDirInfo);
+    return Promise.resolve({ code: 0, msg: '' });
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
 //目录归档
 export const archiveDir = async (dirName: string) => {
   try {

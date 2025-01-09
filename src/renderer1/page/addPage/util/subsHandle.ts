@@ -19,7 +19,7 @@ const getRBConfigJson = async (testItems: string): Promise<RBConfigItem[]> => {
       name = 'BandEdge';
     }
     const jsonFilePath = `app/rbConfig/${name}.json`;
-    const addProjectRbConfig = await ipcRenderer.invoke(
+    const addProjectRbConfig = await ipcRenderer.invoke<RBConfigItem[]>(
       'getJsonFileByFilePath',
       jsonFilePath,
     );

@@ -1,7 +1,13 @@
 {
+  // Most ts-node options can be specified here using their programmatic names.
+  "ts-node": {
+    // It is faster to skip typechecking.
+    // Remove if you want ts-node to do typechecking.
+    "transpileOnly": true
+  },
   "compilerOptions": {
     "incremental": true,
-    "target": "es2022",
+    "target": "ESNext",
     "module": "commonjs",
     "lib": ["dom", "es2022"],
     "jsx": "react-jsx",
@@ -20,8 +26,10 @@
       "@t/*": ["src/customTypes/*"],
       "@main/*": ["src/main/*"],
       "@render/*": ["src/render/*"],
-      "@test/*": ["src/testProcess/*"]
+      "@test/*": ["src/testProcess/*"],
+      "@root/*": ["./*"]
     }
   },
+
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]
 }

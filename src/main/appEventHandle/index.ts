@@ -2,21 +2,20 @@
  * @Author: feifei
  * @Date: 2023-05-17 09:32:41
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-27 11:01:37
+ * @LastEditTime: 2025-01-07 14:55:33
  * @FilePath: \pxa_signal_analyzer\src\main\appEventHandle\index.ts
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
-import { app, Menu, BrowserView, BrowserWindow } from 'electron';
-import { contextTemplate } from './AppMenuList';
-import windowClose from './windowClose';
-import configValidate from '../configValidate';
+import { app } from 'electron';
 import ipcMainEvent from '../ipcMain/index';
+import ipcMainModule1Event from '../ipcMain/ipcMainModule1';
+
 import runVisaProxy from '../utils/runVisaProxy';
 import electronStore from '@src/main/electronStore';
 //子进程启动函数
-export default (win: BrowserWindow) => {
+export default () => {
   //app事件监听函数
   app.on('window-all-closed', async () => {
     //准备杀掉进程
@@ -32,29 +31,9 @@ export default (win: BrowserWindow) => {
   });
   //监听窗口关闭
   // windowClose(win);
-  //监听ipcMain事件
+  //监听ipcMain事件,分开注册,便于查找
   ipcMainEvent();
+  ipcMainModule1Event();
   //启动PythonVisa代理
   runVisaProxy();
-  //添加右键上下文菜单
-  const contextMenu = Menu.buildFromTemplate(contextTemplate);
-  win.webContents.on('context-menu', (e, params) => {
-    contextMenu.popup({ window: win });
-  });
-  //验证配置文件
-  win.on('ready-to-show', () => {
-    configValidate();
-  });
-
-  // 监听窗口最小化事件
-  win.on('minimize', () => {
-    // 在这里可以执行您的逻辑
-    electronStore.set('mainWindowIsShow', true);
-  });
-
-  // 监听窗口恢复事件（从最小化状态恢复）
-  win.on('restore', () => {
-    // 在这里可以执行您的逻辑
-    electronStore.set('mainWindowIsShow', false);
-  });
 };

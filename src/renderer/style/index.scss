@@ -5,6 +5,10 @@ body {
   height: 100%;
   overflow: hidden;
   margin: 0;
+  width: 100%;
+  // scrollbar-width: thin !important;
+  // scrollbar-color: #eaeaea transparent !important;
+  // scrollbar-gutter: stable !important;
 }
 #root {
   height: 100%;
@@ -35,9 +39,10 @@ body {
 /* 滚动条样式 */
 
 ::-webkit-scrollbar {
-  height: 17px;
-  width: 17px;
-  background: transparent;
+  height: 12px;
+  width: 12px;
+  // background: transparent;
+  background-color: #f5f5f5;
 }
 
 ::-webkit-scrollbar-thumb {

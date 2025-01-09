@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-02-23 18:04:48
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-31 11:57:07
+ * @LastEditTime: 2025-01-09 13:37:48
  * @Descripttion: 测试状态,判断是暂停,进行中等等
  */
 import { createSlice } from '@reduxjs/toolkit';
@@ -19,19 +19,20 @@ type InitialStateType = {
   localLogList: LogListType[];
   currentTestRecordName: string;
 };
+const initialState: InitialStateType = {
+  //测试状态
+  isInProgress: electronStoreGet('isInProgress') || false,
+  //是否暂停中
+  isTimeout: electronStoreGet('isTimeout') || false,
+  logList: [],
+  localLogList: [],
+  currentTestRecordName: electronStoreGet('currentTestRecordName') || '',
+};
 export const testStatusSlice = createSlice({
   //命名空间
   name: 'testStatus',
   //初始化数据
-  initialState: {
-    //测试状态
-    isInProgress: electronStoreGet('isInProgress') || false,
-    //是否暂停中
-    isTimeout: electronStoreGet('isTimeout') || false,
-    logList: [],
-    localLogList: [],
-    currentTestRecordName: electronStoreGet('currentTestRecordName') || '',
-  } as InitialStateType,
+  initialState,
   //相当于vuex的mutions
   reducers: {
     setIsInProgress: (state, action) => {

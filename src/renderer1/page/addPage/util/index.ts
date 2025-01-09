@@ -2,13 +2,22 @@
  * @Author: feifei
  * @Date: 2024-12-30 15:17:29
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-30 15:44:37
- * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\util\index.ts
+ * @LastEditTime: 2025-01-09 15:52:24
+ * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\util\index.ts
  * @Description:
  *
  * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved.
  */
 import { evaluate } from 'mathjs';
+import $moment from 'moment';
+
+import {
+  BandItemInfo,
+  NewAddFormValueType,
+  ProjectItemType,
+} from '@src/customTypes/renderer';
+import { nanoid } from 'nanoid';
+const { ipcRenderer } = window.myApi;
 
 //判断公式的正则
 const expressionRegex = /[\+\-\*/]/;
@@ -67,4 +76,52 @@ export const loopFn = (list, subItem) => {
       return '';
     }
   });
+};
+
+//ipcMainMod1Handle,getProjectInfo
+type getProjectInfoPayloadType = {
+  dirName: string;
+  subProjectName: string;
+};
+export const getProjectInfo = async (payload: getProjectInfoPayloadType) => {
+  try {
+    console.log('准备获取项目信息');
+    const list = await ipcRenderer.invoke<ProjectItemType>(
+      'ipcMainMod1Handle',
+      { action: 'getProjectInfo', payload },
+    );
+    return list;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+//生成新的当前行数据
+export const projectInfoGen = (
+  isAdd: boolean,
+  formValue: NewAddFormValueType,
+  projectInfo: ProjectItemType | null,
+) => {
+  if (isAdd) {
+    //给projectList.json中添加本项目
+    const projectObj = {
+      id: nanoid(8),
+      createDate: $moment().format('YYYY-MM-DD HH:mm'),
+      updateDate: null,
+      ...formValue,
+    };
+    return projectObj;
+  }
+  //编辑
+  else {
+    const projectObj = {
+      id: projectInfo?.id ?? nanoid(8),
+      createDate:
+        projectInfo?.createDate ?? $moment().format('YYYY-MM-DD HH:mm'),
+      updateDate: $moment().format('YYYY-MM-DD HH:mm'),
+      ...formValue,
+    };
+    return projectObj;
+  }
 };

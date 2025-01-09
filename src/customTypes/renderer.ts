@@ -97,12 +97,16 @@ export type AddFormValueType = {
 
 export type ProjectItemType = {
   id: string;
-  createDate: string;
+  createDate: string | null;
+  updateDate: string | null;
   projectName: string;
-  networkMode: string;
   testItems: TestItemType;
   RBConfigSelected: Key[];
-  formValue: NewAddFormValueType;
+  networkMode: 'SA' | 'NSA';
+  isGate: boolean;
+  selectBand: BandItemInfo[];
+  LTE_BW?: number | null | undefined;
+  LTE_ARFCN?: number | null | undefined;
 };
 
 //subProject

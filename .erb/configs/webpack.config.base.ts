@@ -2,8 +2,8 @@
  * @Author: feifei
  * @Date: 2023-10-18 16:00:08
  * @LastEditors: feifei
- * @LastEditTime: 2024-01-25 17:35:08
- * @FilePath: \5G_TELEC_TEST\.erb\configs\webpack.config.base.ts
+ * @LastEditTime: 2025-01-07 09:54:15
+ * @FilePath: \pxa_signal_analyzer\.erb\configs\webpack.config.base.ts
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
@@ -64,6 +64,8 @@ const configuration: webpack.Configuration = {
       '@main': path.resolve(__dirname, '../../src/main'),
       //测试进程使用
       '@test': path.resolve(__dirname, '../../src/testProcess'),
+      //测试进程使用
+      '@root': path.resolve(__dirname, '../..'),
     },
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
     modules: [webpackPaths.srcPath, 'node_modules'],

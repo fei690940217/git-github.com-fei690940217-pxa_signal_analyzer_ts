@@ -21,8 +21,9 @@ type BandObjType = {
 type PropsType = {
   row: BandItemInfo;
   bandObj: BandObjType;
+  changeSelectBand: (value: BandItemInfo[]) => void;
 };
-export default ({ row, bandObj }: PropsType) => {
+export default ({ row, bandObj, changeSelectBand }: PropsType) => {
   //本弹窗内的选择项
   const [selectBandModalVisible, setSelectBandModalVisible] =
     useState<boolean>(false);
@@ -37,6 +38,7 @@ export default ({ row, bandObj }: PropsType) => {
         closeModal={() => setSelectBandModalVisible(false)}
         row={row}
         bandObj={bandObj}
+        changeSelectBand={changeSelectBand}
       />
       {/* left */}
       <div className="lte-band-column-left">{Band}</div>

@@ -11,15 +11,45 @@
       flex: 1;
       overflow: auto;
       padding: 5px;
-      border: 1px solid #f0f0f0;
+      scrollbar-width: thin !important;
+      scrollbar-color: #8c8c8c transparent !important;
     }
     .add-project-header {
-      height: 36px;
-      padding: 5px;
+      -webkit-app-region: drag;
+      height: 40px;
+      background: linear-gradient(135deg, #001529, #434343); /* 渐变色背景 */
+      position: relative; /* 必须设置为相对定位以便伪元素定位 */
+      overflow: hidden; /* 防止伪元素溢出 */
+      &:hover {
+        opacity: 0.9;
+      }
+      .add-project-header-content {
+        padding-right: 140px;
+        height: 100%;
+        .header-left {
+          margin-left: 10px;
+          .title-text {
+            color: #fff;
+          }
+        }
+        .header-right {
+          .ant-btn {
+            -webkit-app-region: no-drag;
+            cursor: pointer;
+          }
+        }
+      }
     }
     .add-project-footer {
-      height: 36px;
-      padding: 5px;
+      // background-color: #001529;
+      height: 40px;
+      .add-project-footer-content {
+        height: 100%;
+        background: linear-gradient(135deg, #434343, #001529); /* 渐变色背景 */
+        &:hover {
+          opacity: 0.9;
+        }
+      }
     }
   }
 }

@@ -1,5 +1,4 @@
 import 'webpack-dev-server';
-import Dotenv from 'dotenv-webpack';
 import path from 'path';
 import fs from 'fs';
 import webpack from 'webpack';

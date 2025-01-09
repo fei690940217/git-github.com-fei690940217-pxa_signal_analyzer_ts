@@ -1,3 +1,5 @@
+import { ProjectItemType, ResultItemType } from './renderer';
+
 export type OFDMType = 'DFT' | 'CP';
 export type AddDirType = {
   id: string;
@@ -7,6 +9,28 @@ export type AddDirType = {
 };
 
 export type OpenTheProjectWindowPayload = {
-  projectName: string;
+  dirName: string;
   subProjectName?: string;
+};
+export type IpcRendererInvokeResType = {
+  code: number;
+  msg: string;
+};
+
+export type CreateProjectPayload = {
+  dirName: string;
+  subProjectName: string;
+  isAdd: boolean;
+  projectInfo: ProjectItemType;
+  result: ResultItemType[];
+};
+export type ApiResponseType<T = unknown> = {
+  code: number;
+  msg?: string;
+  data?: T;
+};
+//广播的消息格式
+export type BroadcastChannelParams = {
+  action: string;
+  payload: any;
 };

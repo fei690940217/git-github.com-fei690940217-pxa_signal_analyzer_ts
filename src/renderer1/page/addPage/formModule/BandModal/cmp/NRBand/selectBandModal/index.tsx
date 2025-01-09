@@ -2,8 +2,8 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-30 16:53:43
- * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\BandModal\cmp\NRBand\selectBandModal\index.tsx
+ * @LastEditTime: 2025-01-08 17:26:56
+ * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\formModule\BandModal\cmp\NRBand\selectBandModal\index.tsx
  * @Description: 项目列表主表格
  */
 
@@ -26,8 +26,15 @@ type PropsType = {
   closeModal: () => void;
   row: BandItemInfo;
   bandObj: BandObjType;
+  changeSelectBand: (value: BandItemInfo[]) => void;
 };
-export default ({ modalVisible, closeModal, row, bandObj }: PropsType) => {
+export default ({
+  modalVisible,
+  closeModal,
+  row,
+  bandObj,
+  changeSelectBand,
+}: PropsType) => {
   const dispatch = useAppDispatch();
   const addFormValue = useAppSelector(
     (state) => state.projectList.addFormValue,
@@ -81,7 +88,7 @@ export default ({ modalVisible, closeModal, row, bandObj }: PropsType) => {
         }
         return item;
       });
-      dispatch(setAddFormValue({ ...addFormValue, selectBand: tempList }));
+      changeSelectBand(tempList);
       closeModal();
     }
   };

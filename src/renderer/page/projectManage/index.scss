@@ -23,7 +23,10 @@
                 flex-direction: column;
                 .ant-table-body {
                   flex: 1;
-                  overflow: hidden;
+                  overflow: auto !important;
+                  scrollbar-width: thin !important;
+                  scrollbar-color: #eaeaea transparent !important;
+                  // scrollbar-gutter: stable !important;
                 }
               }
             }

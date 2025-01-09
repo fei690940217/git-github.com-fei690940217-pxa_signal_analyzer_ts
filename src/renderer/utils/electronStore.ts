@@ -2,13 +2,17 @@
  * @Author: feifei
  * @Date: 2024-12-18 15:44:42
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-26 10:04:51
+ * @LastEditTime: 2025-01-06 17:47:48
  * @FilePath: \pxa_signal_analyzer\src\renderer\utils\electronStore.ts
  * @Description:
  *
  * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved.
  */
-const { ipcRenderer } = window.myApi;
+const { ipcRenderer, ipcRendererOn } = window.myApi;
+console.log('ipcRendererOn', ipcRendererOn);
+console.log(ipcRenderer.send);
+console.log(ipcRenderer.sendSync);
+
 import { logError } from './logLevel';
 //设置
 export const electronStoreSet = (key: string, val: any) => {

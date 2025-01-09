@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-04-07 14:24:23
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-26 15:31:38
+ * @LastEditTime: 2025-01-09 17:53:36
  * @Descripttion:   测试用例数据验证与配置文件生成
  */
 
@@ -14,6 +14,7 @@ import LTE_Band_List from './LTE_Band_List';
 import LTE_ARFCN from './LTE_ARFCN';
 import BandEdgeLimit from './bandEdgeLimit';
 import CSELimit from './CSELimit';
+import RBConfigSelectedList from './RBConfigSelectedList';
 import { logError } from '../logger/logLevel';
 
 //参数:window实例
@@ -30,6 +31,8 @@ export default async (isRefresh: boolean = false) => {
     rbConfigData(isRefresh);
     //验证通过>生成json形式的配置表存储在本地
     configData(isRefresh);
+    //
+    RBConfigSelectedList(isRefresh);
   } catch (error) {
     logError(error?.toString() + '配置文件生成失败 42' || '配置文件生成失败');
   }

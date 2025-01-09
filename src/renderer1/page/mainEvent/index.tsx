@@ -2,21 +2,14 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-06-22 11:28:23
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-31 13:07:40
- * @FilePath: \pxa_signal_analyzer\src\renderer1\page\mainEvent\index.jsx
+ * @LastEditTime: 2025-01-07 16:56:20
+ * @FilePath: \pxa_signal_analyzer\src\renderer1\page\mainEvent\index.tsx
  * @Description: app辅助页面,处理main所有进程事件监听,无渲染逻辑
  */
 import './index.scss';
-import { Button, Modal, message, Space, notification } from 'antd';
-import {
-  DeleteOutlined,
-  PlusOutlined,
-  CloudUploadOutlined,
-  CheckCircleOutlined,
-  CloseOutlined,
-} from '@ant-design/icons';
-import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { Modal, message, notification } from 'antd';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   setIsInProgress,
   setIsTimeout,
@@ -31,7 +24,7 @@ message.config({
   maxCount: 1,
 });
 const { confirm, info } = Modal;
-const { ipcRendererOn } = window.myApi;
+const { ipcRendererOn, ipcRendererOnce } = window.myApi;
 const actionObj = {
   setIsInProgress,
   setIsTimeout,

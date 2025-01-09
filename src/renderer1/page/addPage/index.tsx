@@ -3,78 +3,97 @@
  * @Author: xxx
  * @Date: 2023-03-21 17:18:10
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-03 17:45:46
+ * @LastEditTime: 2025-01-09 16:33:54
  * @Descripttion:  新建项目
  */
 
-import { Card, Form, Button, message, notification, Flex } from 'antd';
-import { PlusOutlined, CheckOutlined } from '@ant-design/icons';
+import {
+  Form,
+  Button,
+  message,
+  notification,
+  Flex,
+  Avatar,
+  ConfigProvider,
+} from 'antd';
+import { CheckOutlined, SyncOutlined, CloseOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
-import { type Key } from 'react';
 import './index.scss';
 //设置预设名称
 import FormModule from './formModule';
-import localforage from 'localforage';
-import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
-import {
+import { useAppSelector, useAppDispatch } from '@src/renderer1/hook';
+import type {
   BandItemInfo,
   NewAddFormValueType,
   ProjectItemType,
 } from '@src/customTypes/renderer';
-import { setAddFormValue } from '@src/renderer/store/modules/projectList';
-import { cloneDeep } from 'lodash';
-import modalConfirm from '@src/renderer/utils/modalConfirm';
+import type {
+  ApiResponseType,
+  BroadcastChannelParams,
+  CreateProjectPayload,
+} from '@src/customTypes';
+import { setAddFormValue } from '@src/renderer1/store/modules/projectList';
+import modalConfirm from '@src/renderer1/utils/modalConfirm';
+// import { logChannel } from '@src/renderer1/utils/BroadcastChannel';
+import { refreshProjectListChannel } from '@src/BroadcastChannel';
+
 import RESULTGenerate from './util/RESULT';
-import { logError } from '@src/renderer/utils/logLevel';
+import { getProjectInfo, projectInfoGen } from './util';
+import { logError } from '@src/renderer1/utils/logLevel';
 import { nanoid } from 'nanoid';
 import $moment from 'moment';
-import { delayTime } from '@src/renderer/utils';
-import addLog from '@src/renderer/store/asyncThunk/addLog';
-
+import { delayTime } from '@src/renderer1/utils';
+import addLog from '@src/renderer1/store/asyncThunk/addLog';
+import logoIcon from '@root/assets/icon.png';
+import { useStyle } from './useStyle';
 const { ipcRenderer } = window.myApi;
 export default () => {
+  const { styles } = useStyle();
+  const [messageApi, messageContextHolder] = message.useMessage();
   const [notificationApi, notificationContextHolder] =
     notification.useNotification();
   const dispatch = useAppDispatch();
   const [addProjectForm] = Form.useForm();
-  const currentRow = useAppSelector((state) => state.projectList.currentRow);
   const addFormValue = useAppSelector(
     (state) => state.projectList.addFormValue,
   );
   //LTEBandList
   const [LTEBandList, setLTEBandList] = useState<BandItemInfo[]>([]);
   const [isAdd, setIsAdd] = useState<boolean>(true);
-  const title = isAdd ? '新建项目' : '编辑项目';
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const projectName = urlParams.get('projectName');
-    const subProjectName = urlParams.get('subProjectName');
-    //如果项目名称不为空，说明是编辑项目，否则是新建项目
-    if (subProjectName) {
-      setIsAdd(false);
-    }
-    console.log('projectName', projectName);
-    console.log('subProjectName', subProjectName);
-  }, []);
+  const [dirName, setDirName] = useState<string>('');
+  const [subProjectName, setSubProjectName] = useState<string>('');
+  const [projectInfo, setProjectInfo] = useState<ProjectItemType | null>(null);
   //进入页面,根据currentRow重置数据
   const initFn = async () => {
-    //说明是首页点击复用按钮进入的此页面
-    if (currentRow?.id) {
-      const { formValue } = currentRow;
-      dispatch(setAddFormValue(formValue));
+    const urlParams = new URLSearchParams(window.location.search);
+    const dirName = urlParams.get('dirName');
+    const subProjectName = urlParams.get('subProjectName');
+    if (!dirName) return;
+    setDirName(dirName);
+    if (subProjectName) {
+      //如果项目名称不为空，说明是编辑项目，否则是新建项目
+      setSubProjectName(subProjectName);
+      setIsAdd(false);
+    } else {
+      setIsAdd(true);
     }
-    //其他情况
-    else {
-      const tempAddFormValues: NewAddFormValueType | null =
-        await localforage.getItem('addFormValue');
-      if (tempAddFormValues) {
-        dispatch(setAddFormValue(tempAddFormValues));
-      }
-    }
+    console.log('projectName', dirName);
+    console.log('subProjectName', subProjectName);
+    //退出
+    const flag = !subProjectName;
+    if (flag) return;
+    //编辑
+    //准备获取当前行信息
+    const projectInfo = await getProjectInfo({ dirName, subProjectName });
+    if (!projectInfo) return;
+    setProjectInfo(projectInfo);
+    const { createDate, updateDate, id, ...rest } = projectInfo;
+    dispatch(setAddFormValue(rest));
+    addProjectForm.setFieldsValue(rest);
   };
 
   const getBandList = async () => {
-    const LTEBandList = await ipcRenderer.invoke(
+    const LTEBandList = await ipcRenderer.invoke<BandItemInfo[]>(
       'getJsonFileByFilePath',
       'app/LTE_Band_List.json',
     );
@@ -89,111 +108,123 @@ export default () => {
   }, []);
   //表单验证
   const formVerify = () => {
-    return new Promise<void>(async (resolve, reject) => {
+    return new Promise<boolean>(async (resolve, reject) => {
       try {
         //验证且获取表单数据
         const values = await addProjectForm.validateFields();
         console.log(values);
-        resolve();
+        resolve(true);
       } catch (error) {
-        reject(new Error('请检查表单填写是否完整'));
+        console.error(error);
+        messageApi.warning('请检查表单是否填写完整正确');
+        resolve(false);
       }
     });
-  };
-  //生成新的当前行数据
-  const newCurrentRowHandle = (
-    isAdd: boolean,
-    formValue: NewAddFormValueType,
-  ) => {
-    const { projectName, testItems, networkMode, RBConfigSelected } = formValue;
-    if (isAdd) {
-      //给projectList.json中添加本项目
-      const projectObj = {
-        id: nanoid(8),
-        createDate: $moment().format('YYYY-MM-DD HH:mm'),
-        formValue,
-        RBConfigSelected,
-        projectName,
-        testItems,
-        networkMode,
-      };
-      return projectObj;
-    } else {
-      if (!currentRow?.id) return currentRow;
-      const tempCurrentRow = cloneDeep(currentRow);
-      tempCurrentRow.formValue = formValue;
-      tempCurrentRow.RBConfigSelected = RBConfigSelected;
-      tempCurrentRow.testItems = testItems;
-      tempCurrentRow.networkMode = networkMode;
-      return tempCurrentRow;
-    }
-  };
-  //将当前行的数据存入本地json文件,备份数据用,无实际作用
-  const setProjectInfoToJson = async (data: ProjectItemType) => {
-    try {
-      await ipcRenderer.invoke('setProjectInfoToJson', data);
-    } catch (error) {
-      const msg = `${error?.toString()} 项目信息写入失败 `;
-      logError(msg);
-    }
   };
   //提交函数
   const submit = async () => {
     try {
-      await formVerify();
+      const verifyFlag = await formVerify();
+      console.log(verifyFlag);
+      if (!verifyFlag) return;
       //验证表单
       const { projectName } = addFormValue;
-      const isAdd = projectName !== currentRow?.projectName;
+      const newIsAdd = projectName !== subProjectName;
       //判断是新增/编辑
-      if (isAdd) {
-        await modalConfirm(`确认新建项目 < ${projectName} >?`, '');
-      } else {
-        await modalConfirm(
-          `确认修改项目 < ${projectName} > ?`,
-          '如果是新建项目请修改项目名称后重试',
-        );
-      }
+      const confirmFlag = await modalConfirm(
+        `确认${newIsAdd ? '新建' : '修改'}项目 < ${projectName} >?`,
+        `项目路径 ${dirName} / ${projectName}`,
+      );
+      if (!confirmFlag) return;
       //生成测试数据表并更新result.json
       const result = await RESULTGenerate(addFormValue);
       //新增需要创建文件夹
-      if (isAdd) {
-        await ipcRenderer.invoke('createDir', `/user/project/${projectName}`);
-      }
-      const newCurrentRow = newCurrentRowHandle(isAdd, addFormValue);
-      if (newCurrentRow?.id) {
-        //更新本地数据库
-        setProjectInfoToJson(newCurrentRow);
-        // 写入/刷新 当前行的结果表
-        await ipcRenderer.invoke('setJsonFile', {
-          type: 'currentResult',
-          params: { projectName, result },
-        });
-        message.success('Success');
+      const newProjectInfo = projectInfoGen(
+        newIsAdd,
+        addFormValue,
+        projectInfo,
+      );
+      // 通知后端,创建项目
+      const payload: CreateProjectPayload = {
+        dirName,
+        subProjectName: projectName,
+        isAdd: newIsAdd,
+        projectInfo: newProjectInfo,
+        result,
+      };
+      const res: ApiResponseType = await ipcRenderer.invoke(
+        'ipcMainMod1Handle',
+        {
+          action: 'createProject',
+          payload,
+        },
+      );
+      console.log('后端已返回数据', res);
+      const { code, msg } = res;
+      //创建成功
+      if (code === 0) {
+        //1通知mainWindow更新项目列表,使用广播  //BroadcastChannelParams
+        refreshProjectListChannel.postMessage('refreshProjectList');
+        //2.通知mainWindow更新项目列表,使用store
+        messageApi.success('项目创建成功');
         await delayTime(500);
-        //添加log
-        const log = `success_-_${projectName} 项目已修改`;
-        dispatch(addLog(log));
+        ipcRenderer.send('close-add-window');
+      } else {
+        throw new Error(msg);
       }
     } catch (error) {
       const msg = `${error?.toString()} 项目创建失败 `;
       logError(msg);
-      if (error !== '取消') {
-        notificationApi.error({
-          message: 'Tip',
-          description: String(error),
-          duration: null,
-        });
-        return;
-      }
+      notificationApi.error({
+        message: 'Tip',
+        description: String(error),
+        duration: null,
+      });
+      return;
     }
+  };
+  //强制更新所有配置文件
+  const refreshConfigFile = () => {
+    ipcRenderer.send('refreshConfigFile');
+  };
+  //取消/关闭窗口
+  const cancelFn = () => {
+    ipcRenderer.send('close-add-window');
+  };
+  const clickk = () => {
+    refreshProjectListChannel.postMessage('你好mianWindow,我是addWindow');
   };
   return (
     <div className="add-project-wrapper">
       {notificationContextHolder}
+      {messageContextHolder}
       <div className="add-project-content">
         <div className="add-project-header">
-          <Flex>
-            <div>{title}</div>
+          <Flex className="add-project-header-content" justify="space-between">
+            <Flex className="header-left" align="center" gap={8}>
+              <Avatar src={logoIcon} size={24} />
+              <span className="title-text">
+                {isAdd ? '新建项目' : '修改项目'}
+              </span>
+            </Flex>
+            <Flex className="header-right" align="center" gap={8}>
+              <Button
+                onClick={refreshConfigFile}
+                size="small"
+                ghost
+                icon={<SyncOutlined />}
+              >
+                更新配置文件
+              </Button>
+              <Button
+                onClick={clickk}
+                size="small"
+                ghost
+                icon={<SyncOutlined />}
+              >
+                测试按钮
+              </Button>
+            </Flex>
           </Flex>
         </div>
         <div className="add-project-body">
@@ -204,18 +235,34 @@ export default () => {
           />
         </div>
         <div className="add-project-footer">
-          <Flex gap={20} justify="center">
-            <Button size="small" type="primary" ghost onClick={submit}>
-              取 消
-            </Button>
+          <Flex
+            gap={40}
+            justify="center"
+            align="center"
+            className="add-project-footer-content"
+          >
             <Button
               size="small"
-              type="primary"
-              onClick={submit}
-              icon={<CheckOutlined />}
+              icon={<CloseOutlined />}
+              ghost
+              onClick={cancelFn}
             >
-              提 交
+              取 消
             </Button>
+            <ConfigProvider
+              button={{
+                className: styles.linearGradientButton,
+              }}
+            >
+              <Button
+                size="small"
+                type="primary"
+                onClick={submit}
+                icon={<CheckOutlined />}
+              >
+                提 交
+              </Button>
+            </ConfigProvider>
           </Flex>
         </div>
       </div>

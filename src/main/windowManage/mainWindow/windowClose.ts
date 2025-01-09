@@ -8,8 +8,8 @@
  */
 import { ipcMain, dialog } from 'electron';
 import electronStore from '@src/main/electronStore';
-import { dispatchAction, mainSendRender } from '../utils';
-import { getTestProcessInstance } from '../ipcMain/testProcess/TestProcessSingleton';
+import { dispatchAction, mainSendRender } from '@src/main/utils';
+import { getTestProcessInstance } from '@src/main/ipcMain/testProcess/TestProcessSingleton';
 export default function fn(win) {
   win.on('close', (e) => {
     const isInProgress = electronStore.get('isInProgress');

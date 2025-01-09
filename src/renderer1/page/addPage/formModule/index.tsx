@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-03-21 17:18:10
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-03 17:34:06
+ * @LastEditTime: 2025-01-09 10:07:17
  * @Descripttion:  form模块
  */
 import { Form, Input, Select, Radio, Switch, Space } from 'antd';
@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { generateDefaultSelectRBList } from '@src/renderer/page/addPage/util/RBTableObj';
 import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
 import { setAddFormValue } from '@src/renderer/store/modules/projectList';
+import { RBConfigValidator, BandValidator } from './validator';
 const LTE_BW_LIST = [
   { label: 1.4, value: 1.4 },
   { label: 3, value: 3 },
@@ -36,50 +37,7 @@ const App = ({ addProjectForm, LTEBandList }: Props) => {
   const addFormValue = useAppSelector(
     (state) => state.projectList.addFormValue,
   );
-  const { selectBand, networkMode, RBConfigSelected } = addFormValue;
-  const showLTE = networkMode === 'NSA';
-
-  const BandValidator = async () => {
-    try {
-      if (selectBand?.length) {
-        //NSA
-        for (let BandObj of selectBand) {
-          const { Band, SCS, BW, ARFCN, LTE_Band } = BandObj;
-          //NSA
-          if (showLTE) {
-            if (!LTE_Band?.length) {
-              return Promise.reject(`${Band}未选择对应的LTE_Band`);
-            }
-          }
-          if (!SCS?.length) {
-            return Promise.reject(`${Band}未选择SCS`);
-          }
-          if (!BW?.length) {
-            return Promise.reject(`${Band}未选择BW`);
-          }
-          if (!ARFCN?.length) {
-            return Promise.reject(`${Band}未选择ARFCN`);
-          }
-        }
-        return Promise.resolve();
-      } else {
-        return Promise.reject('未选择NR_Band');
-      }
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-  const RBConfigValidator = async () => {
-    try {
-      if (RBConfigSelected?.length) {
-        return Promise.resolve();
-      } else {
-        return Promise.reject(`请勾选RB配置`);
-      }
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
+  const showLTE = addFormValue?.networkMode === 'NSA';
   const testItemsChange = (e: RadioChangeEvent) => {
     const testItems = e.target.value;
     if (testItems) {
@@ -91,6 +49,8 @@ const App = ({ addProjectForm, LTEBandList }: Props) => {
           testItems,
         }),
       );
+      //修改组件维护的数据
+      addProjectForm.setFieldValue('RBConfigSelected', idList);
     } else {
       dispatch(
         setAddFormValue({
@@ -99,6 +59,8 @@ const App = ({ addProjectForm, LTEBandList }: Props) => {
           testItems: '',
         }),
       );
+      //修改组件维护的数据
+      addProjectForm.setFieldValue('RBConfigSelected', []);
     }
   };
   const projectNameChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -188,7 +150,7 @@ const App = ({ addProjectForm, LTEBandList }: Props) => {
               options={testItemList}
             ></Radio.Group>
           </Form.Item>
-          <Form.Item label="Gate">
+          <Form.Item label="Gate" required>
             <Space align="baseline">
               <Form.Item name="isGate" noStyle>
                 <Switch
@@ -226,20 +188,14 @@ const App = ({ addProjectForm, LTEBandList }: Props) => {
           {/* band 频段 */}
           <Form.Item
             label="Band"
+            name="selectBand"
             required
-            name="Band"
             validateDebounce={1000}
-            rules={[
-              {
-                validator: BandValidator,
-              },
-            ]}
+            validateTrigger="onChange"
+            rules={[BandValidator]}
             className="select-band-form-item"
           >
-            <div className="select-band-form-item-content">
-              {/* 用户选中的Band表 */}
-              <SelectBand showLTE={showLTE} LTEBandList={LTEBandList} />
-            </div>
+            <SelectBand showLTE={showLTE} LTEBandList={LTEBandList} />
           </Form.Item>
 
           {/* LTE-BW */}
@@ -290,7 +246,7 @@ const App = ({ addProjectForm, LTEBandList }: Props) => {
           <Form.Item
             label="RBConfig"
             required
-            name="RBConfig"
+            name="RBConfigSelected"
             validateTrigger="onChange"
             rules={[
               {
@@ -299,9 +255,7 @@ const App = ({ addProjectForm, LTEBandList }: Props) => {
             ]}
             className="select-band-form-item"
           >
-            <div className="select-band-form-item-content">
-              <RBConfigTable />
-            </div>
+            <RBConfigTable />
           </Form.Item>
         </Form>
       </div>

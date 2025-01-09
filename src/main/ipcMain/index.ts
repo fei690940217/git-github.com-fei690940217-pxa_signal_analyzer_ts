@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-06-22 15:51:43
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-03 16:09:15
+ * @LastEditTime: 2025-01-08 10:22:36
  * @FilePath: \pxa_signal_analyzer\src\main\ipcMain\index.ts
  * @Description: 监听渲染进程事件
  *
@@ -36,6 +36,7 @@ import {
   getImageBase4,
   openTheProjectWindow,
   addDirFn,
+  editDirFn,
 } from './functionList';
 //子进程启动函数
 import {
@@ -52,6 +53,11 @@ import { getJsonFile, setJsonFile } from './getAndSetJsonFile';
 import { DeleteResultPayload } from '@src/customTypes/main';
 import { AddDirType } from '@src/customTypes/index';
 import { nanoid } from 'nanoid';
+import {
+  createAddWindow,
+  getAddWindow,
+} from '@src/main/windowManage/addWindow';
+
 export default () => {
   //验证配置文件>config文件夹,用户定义
   ipcMain.on('refreshConfigFile', () => {
@@ -260,19 +266,15 @@ export default () => {
     projectName: string;
     subProjectName?: string;
   };
-  //openTheProjectWindow
-  ipcMain.on(
-    'openTheProjectWindow',
-    (e, payload: OpenTheProjectWindowPayload) => {
-      //新建或获取数据库
-      openTheProjectWindow(payload);
-    },
-  );
+
   //add-dir
   ipcMain.handle('add-dir', async (e, payload: AddDirType) => {
     return addDirFn(payload);
   });
-
+  //edit-dir
+  ipcMain.handle('edit-dir', async (e, payload: AddDirType) => {
+    return editDirFn(payload);
+  });
   //删除文件或者文件夹
   ipcMain.handle('removeDir', (e, dirName: string) => {
     return new Promise<void>(async (resolve, reject) => {
@@ -289,5 +291,21 @@ export default () => {
         reject(error);
       }
     });
+  });
+
+  //openTheProjectWindow
+  ipcMain.on(
+    'openTheProjectWindow',
+    (e, payload: OpenTheProjectWindowPayload) => {
+      //新建或获取数据库
+      openTheProjectWindow(payload);
+    },
+  );
+  //close-add-window 关闭新增窗口
+  ipcMain.on('close-add-window', (e, payload) => {
+    //获取新增窗口
+    const addWindow = getAddWindow();
+    addWindow?.close();
+    // addWindow?.hide();
   });
 };

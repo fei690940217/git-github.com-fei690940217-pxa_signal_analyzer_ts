@@ -2,8 +2,8 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-30 16:54:14
- * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\BandModal\index.tsx
+ * @LastEditTime: 2025-01-09 15:21:07
+ * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\formModule\BandModal\index.tsx
  * @Description: 项目列表主表格
  */
 
@@ -14,7 +14,6 @@ import { useState, useEffect, useMemo } from 'react';
 import './index.scss';
 import { cloneDeep } from 'lodash';
 import { logError } from '@/utils/logLevel';
-import { BandItemInfo } from '@src/customTypes/renderer';
 import { nanoid } from 'nanoid';
 import NRBand from './cmp/NRBand';
 import LTEBand from './cmp/LTEBand';
@@ -24,13 +23,18 @@ import ARFCNColumn from './cmp/ARFCNColumn';
 import { setAddFormValue } from '@src/renderer/store/modules/projectList';
 import { useAppDispatch, useAppSelector } from '@src/renderer/hook';
 import { NRBandObjType, BandItemType } from '@src/customTypes/main';
+import { BandItemInfo } from '@src/customTypes/renderer';
+
 const { ipcRenderer } = window.myApi;
 
 type PropsType = {
   showLTE: boolean;
   LTEBandList: any;
+  id?: string;
+  value?: BandItemInfo[];
+  onChange?: (value: BandItemInfo[]) => void;
 };
-export default ({ showLTE, LTEBandList }: PropsType) => {
+export default ({ showLTE, LTEBandList, id, value, onChange }: PropsType) => {
   //本弹窗内的选择项
   const [FCCBandList, setFCCBandList] = useState<BandItemType[]>([]);
   const [messageApi, messageContextHolder] = message.useMessage();
@@ -39,6 +43,10 @@ export default ({ showLTE, LTEBandList }: PropsType) => {
   );
   const { selectBand } = addFormValue;
   const dispatch = useAppDispatch();
+  const changeSelectBand = (selectBand: BandItemInfo[]) => {
+    dispatch(setAddFormValue({ ...addFormValue, selectBand }));
+    onChange?.(selectBand);
+  };
   //获取FCC Band列表
   const getBandList = async () => {
     try {
@@ -92,15 +100,16 @@ export default ({ showLTE, LTEBandList }: PropsType) => {
       BW: [], // 已知BW是一个包含数字的数组
       ARFCN: [], // 已知ARFCN是一个包含数字的数组
     };
-    const tempSelectBand = cloneDeep(selectBand);
+    const selectBandIsArray = Array.isArray(selectBand);
+    const tempSelectBand = selectBandIsArray ? cloneDeep(selectBand) : [];
     tempSelectBand.push(row);
-    dispatch(setAddFormValue({ ...addFormValue, selectBand: tempSelectBand }));
+    changeSelectBand(tempSelectBand);
   };
   //删除一行
   const delRow = (row: BandItemInfo) => {
     const tempSelectBand = cloneDeep(selectBand);
     const rst = tempSelectBand.filter((item) => item.id !== row.id);
-    dispatch(setAddFormValue({ ...addFormValue, selectBand: rst }));
+    changeSelectBand(rst);
   };
   const DelColumnRender = (_text: any, row: BandItemInfo) => {
     return (
@@ -122,7 +131,13 @@ export default ({ showLTE, LTEBandList }: PropsType) => {
       dataIndex: 'Band',
       key: 'Band',
       width: 140,
-      render: (text, record) => <NRBand row={record} bandObj={bandObj} />,
+      render: (text, record) => (
+        <NRBand
+          changeSelectBand={changeSelectBand}
+          row={record}
+          bandObj={bandObj}
+        />
+      ),
     },
     {
       title: 'LTE_Band',
@@ -131,7 +146,11 @@ export default ({ showLTE, LTEBandList }: PropsType) => {
       width: 230,
       hidden: !showLTE,
       render: (text, record) => (
-        <LTEBand row={record} LTEBandList={LTEBandList} />
+        <LTEBand
+          changeSelectBand={changeSelectBand}
+          row={record}
+          LTEBandList={LTEBandList}
+        />
       ),
     },
     {
@@ -140,7 +159,9 @@ export default ({ showLTE, LTEBandList }: PropsType) => {
       key: 'SCS',
       width: 180,
       ellipsis: true,
-      render: (text, record) => <SCSColumn row={record} />,
+      render: (text, record) => (
+        <SCSColumn changeSelectBand={changeSelectBand} row={record} />
+      ),
     },
     {
       title: 'NR_BW(MHz)',
@@ -148,7 +169,9 @@ export default ({ showLTE, LTEBandList }: PropsType) => {
       key: 'BW',
       width: 230,
       ellipsis: true,
-      render: (text, record) => <NRBWColumn row={record} />,
+      render: (text, record) => (
+        <NRBWColumn changeSelectBand={changeSelectBand} row={record} />
+      ),
     },
     {
       title: 'NR_ARFCN',
@@ -156,7 +179,9 @@ export default ({ showLTE, LTEBandList }: PropsType) => {
       key: 'ARFCN',
       width: 180,
       ellipsis: true,
-      render: (text, record) => <ARFCNColumn row={record} />,
+      render: (text, record) => (
+        <ARFCNColumn changeSelectBand={changeSelectBand} row={record} />
+      ),
     },
     {
       title: 'Del',
@@ -185,7 +210,7 @@ export default ({ showLTE, LTEBandList }: PropsType) => {
       <div className="select-band-modal-content__right">
         <Table
           size="small"
-          dataSource={selectBand}
+          dataSource={value}
           rowKey="id"
           bordered
           pagination={false}

@@ -8,8 +8,7 @@
  */
 import { app } from 'electron';
 import { type MenuItemConstructorOptions } from 'electron';
-
-import { mainSendRender } from '../utils/index';
+import { mainSendRender } from '@src/main/utils/index';
 // 右键菜单
 export const contextTemplate: MenuItemConstructorOptions[] = [
   {

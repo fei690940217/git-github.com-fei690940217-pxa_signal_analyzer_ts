@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-12-15 14:08:57
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-31 09:22:05
+ * @LastEditTime: 2025-01-06 09:37:03
  * @FilePath: \pxa_signal_analyzer\src\common\index.ts
  * @Description:前后端通用的纯函数,或者部分静态数据
  *
@@ -31,7 +31,7 @@ type TestItem = {
   value: TestItemType; // 限制 value 字段的值为这些固定的字符串
 };
 //测试用例
-export const testItemList: readonly TestItem[] = [
+export const testItemList: TestItem[] = [
   { label: 'Peak-Average Ratio', value: 'PAR' },
   { label: 'Occupied Bandwidth', value: 'OBW' },
   { label: 'Conducted Spurious Emission', value: 'CSE' },

@@ -2,8 +2,8 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-30 17:09:33
- * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\BandModal\cmp\LTEBand\LTEBandModal\index.tsx
+ * @LastEditTime: 2025-01-08 17:24:30
+ * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\formModule\BandModal\cmp\LTEBand\LTEBandModal\index.tsx
  * @Description: 项目列表主表格
  */
 import { Modal, Radio, Checkbox } from 'antd';
@@ -12,13 +12,21 @@ import './index.scss';
 import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
 import { setAddFormValue } from '@src/renderer/store/modules/projectList';
 import { cloneDeep } from 'lodash';
+import { BandItemInfo } from '@src/customTypes/renderer';
 type PropsType = {
   modalVisible: boolean;
   closeModal: () => void;
   row: any;
   LTEBandList: any[];
+  changeSelectBand: (value: BandItemInfo[]) => void;
 };
-export default ({ modalVisible, closeModal, row, LTEBandList }: PropsType) => {
+export default ({
+  modalVisible,
+  closeModal,
+  row,
+  LTEBandList,
+  changeSelectBand,
+}: PropsType) => {
   const dispatch = useAppDispatch();
   // const selectBand = useAppSelector((state) => state.projectList.selectBand);
   const addFormValue = useAppSelector(
@@ -50,7 +58,7 @@ export default ({ modalVisible, closeModal, row, LTEBandList }: PropsType) => {
       }
       return item;
     });
-    dispatch(setAddFormValue({ ...addFormValue, selectBand: tempList }));
+    changeSelectBand(tempList);
     closeModal();
   };
   return (

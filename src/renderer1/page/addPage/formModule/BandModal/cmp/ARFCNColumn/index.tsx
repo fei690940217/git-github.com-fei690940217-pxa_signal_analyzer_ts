@@ -19,8 +19,9 @@ import { setAddFormValue } from '@src/renderer/store/modules/projectList';
 //
 type PropsType = {
   row: BandItemInfo;
+  changeSelectBand: (value: BandItemInfo[]) => void;
 };
-export default ({ row }: PropsType) => {
+export default ({ row, changeSelectBand }: PropsType) => {
   const dispatch = useAppDispatch();
   //本弹窗内的选择项
   // const selectBand = useAppSelector((state) => state.projectList.selectBand);
@@ -38,7 +39,7 @@ export default ({ row }: PropsType) => {
       }
       return item;
     });
-    dispatch(setAddFormValue({ ...addFormValue, selectBand: tempList }));
+    changeSelectBand(tempList);
   };
   return (
     <div className="lte-band-column-wrapper">
