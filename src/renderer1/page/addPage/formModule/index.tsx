@@ -3,21 +3,24 @@
  * @Author: xxx
  * @Date: 2023-03-21 17:18:10
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-09 10:07:17
+ * @LastEditTime: 2025-01-10 10:12:20
  * @Descripttion:  form模块
  */
 import { Form, Input, Select, Radio, Switch, Space } from 'antd';
 import type { RadioChangeEvent } from 'antd';
-import { type Key, ChangeEvent } from 'react';
+import { type Key, ChangeEvent, useEffect, useState } from 'react';
 import './index.scss';
 import { testItemList } from '@src/common';
 import SelectBand from './BandModal';
 import RBConfigTable from './RBPlanTable';
 import { useTranslation } from 'react-i18next';
-import { generateDefaultSelectRBList } from '@src/renderer/page/addPage/util/RBTableObj';
-import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
-import { setAddFormValue } from '@src/renderer/store/modules/projectList';
+import { generateDefaultSelectRBList } from '@src/renderer1/page/addPage/util';
+import { useAppSelector, useAppDispatch } from '@src/renderer1/hook';
+import { setAddFormValue } from '@src/renderer1/store/modules/projectList';
 import { RBConfigValidator, BandValidator } from './validator';
+import { RBObjType } from '@src/customTypes/renderer';
+const { ipcRenderer } = window.myApi;
+
 const LTE_BW_LIST = [
   { label: 1.4, value: 1.4 },
   { label: 3, value: 3 },
@@ -37,11 +40,30 @@ const App = ({ addProjectForm, LTEBandList }: Props) => {
   const addFormValue = useAppSelector(
     (state) => state.projectList.addFormValue,
   );
+  const [RBTableObj, setRBTableObj] = useState<RBObjType | null>(null);
+
   const showLTE = addFormValue?.networkMode === 'NSA';
+  const RBTableList = RBTableObj?.[addFormValue?.testItems] || [];
+  //获取FCC Band列表
+  const getRBTableObj = async () => {
+    try {
+      const allRBObj: RBObjType = await ipcRenderer.invoke<RBObjType>(
+        'getJsonFileByFilePath',
+        'app/RBConfigSelectedList.json',
+      );
+      setRBTableObj(allRBObj);
+    } catch (error) {
+      console.error(error);
+      setRBTableObj(null);
+    }
+  };
+  useEffect(() => {
+    getRBTableObj();
+  }, []);
   const testItemsChange = (e: RadioChangeEvent) => {
     const testItems = e.target.value;
     if (testItems) {
-      const idList = generateDefaultSelectRBList(testItems);
+      const idList = generateDefaultSelectRBList(testItems, RBTableList);
       dispatch(
         setAddFormValue({
           ...addFormValue,
@@ -135,6 +157,7 @@ const App = ({ addProjectForm, LTEBandList }: Props) => {
 
           {/* 测试用例 */}
           <Form.Item
+            initialValue="PAR"
             label={t('testItem')}
             name="testItems"
             rules={[
@@ -255,7 +278,7 @@ const App = ({ addProjectForm, LTEBandList }: Props) => {
             ]}
             className="select-band-form-item"
           >
-            <RBConfigTable />
+            <RBConfigTable RBTableList={RBTableList} />
           </Form.Item>
         </Form>
       </div>

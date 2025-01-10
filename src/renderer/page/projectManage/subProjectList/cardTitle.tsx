@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-09 16:40:31
+ * @LastEditTime: 2025-01-10 13:40:50
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\projectManage\subProjectList\cardTitle.tsx
  * @Description: 项目列表主表格
  */
@@ -19,8 +19,13 @@ import React from 'react';
 import './index.scss';
 import { logError } from '@/utils/logLevel';
 import { ProjectItemType } from '@src/customTypes/renderer';
-import { AddDirType, OpenTheProjectWindowPayload } from '@src/customTypes';
-import modalConfirm from '@src/renderer/utils/modalConfirm';
+import {
+  AddDirType,
+  OpenTheProjectWindowPayload,
+  ArchiveProjectPayload,
+  ApiResponseType,
+} from '@src/customTypes';
+import modalConfirm from '@src/renderer1/utils/modalConfirm';
 
 const { ipcRenderer } = window.myApi;
 type PropsType = {
@@ -73,10 +78,32 @@ export default ({
   };
   //归档
   const archiveFn = async () => {
-    if (currentDir?.id) {
+    if (selectSubProject?.length && currentDir?.dirName) {
       try {
-        await modalConfirm(`确认归档 < ${currentDir.dirName} > ?`, '');
-        await ipcRenderer.invoke('archiveDir', currentDir.dirName);
+        const projectNameStr = selectSubProject
+          .map((item) => item.projectName)
+          .join(', ');
+        const confirmFlag = await modalConfirm(
+          `确认归档  ?`,
+          `归档项目: ${projectNameStr} `,
+        );
+        if (!confirmFlag) return;
+        const subProjectNameList = selectSubProject.map(
+          (item) => item.projectName,
+        );
+        const payload: ArchiveProjectPayload = {
+          dirName: currentDir.dirName,
+          subProjectNameList,
+        };
+        const res = await ipcRenderer.invoke<ApiResponseType<any>>(
+          'ipcMainMod1Handle',
+          {
+            action: 'archiveProject',
+            payload,
+          },
+        );
+        const { code, data } = res;
+        console.log(data);
         //更新项目列表
         getSubProjectList();
         //清除选中行
@@ -97,11 +124,69 @@ export default ({
     } else {
       messageApi.warning({
         duration: 5,
-        content: '请选择一个目录操作',
+        content: '请选择要归档的操作,允许多选',
       });
     }
   };
-  const deleteFn = () => {};
+  const deleteFn = async () => {
+    if (selectSubProject?.length && currentDir?.dirName) {
+      try {
+        const projectNameStr = selectSubProject
+          .map((item) => item.projectName)
+          .join(', ');
+        const confirmFlag = await modalConfirm(
+          `确认删除项目: < ${projectNameStr} > ?`,
+          '请谨慎操作! 删除后不可恢复!',
+        );
+        if (!confirmFlag) return;
+        const subProjectNameList = selectSubProject.map(
+          (item) => item.projectName,
+        );
+        const payload: ArchiveProjectPayload = {
+          dirName: currentDir.dirName,
+          subProjectNameList,
+        };
+        const res = await ipcRenderer.invoke<ApiResponseType<any>>(
+          'ipcMainMod1Handle',
+          {
+            action: 'deleteProject',
+            payload,
+          },
+        );
+        const { code, data } = res;
+        console.log(data);
+        //更新项目列表
+        getSubProjectList();
+        //清除选中行
+        setSelectSubProject([]);
+        messageApi.success({
+          duration: 5,
+          content: '已删除',
+        });
+      } catch (error) {
+        logError(error?.toString());
+        messageApi.error({
+          duration: 5,
+          content: String(error),
+        });
+      }
+    } else {
+      messageApi.warning({
+        duration: 5,
+        content: '请选择要归档的操作,允许多选',
+      });
+    }
+  };
+  const refreshFn = () => {
+    if (currentDir?.dirName) {
+      getSubProjectList();
+    } else {
+      messageApi.warning({
+        duration: 5,
+        content: '没有选择目录',
+      });
+    }
+  };
   return (
     <Flex gap={20}>
       {messageContextHolder}
@@ -136,21 +221,22 @@ export default ({
         >
           归档
         </Button>
-        <Button
-          variant="outlined"
-          color="danger"
-          icon={<DeleteTwoTone twoToneColor="red" />}
-          size="small"
-          onClick={deleteFn}
-        >
-          删除
-        </Button>
+        <Tooltip title="删除项目">
+          <Button
+            variant="outlined"
+            color="danger"
+            icon={<DeleteTwoTone twoToneColor="red" />}
+            size="small"
+            onClick={deleteFn}
+          ></Button>
+        </Tooltip>
+
         <Tooltip title="刷新列表">
           <Button
             variant="outlined"
             icon={<ReloadOutlined />}
             size="small"
-            onClick={deleteFn}
+            onClick={refreshFn}
           />
         </Tooltip>
       </Flex>

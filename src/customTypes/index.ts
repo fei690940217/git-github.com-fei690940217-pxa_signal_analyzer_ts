@@ -34,3 +34,8 @@ export type BroadcastChannelParams = {
   action: string;
   payload: any;
 };
+//归档项目的格式
+export type ArchiveProjectPayload = {
+  dirName: string;
+  subProjectNameList: string[];
+};

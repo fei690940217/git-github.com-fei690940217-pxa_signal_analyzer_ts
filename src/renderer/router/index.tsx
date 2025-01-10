@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-02-23 17:55:33
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-19 14:46:47
+ * @LastEditTime: 2025-01-10 13:34:01
  * @Descripttion:
  */
 import { RouteObject } from 'react-router';
@@ -16,7 +16,7 @@ import Layout from '@/page/layout/index';
 //测试页并且是默认主页
 import TestPage from '@/page/testPage';
 //新建项目
-const AddPage = lazy(() => import('@/page/addPage'));
+// const AddPage = lazy(() => import('@/page/addPage'));
 //设置
 const SetPage = lazy(() => import('@/page/setPage'));
 //demo
@@ -39,10 +39,10 @@ const routes: RouteObject[] = [
         path: '/projectManage',
         element: <ProjectManage />,
       },
-      {
-        path: '/add',
-        element: <AddPage></AddPage>,
-      },
+      // {
+      //   path: '/add',
+      //   element: <AddPage></AddPage>,
+      // },
       {
         path: '/set',
         element: <SetPage></SetPage>,

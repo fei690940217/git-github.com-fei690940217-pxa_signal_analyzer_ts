@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2023-10-17 16:56:16
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-30 17:58:42
+ * @LastEditTime: 2025-01-10 10:39:04
  * @FilePath: \pxa_signal_analyzer\src\customTypes\renderer.ts
  * @Description:
  *
@@ -101,7 +101,7 @@ export type ProjectItemType = {
   updateDate: string | null;
   projectName: string;
   testItems: TestItemType;
-  RBConfigSelected: Key[];
+  RBConfigSelected: RBItemType[];
   networkMode: 'SA' | 'NSA';
   isGate: boolean;
   selectBand: BandItemInfo[];
@@ -256,5 +256,5 @@ export type NewAddFormValueType = {
   selectBand: BandItemInfo[];
   LTE_BW: number | null | undefined;
   LTE_ARFCN: number | null | undefined;
-  RBConfigSelected: Key[];
+  RBConfigSelected: RBItemType[];
 };

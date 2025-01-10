@@ -1,6 +1,4 @@
 import {
-  AddFormValueType,
-  ResultItemType,
   TestItemType,
   SupRowType,
   RBItemType,
@@ -8,8 +6,6 @@ import {
 import { RBConfigItem } from '@src/customTypes/main';
 import { cloneDeep } from 'lodash';
 import { logError } from '@/utils/logLevel';
-import { type Key } from 'react';
-import RBTableObj from './RBTableObj';
 
 const { ipcRenderer } = window.myApi;
 const getRBConfigJson = async (testItems: string): Promise<RBConfigItem[]> => {
@@ -30,31 +26,12 @@ const getRBConfigJson = async (testItems: string): Promise<RBConfigItem[]> => {
   }
 };
 
-//根据RBSelectedRowKeys 与addProjectRbConfig 生成RB列表  参数为测试用例 例如 PAR
-//BandEdgeIC配置项的RB名称比较特殊，需要单独处理,但是实际上以下两项都从Outer_Full中读取数据
-//  'Outer_Full_Left',
-//   'Outer_Full_Right',
-const RBListGenerate = (RBConfigSelected: Key[], testItem: TestItemType) => {
-  try {
-    const RB_LIST = RBTableObj[testItem];
-    const rbList = RB_LIST.filter((rbItem) => {
-      return RBConfigSelected.includes(rbItem.id);
-    });
-
-    if (testItem === 'BandEdgeIC') {
-      return rbList.map((item) => {
-        if (item.RB?.includes('Full')) {
-          item.RB = 'Outer_Full';
-        }
-        return item;
-      });
-    }
-    return rbList;
-  } catch (error) {
-    logError(error);
-    return [];
-  }
+const RBNameIsMatch = (origin: string, target: string) => {
+  return origin === target || origin.includes(target);
 };
+//这是最关键的函数
+//用于查找RB num和start的函数
+//所有的一切操作都是为了查找这两个参数
 const findRbNumAndStart = async (
   addProjectRbConfig: RBConfigItem[],
   testItems: TestItemType,
@@ -65,25 +42,15 @@ const findRbNumAndStart = async (
     const { SCS, BW } = supItem;
     const { OFDM, RB, modulate } = RBItem;
     const normalFindItem = addProjectRbConfig.find((item) => {
-      const flag =
-        item.SCS == SCS && item.BW == BW && item.OFDM == OFDM && item.RB == RB;
-      return flag;
+      //RB 的名称在这里需要特殊处理一下,因为格式并统一
+      const flag = item.SCS == SCS && item.BW == BW && item.OFDM == OFDM;
+      const RBFlag = RBNameIsMatch(RB, item.RB);
+      return flag && RBFlag;
     });
-    //满RB
-    const fullFindItem = addProjectRbConfig.find((item) => {
-      const flag =
-        item.SCS == SCS &&
-        item.BW == BW &&
-        item.OFDM == OFDM &&
-        item.RB == 'Outer_Full';
-      return flag;
-    });
-    if (normalFindItem && fullFindItem) {
+    if (normalFindItem) {
       const obj = {
         RBNum: normalFindItem.num,
         RBStart: normalFindItem.start,
-        fullRBNum: fullFindItem.num,
-        fullRBStart: fullFindItem.start,
         modulate,
         OFDM,
         RB,
@@ -187,28 +154,30 @@ const normalListGenerate = async (
 //子级数据生成
 export default async (
   list: SupRowType[],
-  RBConfigSelected: Key[],
+  RBConfigSelected: RBItemType[],
   testItems: TestItemType,
 ) => {
   try {
-    const RBList = RBListGenerate(RBConfigSelected, testItems);
     const supList = list;
     //获取新增项目的配置文件
     const addProjectRbConfig = await getRBConfigJson(testItems);
     let RESULT = [];
+    //bandedge特殊处理
     if (testItems === 'BandEdge') {
       RESULT = await BandEdgeListGenerate(
         addProjectRbConfig,
         testItems,
         supList,
-        RBList,
+        RBConfigSelected,
       );
-    } else {
+    }
+    //其他所有的
+    else {
       RESULT = await normalListGenerate(
         addProjectRbConfig,
         testItems,
         supList,
-        RBList,
+        RBConfigSelected,
       );
     }
     return Promise.resolve(RESULT);

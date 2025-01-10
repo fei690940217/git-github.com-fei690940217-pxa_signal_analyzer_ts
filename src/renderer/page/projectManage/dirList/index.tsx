@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-08 09:38:59
+ * @LastEditTime: 2025-01-10 15:33:08
  * @FilePath: \pxa_signal_analyzer\src\renderer\page\projectManage\dirList\index.tsx
  * @Description: 目录管理
  */
@@ -24,6 +24,8 @@ import {
   HddTwoTone,
   EyeOutlined,
   EyeTwoTone,
+  ReloadOutlined,
+  FolderOpenTwoTone,
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import './index.scss';
@@ -34,6 +36,7 @@ import { AddDirType } from '@src/customTypes';
 
 import modalConfirm from '@src/renderer/utils/modalConfirm';
 import AddDirModal from './addDirModal';
+import { ProjectItemType } from '@src/customTypes/renderer';
 
 type TableRowSelection<T extends object = object> =
   TableProps<T>['rowSelection'];
@@ -54,7 +57,7 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
   const [isAdd, setIsAdd] = useState<boolean>(true);
   const [dirList, setDirList] = useState<AddDirType[]>([]);
 
-  const getProjectList = async () => {
+  const getDirList = async () => {
     try {
       const list = await ipcRenderer.invoke<AddDirType[]>('getJsonFile', {
         type: 'projectList',
@@ -102,7 +105,7 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
         await modalConfirm(`确认归档 < ${currentDir.dirName} > ?`, '');
         await ipcRenderer.invoke('archiveDir', currentDir.dirName);
         //通知父组件>更新项目列表
-        getProjectList();
+        getDirList();
         //清除当前行
         setCurrentDir(null);
         messageApi.success({
@@ -149,7 +152,7 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
         );
         await ipcRenderer.invoke('removeDir', currentDir.dirName);
         //通知父组件>更新项目列表
-        getProjectList();
+        getDirList();
         //清除当前行
         setCurrentDir(null);
         messageApi.success({
@@ -190,6 +193,27 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
       </Tooltip>
     );
   };
+  const openDir = async (row: AddDirType) => {
+    try {
+      if (row?.dirName) {
+        const res = await ipcRenderer.invoke('ipcMainMod1Handle', {
+          action: 'openDir',
+          payload: `user/project/${row.dirName}`,
+        });
+        console.log('openDir回传数据', res);
+      }
+    } catch (error) {
+      logError(String(error));
+      messageApi.error(String(error));
+    }
+  };
+  const openDirColumnRender = (_text: any, record: AddDirType) => {
+    return (
+      <Tooltip title="打开文件夹">
+        <FolderOpenTwoTone onClick={() => openDir(record)} />
+      </Tooltip>
+    );
+  };
   return (
     <Card
       className="dir-manage-card manage-card-item"
@@ -201,44 +225,56 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
         <Flex gap={20}>
           <h2 style={{ fontSize: 16, margin: 0 }}>目录管理</h2>
           <Flex gap={8} align="center">
-            <Button
-              color="primary"
-              icon={<PlusOutlined />}
-              variant="solid"
-              size="small"
-              onClick={addFn}
-            >
-              新增
-            </Button>
+            <Tooltip title="添加目录">
+              <Button
+                color="primary"
+                icon={<PlusOutlined />}
+                variant="outlined"
+                size="small"
+                onClick={addFn}
+              ></Button>
+            </Tooltip>
+
             {/* 归档 */}
-            <Button
-              color="primary"
-              icon={<EditOutlined />}
-              variant="solid"
-              size="small"
-              onClick={editDirFn}
-            >
-              编辑
-            </Button>
+            <Tooltip title="修改目录信息">
+              <Button
+                color="primary"
+                icon={<EditOutlined />}
+                variant="outlined"
+                size="small"
+                onClick={editDirFn}
+              ></Button>
+            </Tooltip>
+
             {/* 归档 */}
-            <Button
-              color="primary"
-              icon={<HddTwoTone />}
-              variant="outlined"
-              size="small"
-              onClick={archiveFn}
-            >
-              归档
-            </Button>
-            <Button
-              variant="outlined"
-              color="danger"
-              icon={<DeleteTwoTone twoToneColor="red" />}
-              size="small"
-              onClick={deleteFn}
-            >
-              删除
-            </Button>
+            <Tooltip title="归档">
+              <Button
+                color="primary"
+                icon={<HddTwoTone />}
+                variant="outlined"
+                size="small"
+                onClick={archiveFn}
+              ></Button>
+            </Tooltip>
+
+            <Tooltip title="删除目录">
+              <Button
+                variant="outlined"
+                color="danger"
+                icon={<DeleteTwoTone twoToneColor="red" />}
+                size="small"
+                onClick={deleteFn}
+              ></Button>
+            </Tooltip>
+
+            <Tooltip title="刷新目录">
+              <Button
+                variant="outlined"
+                icon={<ReloadOutlined />}
+                size="small"
+                onClick={getDirList}
+              />
+            </Tooltip>
           </Flex>
         </Flex>
       }
@@ -248,7 +284,7 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
         modalVisible={modalVisible}
         closeModal={() => setModalVisible(false)}
         isAdd={isAdd}
-        refreshDirList={getProjectList}
+        refreshDirList={getDirList}
         currentDir={currentDir}
       ></AddDirModal>
       <ConfigProvider
@@ -290,6 +326,14 @@ export default ({ currentDir, setCurrentDir }: PropsType) => {
             title="Other"
             width={60}
             render={otherInfoColumnRender}
+          />
+          {/* 操作 */}
+          <Column
+            align="center"
+            width={50}
+            title="Dir"
+            ellipsis={true}
+            render={openDirColumnRender}
           />
         </Table>
       </ConfigProvider>

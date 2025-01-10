@@ -20,7 +20,7 @@ const edgeBand = [
 // 获取项目配置
 const fetchProjectConfig = async (): Promise<ARFCNConfigItem[]> => {
   try {
-    const list = await ipcRenderer.invoke(
+    const list = await ipcRenderer.invoke<ARFCNConfigItem[]>(
       'getJsonFileByFilePath',
       'app/NR_ARFCN_Config.json',
     );

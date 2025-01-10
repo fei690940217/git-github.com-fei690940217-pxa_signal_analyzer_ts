@@ -2,7 +2,7 @@
  * @Author: feifei
  * @Date: 2024-12-30 15:17:29
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-09 15:52:24
+ * @LastEditTime: 2025-01-10 10:02:41
  * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\util\index.ts
  * @Description:
  *
@@ -15,6 +15,8 @@ import {
   BandItemInfo,
   NewAddFormValueType,
   ProjectItemType,
+  RBItemType,
+  TestItemType,
 } from '@src/customTypes/renderer';
 import { nanoid } from 'nanoid';
 const { ipcRenderer } = window.myApi;
@@ -123,5 +125,51 @@ export const projectInfoGen = (
       ...formValue,
     };
     return projectObj;
+  }
+};
+
+//生成默认的选中的RB选择项
+export const generateDefaultSelectRBList = (
+  testItem: TestItemType,
+  allRBList: RBItemType[],
+) => {
+  if (testItem === 'BandEdge') {
+    return allRBList?.filter((item) => {
+      return (
+        item.OFDM === 'DFT' &&
+        (item.modulate === 'BPSK' || item.modulate === 'QPSK')
+      );
+    });
+  } else if (testItem === 'CSE') {
+    return allRBList?.filter((item) => {
+      const flag1 = item.OFDM === 'DFT';
+      const flag2 = item.modulate === 'BPSK' || item.modulate === 'QPSK';
+      const flag3 = item.RB?.includes('1RB');
+      return flag1 && flag2 && flag3;
+    });
+  } else if (testItem === 'PAR') {
+    const modulateList = ['DFT-BPSK', 'DFT-256QAM', 'CP-QPSK', 'CP-256QAM'];
+    return allRBList?.filter((item) => {
+      const flag1 = modulateList.includes(`${item.OFDM}-${item.modulate}`);
+      const flag2 = item.RB?.includes('Full');
+      return flag1 && flag2;
+    });
+  } else if (testItem === 'OBW') {
+    const modulateList = [
+      'DFT-BPSK',
+      'DFT-QPSK',
+      'DFT-16QAM',
+      'DFT-64QAM',
+      'DFT-256QAM',
+      'CP-QPSK',
+    ];
+    return allRBList?.filter((item) => {
+      const flag1 = modulateList.includes(`${item.OFDM}-${item.modulate}`);
+      return flag1;
+    });
+  }
+  //其他的没有默认选项
+  else {
+    return [];
   }
 };

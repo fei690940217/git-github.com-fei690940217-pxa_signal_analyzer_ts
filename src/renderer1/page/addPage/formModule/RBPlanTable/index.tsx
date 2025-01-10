@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-09 18:01:01
+ * @LastEditTime: 2025-01-10 10:11:30
  * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\formModule\RBPlanTable\index.tsx
  * @Description: 勾选测试项页面
  */
@@ -16,16 +16,15 @@
  * @Description: 勾选测试项页面
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './index.scss';
 import { Table, ConfigProvider } from 'antd';
-import RBTableObj from '@/page/addPage/util/RBTableObj';
 import type { TableProps } from 'antd';
-import type { RBItemType } from '@src/customTypes/renderer';
+import type { RBItemType, RBObjType } from '@src/customTypes/renderer';
 
 import { setAddFormValue } from '@src/renderer/store/modules/projectList';
 import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
-
+const { ipcRenderer } = window.myApi;
 type TableRowSelection<T extends object = object> =
   TableProps<T>['rowSelection'];
 const { Column } = Table;
@@ -34,18 +33,20 @@ type PropsType = {
   id?: string;
   value?: RBItemType[];
   onChange?: (value: RBItemType[]) => void;
+  RBTableList: RBItemType[];
 };
+
 export default (props: PropsType) => {
-  const { id, value, onChange } = props;
+  const { id, value, onChange, RBTableList } = props;
   const dispatch = useAppDispatch();
   const addFormValue = useAppSelector(
     (state) => state.projectList.addFormValue,
   );
   const testItem = addFormValue?.testItems || '';
-  const RBTableList = RBTableObj[testItem];
   const isHiddenChannel = testItem !== 'BandEdge';
 
   const selectedRowKeys = value?.map((item) => item.id) || [];
+
   const tableRowSelection: TableRowSelection<RBItemType> = {
     type: 'checkbox',
     checkStrictly: false,
