@@ -29,9 +29,7 @@ type PropsType = {
 };
 export default ({ modalVisible, closeModal, row, bandObj }: PropsType) => {
   const dispatch = useAppDispatch();
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const { selectBand } = addFormValue;
   //本弹窗内的选择项
   const [radioGroupValue, setRadioGroupValue] = useState<string>('');

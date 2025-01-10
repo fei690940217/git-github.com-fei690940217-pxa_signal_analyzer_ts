@@ -20,10 +20,8 @@ type PropsType = {
 };
 export default ({ modalVisible, closeModal, row, LTEBandList }: PropsType) => {
   const dispatch = useAppDispatch();
-  // const selectBand = useAppSelector((state) => state.projectList.selectBand);
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  // const selectBand = useAppSelector((state) => state.selectBand);
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const { selectBand } = addFormValue;
   const { LTE_Band, Band } = row;
   //本弹窗内的选择项

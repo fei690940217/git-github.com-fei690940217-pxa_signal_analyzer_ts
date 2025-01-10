@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-08 17:26:56
+ * @LastEditTime: 2025-01-10 16:24:08
  * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\formModule\BandModal\cmp\NRBand\selectBandModal\index.tsx
  * @Description: 项目列表主表格
  */
@@ -12,8 +12,7 @@ import type { RadioChangeEvent } from 'antd';
 import { useState, useEffect } from 'react';
 import './index.scss';
 import { BandItemInfo } from '@src/customTypes/renderer';
-import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
-import { setAddFormValue } from '@src/renderer/store/modules/projectList';
+import { useAppSelector } from '@src/renderer1/hook';
 import { cloneDeep } from 'lodash';
 import { BandItemType } from '@src/customTypes/main';
 
@@ -35,10 +34,7 @@ export default ({
   bandObj,
   changeSelectBand,
 }: PropsType) => {
-  const dispatch = useAppDispatch();
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const { selectBand } = addFormValue;
   //本弹窗内的选择项
   const [radioGroupValue, setRadioGroupValue] = useState<string>('');

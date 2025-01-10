@@ -19,9 +19,7 @@ type PropsType = {
 export default ({ row }: PropsType) => {
   const dispatch = useAppDispatch();
   //本弹窗内的选择项
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const { selectBand } = addFormValue;
   const SCS_Change = (value: number[]) => {
     value.sort((a, b) => a - b);

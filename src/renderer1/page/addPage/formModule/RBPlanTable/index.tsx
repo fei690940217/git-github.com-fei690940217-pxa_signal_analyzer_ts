@@ -22,8 +22,8 @@ import { Table, ConfigProvider } from 'antd';
 import type { TableProps } from 'antd';
 import type { RBItemType, RBObjType } from '@src/customTypes/renderer';
 
-import { setAddFormValue } from '@src/renderer/store/modules/projectList';
-import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
+import { setAddFormValue } from '@src/renderer1/store';
+import { useAppSelector, useAppDispatch } from '@src/renderer1/hook';
 const { ipcRenderer } = window.myApi;
 type TableRowSelection<T extends object = object> =
   TableProps<T>['rowSelection'];
@@ -39,9 +39,7 @@ type PropsType = {
 export default (props: PropsType) => {
   const { id, value, onChange, RBTableList } = props;
   const dispatch = useAppDispatch();
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const testItem = addFormValue?.testItems || '';
   const isHiddenChannel = testItem !== 'BandEdge';
 

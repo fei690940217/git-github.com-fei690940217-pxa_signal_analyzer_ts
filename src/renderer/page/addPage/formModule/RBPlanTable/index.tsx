@@ -31,9 +31,7 @@ const { Column } = Table;
 //props testItem 测试用例
 export default () => {
   const dispatch = useAppDispatch();
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const testItem = addFormValue?.testItems || '';
   const RBTableList = RBTableObj[testItem];
   const isHiddenChannel = testItem !== 'BandEdge';

@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-08 17:28:45
+ * @LastEditTime: 2025-01-10 16:24:39
  * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\formModule\BandModal\cmp\SCSColumn\index.tsx
  * @Description: 项目列表主表格
  */
@@ -10,19 +10,15 @@
 import { Select } from 'antd';
 import { cloneDeep } from 'lodash';
 import { BandItemInfo } from '@src/customTypes/renderer';
-import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
-import { setAddFormValue } from '@src/renderer/store/modules/projectList';
+import { useAppSelector } from '@src/renderer1/hook';
 //
 type PropsType = {
   row: BandItemInfo;
   changeSelectBand: (value: BandItemInfo[]) => void;
 };
 export default ({ row, changeSelectBand }: PropsType) => {
-  const dispatch = useAppDispatch();
   //本弹窗内的选择项
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const { selectBand } = addFormValue;
   const SCS_Change = (value: number[]) => {
     value.sort((a, b) => a - b);

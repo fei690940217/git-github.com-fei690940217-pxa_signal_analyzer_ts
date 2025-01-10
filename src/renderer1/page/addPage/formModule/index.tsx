@@ -16,7 +16,7 @@ import RBConfigTable from './RBPlanTable';
 import { useTranslation } from 'react-i18next';
 import { generateDefaultSelectRBList } from '@src/renderer1/page/addPage/util';
 import { useAppSelector, useAppDispatch } from '@src/renderer1/hook';
-import { setAddFormValue } from '@src/renderer1/store/modules/projectList';
+import { setAddFormValue } from '@src/renderer1/store';
 import { RBConfigValidator, BandValidator } from './validator';
 import { RBObjType } from '@src/customTypes/renderer';
 const { ipcRenderer } = window.myApi;
@@ -37,9 +37,7 @@ type Props = {
 const App = ({ addProjectForm, LTEBandList }: Props) => {
   const { t } = useTranslation('addPage');
   const dispatch = useAppDispatch();
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const [RBTableObj, setRBTableObj] = useState<RBObjType | null>(null);
 
   const showLTE = addFormValue?.networkMode === 'NSA';

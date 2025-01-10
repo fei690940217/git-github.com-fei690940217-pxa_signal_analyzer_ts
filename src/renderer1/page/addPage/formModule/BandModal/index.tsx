@@ -2,7 +2,7 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-09 15:21:07
+ * @LastEditTime: 2025-01-10 16:41:56
  * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\formModule\BandModal\index.tsx
  * @Description: 项目列表主表格
  */
@@ -20,8 +20,8 @@ import LTEBand from './cmp/LTEBand';
 import SCSColumn from './cmp/SCSColumn';
 import NRBWColumn from './cmp/NRBWColumn';
 import ARFCNColumn from './cmp/ARFCNColumn';
-import { setAddFormValue } from '@src/renderer/store/modules/projectList';
-import { useAppDispatch, useAppSelector } from '@src/renderer/hook';
+import { setAddFormValue } from '@src/renderer1/store';
+import { useAppDispatch, useAppSelector } from '@src/renderer1/hook';
 import { NRBandObjType, BandItemType } from '@src/customTypes/main';
 import { BandItemInfo } from '@src/customTypes/renderer';
 
@@ -38,9 +38,7 @@ export default ({ showLTE, LTEBandList, id, value, onChange }: PropsType) => {
   //本弹窗内的选择项
   const [FCCBandList, setFCCBandList] = useState<BandItemType[]>([]);
   const [messageApi, messageContextHolder] = message.useMessage();
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const { selectBand } = addFormValue;
   const dispatch = useAppDispatch();
   const changeSelectBand = (selectBand: BandItemInfo[]) => {

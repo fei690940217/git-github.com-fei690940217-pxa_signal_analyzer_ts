@@ -34,9 +34,7 @@ export default ({ showLTE, LTEBandList }: PropsType) => {
   //本弹窗内的选择项
   const [FCCBandList, setFCCBandList] = useState<BandItemType[]>([]);
   const [messageApi, messageContextHolder] = message.useMessage();
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const { selectBand } = addFormValue;
   const dispatch = useAppDispatch();
   //获取FCC Band列表

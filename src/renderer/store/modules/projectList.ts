@@ -52,7 +52,7 @@ export const projectListSlice = createSlice({
   reducers: {
     setProjectList: (state, action) => {
       let tempProjectList = action.payload;
-      state.projectList = tempProjectList;
+      state = tempProjectList;
     },
     changeCurrentRow: (state, action) => {
       let payload = action.payload;

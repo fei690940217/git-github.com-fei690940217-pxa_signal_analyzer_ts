@@ -39,10 +39,8 @@ export default () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [addProjectForm] = Form.useForm();
-  const currentRow = useAppSelector((state) => state.projectList.currentRow);
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const currentRow = useAppSelector((state) => state.currentRow);
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   //LTEBandList
   const [LTEBandList, setLTEBandList] = useState<BandItemInfo[]>([]);
   //进入页面,根据currentRow重置数据

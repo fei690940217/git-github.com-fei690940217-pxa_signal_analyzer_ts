@@ -23,10 +23,8 @@ type PropsType = {
 export default ({ row }: PropsType) => {
   const dispatch = useAppDispatch();
   //本弹窗内的选择项
-  // const selectBand = useAppSelector((state) => state.projectList.selectBand);
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  // const selectBand = useAppSelector((state) => state.selectBand);
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const { selectBand } = addFormValue;
   const ARFCN_Change = (value: number[]) => {
     //排序

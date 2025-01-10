@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-03-21 17:18:10
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-09 16:33:54
+ * @LastEditTime: 2025-01-10 16:19:18
  * @Descripttion:  新建项目
  */
 
@@ -22,17 +22,9 @@ import './index.scss';
 //设置预设名称
 import FormModule from './formModule';
 import { useAppSelector, useAppDispatch } from '@src/renderer1/hook';
-import type {
-  BandItemInfo,
-  NewAddFormValueType,
-  ProjectItemType,
-} from '@src/customTypes/renderer';
-import type {
-  ApiResponseType,
-  BroadcastChannelParams,
-  CreateProjectPayload,
-} from '@src/customTypes';
-import { setAddFormValue } from '@src/renderer1/store/modules/projectList';
+import type { BandItemInfo, ProjectItemType } from '@src/customTypes/renderer';
+import type { ApiResponseType, CreateProjectPayload } from '@src/customTypes';
+import { setAddFormValue } from '@src/renderer1/store';
 import modalConfirm from '@src/renderer1/utils/modalConfirm';
 // import { logChannel } from '@src/renderer1/utils/BroadcastChannel';
 import { refreshProjectListChannel } from '@src/BroadcastChannel';
@@ -40,10 +32,7 @@ import { refreshProjectListChannel } from '@src/BroadcastChannel';
 import RESULTGenerate from './util/RESULT';
 import { getProjectInfo, projectInfoGen } from './util';
 import { logError } from '@src/renderer1/utils/logLevel';
-import { nanoid } from 'nanoid';
-import $moment from 'moment';
 import { delayTime } from '@src/renderer1/utils';
-import addLog from '@src/renderer1/store/asyncThunk/addLog';
 import logoIcon from '@root/assets/icon.png';
 import { useStyle } from './useStyle';
 const { ipcRenderer } = window.myApi;
@@ -54,9 +43,7 @@ export default () => {
     notification.useNotification();
   const dispatch = useAppDispatch();
   const [addProjectForm] = Form.useForm();
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   //LTEBandList
   const [LTEBandList, setLTEBandList] = useState<BandItemInfo[]>([]);
   const [isAdd, setIsAdd] = useState<boolean>(true);

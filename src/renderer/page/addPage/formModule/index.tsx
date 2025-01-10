@@ -33,9 +33,7 @@ type Props = {
 const App = ({ addProjectForm, LTEBandList }: Props) => {
   const { t } = useTranslation('addPage');
   const dispatch = useAppDispatch();
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const { selectBand, networkMode, RBConfigSelected } = addFormValue;
   const showLTE = networkMode === 'NSA';
 

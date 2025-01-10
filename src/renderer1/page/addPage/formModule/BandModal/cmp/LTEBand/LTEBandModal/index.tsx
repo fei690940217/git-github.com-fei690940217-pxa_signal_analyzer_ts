@@ -2,15 +2,14 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-08 17:24:30
+ * @LastEditTime: 2025-01-10 16:39:50
  * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\formModule\BandModal\cmp\LTEBand\LTEBandModal\index.tsx
  * @Description: 项目列表主表格
  */
-import { Modal, Radio, Checkbox } from 'antd';
-import React, { useState, useEffect, useMemo, lazy } from 'react';
+import { Modal, Checkbox } from 'antd';
+import { useState, useEffect } from 'react';
 import './index.scss';
-import { useAppSelector, useAppDispatch } from '@src/renderer/hook';
-import { setAddFormValue } from '@src/renderer/store/modules/projectList';
+import { useAppSelector } from '@src/renderer1/hook';
 import { cloneDeep } from 'lodash';
 import { BandItemInfo } from '@src/customTypes/renderer';
 type PropsType = {
@@ -27,11 +26,7 @@ export default ({
   LTEBandList,
   changeSelectBand,
 }: PropsType) => {
-  const dispatch = useAppDispatch();
-  // const selectBand = useAppSelector((state) => state.projectList.selectBand);
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const { selectBand } = addFormValue;
   const { LTE_Band, Band } = row;
   //本弹窗内的选择项

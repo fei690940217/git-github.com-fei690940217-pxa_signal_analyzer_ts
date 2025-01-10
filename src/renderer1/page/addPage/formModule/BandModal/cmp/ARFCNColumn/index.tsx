@@ -2,32 +2,23 @@
  * @Author: fei690940217 690940217@qq.com
  * @Date: 2022-07-14 11:37:59
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-27 17:19:32
- * @FilePath: \pxa_signal_analyzer\src\renderer\page\addPage\formModule\BandModal\cmp\ARFCNColumn\index.tsx
+ * @LastEditTime: 2025-01-10 16:39:59
+ * @FilePath: \pxa_signal_analyzer\src\renderer1\page\addPage\formModule\BandModal\cmp\ARFCNColumn\index.tsx
  * @Description: 项目列表主表格
  */
 
-import { Table, message, Modal, Checkbox, Select, Button, Tooltip } from 'antd';
-import type { GetProp, CheckboxProps } from 'antd';
-import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import React, { useState, useEffect, useMemo, lazy } from 'react';
+import { Select } from 'antd';
 import './index.scss';
-import { useAppDispatch, useAppSelector } from '@src/renderer/hook';
+import { useAppSelector } from '@src/renderer1/hook';
 import { cloneDeep } from 'lodash';
 import { BandItemInfo } from '@src/customTypes/renderer';
-import { setAddFormValue } from '@src/renderer/store/modules/projectList';
 //
 type PropsType = {
   row: BandItemInfo;
   changeSelectBand: (value: BandItemInfo[]) => void;
 };
 export default ({ row, changeSelectBand }: PropsType) => {
-  const dispatch = useAppDispatch();
-  //本弹窗内的选择项
-  // const selectBand = useAppSelector((state) => state.projectList.selectBand);
-  const addFormValue = useAppSelector(
-    (state) => state.projectList.addFormValue,
-  );
+  const addFormValue = useAppSelector((state) => state.addFormValue);
   const { selectBand } = addFormValue;
   const ARFCN_Change = (value: number[]) => {
     //排序
