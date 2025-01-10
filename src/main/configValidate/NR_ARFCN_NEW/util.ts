@@ -1,27 +1,32 @@
+/*
+ * @Author: feifei
+ * @Date: 2025-01-10 17:22:23
+ * @LastEditors: feifei
+ * @LastEditTime: 2025-01-10 18:01:20
+ * @FilePath: \pxa_signal_analyzer\src\main\configValidate\NR_ARFCN_NEW\util.ts
+ * @Description:
+ *
+ * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
+ */
 import { logError } from '@src/main/logger/logLevel';
 import XLSX from 'xlsx';
 import { type Range } from 'xlsx';
 import { RBConfigItem } from '@src/customTypes/main';
 import { OFDMType } from '@src/customTypes';
+const reg = /\s/g; //去掉空格
 export const workbookNameHandle = (sheetName: string | undefined) => {
   if (!sheetName) {
     return null;
   }
-  //表名,例 15Mkz,30Mkz
-  let key = null;
-  if (sheetName.includes('15')) {
-    key = 15;
-  } else if (sheetName.includes('30')) {
-    key = 30;
-  } else if (sheetName.includes('60')) {
-    key = 60;
-  }
-  if (key) {
-    return key;
+  const tempName = sheetName.replace(reg, '');
+  if (tempName) {
+    return tempName;
   } else {
     return null;
   }
 };
+
+const header = ['BW', 'Link', 'Level', 'Freq', 'ARFCN'];
 export const xlsxDataArrayToObject = (
   result: any[][],
   filterRow: number,

@@ -3,7 +3,7 @@
  * @Author: xxx
  * @Date: 2023-04-06 10:24:55
  * @LastEditors: feifei
- * @LastEditTime: 2025-01-10 17:47:54
+ * @LastEditTime: 2025-01-10 18:02:08
  * @Descripttion: 考虑改造一下格式，使其更清晰易懂
  */
 import mergeCellDataFill from '@src/main/utils/mergeCellDataFill';
@@ -22,6 +22,7 @@ import {
   NRBandObjType,
   RBConfigItem,
 } from '@src/customTypes/main';
+import { workbookNameHandle, xlsxDataArrayToObject } from './util';
 
 //解析后存储地址的基路径
 const toBaseFilePath = path.join(appConfigFilePath, 'app/NR_ARFCN_&_FREQ');
@@ -271,8 +272,9 @@ const readXlsx = async (
     }
     for (const sheetItem of WorkbookSheets) {
       const { name, Hidden } = sheetItem;
-      const SCS = workbookNameHandle(name);
-      if (Hidden === 1 || !name || !SCS) {
+      //表的名字::band
+      const BandName = workbookNameHandle(name);
+      if (Hidden === 1 || !name || !BandName) {
         continue;
       }
       const sheet = Sheets[name];
@@ -286,8 +288,8 @@ const readXlsx = async (
       });
       //mergeCellDataFill,填充合并单元格
       const fillJson = mergeCellDataFill(merges, json);
-      //处理数据
-      const newJson = xlsxDataArrayToObject(fillJson, 1, SCS, testItem);
+      //数组改为对象,生成数组的原因是要进行单元格合并处理
+      const newJson = xlsxDataArrayToObject(fillJson, 3, SCS, testItem);
       RESULT = RESULT.concat(newJson);
     }
     await outputJson(saveFilePath, RESULT);
