@@ -2,8 +2,8 @@
  * @Author: feifei
  * @Date: 2024-12-05 17:43:23
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 14:05:35
- * @FilePath: \pxa_signal_analyzer\src\main\utils\runVisaProxy.ts
+ * @LastEditTime: 2025-01-12 11:58:17
+ * @FilePath: \pxa_signal_analyzer_ts\src\main\utils\runVisaProxy.ts
  * @Description:
  *
  * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved.
@@ -18,7 +18,8 @@ import { appConfigFilePath } from '../publicData';
 import { delayTime, mainSendRender } from './index';
 import path from 'path';
 import childProcess from 'child_process';
-
+import type { ChildProcess } from 'child_process';
+import { pathExists } from 'fs-extra';
 //判断端口可用情况,如果不可用会返回一个可用端口
 import portfinder from 'portfinder';
 const python_proxy_filename = path.join(
@@ -29,20 +30,26 @@ const python_proxy_filename = path.join(
 
 //默认端口
 export default () => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       //是否正在运行
       let flag = await visaIsStarting();
       if (flag) {
         resolve();
       } else {
+        const python_proxy_flag = await pathExists(python_proxy_filename);
+        if (!python_proxy_flag) return;
         const port = await portfinder.getPortPromise({
           port: defaultPort,
         });
 
-        const child = childProcess.spawn(python_proxy_filename, [port], {
-          detached: false,
-        });
+        const child: ChildProcess = childProcess.spawn(
+          python_proxy_filename,
+          [port.toString()],
+          {
+            detached: false,
+          },
+        );
         //如果启动成功
         if (child.pid) {
           electronStore.set('visaProxyPort', port);

@@ -2,8 +2,8 @@
  * @Author: feifei
  * @Date: 2024-12-05 17:43:23
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-26 11:05:58
- * @FilePath: \pxa_signal_analyzer\src\main\utils\forceRestartVisaProxy.ts
+ * @LastEditTime: 2025-01-12 12:01:11
+ * @FilePath: \pxa_signal_analyzer_ts\src\main\utils\forceRestartVisaProxy.ts
  * @Description:
  *
  * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved.
@@ -25,7 +25,7 @@ const python_proxy_filename = path.join(
 );
 //寻找进程的指令
 const command = `tasklist /FO CSV | findstr /i "visa_proxy_only_spectrum"`;
-const papaParse = (csvData) => {
+const papaParse = (csvData: string) => {
   return new Promise((resolve, reject) => {
     try {
       // 使用 Papa.parse 解析 CSV 数据

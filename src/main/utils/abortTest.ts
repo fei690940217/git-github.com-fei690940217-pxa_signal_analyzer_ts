@@ -2,8 +2,8 @@
  * @Author: feifei
  * @Date: 2023-07-11 15:37:22
  * @LastEditors: feifei
- * @LastEditTime: 2024-12-20 13:33:04
- * @FilePath: \pxa_signal_analyzer\src\main\utils\abortTest.ts
+ * @LastEditTime: 2025-01-12 12:00:39
+ * @FilePath: \pxa_signal_analyzer_ts\src\main\utils\abortTest.ts
  * @Description: 用户主动结束测试
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
@@ -11,8 +11,9 @@
 import { mainSendRender } from '@src/main/utils';
 import dispatchAction from '@src/main/utils/dispatchAction';
 import { getTestProcessInstance } from '@src/main/ipcMain/testProcess/TestProcessSingleton';
+type AbortTestStatusType = 'success' | 'abort' | 'error';
 //结束测试
-export default async (status) => {
+export default async (status: AbortTestStatusType) => {
   try {
     const testProcess = getTestProcessInstance();
     //如果是测试中,则kill测试进程
